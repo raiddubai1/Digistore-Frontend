@@ -1,0 +1,196 @@
+import axios, { AxiosInstance, AxiosError } from 'axios';
+
+// API Configuration
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+// Create axios instance
+const api: AxiosInstance = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request interceptor - Add auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor - Handle errors and token refresh
+api.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as any;
+
+    // If 401 and not already retried, try to refresh token
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (refreshToken) {
+          const response = await axios.post(`${API_URL}/auth/refresh`, {
+            refreshToken,
+          });
+
+          const { accessToken } = response.data.data;
+          localStorage.setItem('accessToken', accessToken);
+
+          // Retry original request with new token
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        // Refresh failed, logout user
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+// ============================================
+// AUTH API
+// ============================================
+
+export const authAPI = {
+  register: (data: {
+    email: string;
+    password: string;
+    name: string;
+    role?: 'CUSTOMER' | 'VENDOR';
+  }) => api.post('/auth/register', data),
+
+  login: (email: string, password: string) =>
+    api.post('/auth/login', { email, password }),
+
+  logout: () => api.post('/auth/logout'),
+
+  getCurrentUser: () => api.get('/auth/me'),
+
+  verifyEmail: (token: string) => api.post('/auth/verify-email', { token }),
+
+  forgotPassword: (email: string) =>
+    api.post('/auth/forgot-password', { email }),
+
+  resetPassword: (token: string, password: string) =>
+    api.post('/auth/reset-password', { token, password }),
+
+  refreshToken: (refreshToken: string) =>
+    api.post('/auth/refresh', { refreshToken }),
+};
+
+// ============================================
+// PRODUCTS API
+// ============================================
+
+export const productsAPI = {
+  getAll: (params?: {
+    page?: number;
+    limit?: number;
+    category?: string;
+    search?: string;
+    priceMin?: number;
+    priceMax?: number;
+    rating?: number;
+    sort?: string;
+  }) => api.get('/products', { params }),
+
+  getFeatured: () => api.get('/products/featured'),
+
+  getBestsellers: () => api.get('/products/bestsellers'),
+
+  getNewArrivals: () => api.get('/products/new-arrivals'),
+
+  getBySlug: (slug: string) => api.get(`/products/${slug}`),
+
+  create: (data: any) => api.post('/products', data),
+
+  update: (id: string, data: any) => api.put(`/products/${id}`, data),
+
+  delete: (id: string) => api.delete(`/products/${id}`),
+};
+
+// ============================================
+// CATEGORIES API
+// ============================================
+
+export const categoriesAPI = {
+  getAll: () => api.get('/categories'),
+
+  getBySlug: (slug: string) => api.get(`/categories/${slug}`),
+};
+
+// ============================================
+// ORDERS API
+// ============================================
+
+export const ordersAPI = {
+  getMyOrders: () => api.get('/orders/my-orders'),
+
+  getById: (id: string) => api.get(`/orders/${id}`),
+
+  create: (data: {
+    items: Array<{
+      productId: string;
+      license: 'PERSONAL' | 'COMMERCIAL' | 'EXTENDED';
+    }>;
+    couponCode?: string;
+  }) => api.post('/orders', data),
+};
+
+// ============================================
+// USER API
+// ============================================
+
+export const userAPI = {
+  getProfile: () => api.get('/users/profile'),
+
+  updateProfile: (data: any) => api.put('/users/profile', data),
+
+  getWishlist: () => api.get('/users/wishlist'),
+
+  addToWishlist: (productId: string) =>
+    api.post(`/users/wishlist/${productId}`),
+
+  removeFromWishlist: (productId: string) =>
+    api.delete(`/users/wishlist/${productId}`),
+
+  getDownloads: () => api.get('/users/downloads'),
+};
+
+// ============================================
+// REVIEWS API
+// ============================================
+
+export const reviewsAPI = {
+  getProductReviews: (productId: string) =>
+    api.get(`/reviews/product/${productId}`),
+
+  create: (data: {
+    productId: string;
+    rating: number;
+    title?: string;
+    comment: string;
+  }) => api.post('/reviews', data),
+
+  update: (id: string, data: any) => api.put(`/reviews/${id}`, data),
+
+  delete: (id: string) => api.delete(`/reviews/${id}`),
+};
+
+export default api;
+

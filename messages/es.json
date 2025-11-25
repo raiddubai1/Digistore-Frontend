@@ -1,0 +1,135 @@
+{
+  "common": {
+    "search": "Buscar",
+    "cart": "Carrito",
+    "account": "Cuenta",
+    "language": "Idioma",
+    "home": "Inicio",
+    "products": "Productos",
+    "categories": "Categorías",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "viewAll": "Ver todo",
+    "addToCart": "Añadir al carrito",
+    "buyNow": "Comprar ahora",
+    "learnMore": "Saber más",
+    "continueShopping": "Continuar comprando",
+    "proceedToCheckout": "Proceder al pago"
+  },
+  "home": {
+    "hero": {
+      "title": "Productos Digitales Premium",
+      "subtitle": "Descarga libros electrónicos, plantillas y herramientas digitales de alta calidad al instante. Comienza a crear contenido increíble hoy.",
+      "browseProducts": "Explorar productos",
+      "viewCategories": "Ver categorías"
+    },
+    "features": {
+      "instantDownload": {
+        "title": "Descarga instantánea",
+        "description": "Obtén tus productos digitales inmediatamente después de la compra. Sin esperas, sin complicaciones."
+      },
+      "securePayment": {
+        "title": "Pago seguro",
+        "description": "Tus transacciones están protegidas con cifrado estándar de la industria."
+      },
+      "highQuality": {
+        "title": "Alta calidad",
+        "description": "Todos los productos se seleccionan cuidadosamente para garantizar los más altos estándares de calidad."
+      }
+    },
+    "stats": {
+      "products": "Productos digitales",
+      "customers": "Clientes satisfechos",
+      "rating": "Calificación promedio",
+      "support": "Soporte"
+    },
+    "sections": {
+      "featured": "Productos destacados",
+      "featuredDesc": "Productos digitales premium seleccionados a mano",
+      "bestsellers": "Más vendidos",
+      "bestsellersDesc": "Productos más populares este mes",
+      "newArrivals": "Novedades",
+      "newArrivalsDesc": "Últimas incorporaciones a nuestra colección"
+    },
+    "cta": {
+      "title": "¿Listo para comenzar?",
+      "description": "Únete a miles de clientes satisfechos y descarga tu primer producto digital hoy.",
+      "button": "Comenzar a comprar"
+    }
+  },
+  "products": {
+    "title": "Todos los productos",
+    "description": "Explora nuestra colección de {count} productos digitales premium",
+    "filters": "Filtros",
+    "clearAll": "Limpiar todo",
+    "categories": "Categorías",
+    "priceRange": "Rango de precio",
+    "rating": "Calificación",
+    "under20": "Menos de $20",
+    "range2050": "$20 - $50",
+    "over50": "Más de $50",
+    "stars4plus": "4+ estrellas",
+    "stars5": "5 estrellas",
+    "showing": "Mostrando",
+    "sortBy": "Ordenar por",
+    "mostPopular": "Más popular",
+    "newest": "Más reciente",
+    "priceLowHigh": "Precio: Menor a mayor",
+    "priceHighLow": "Precio: Mayor a menor",
+    "highestRated": "Mejor calificado",
+    "noProducts": "No se encontraron productos que coincidan con tus filtros.",
+    "downloads": "descargas",
+    "reviews": "reseñas"
+  },
+  "cart": {
+    "title": "Carrito de compras",
+    "empty": "Tu carrito está vacío",
+    "emptyDesc": "¡Añade algunos productos para comenzar!",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "checkout": "Proceder al pago",
+    "continueShopping": "Continuar comprando",
+    "license": "Licencia",
+    "quantity": "Cantidad"
+  },
+  "checkout": {
+    "title": "Pago",
+    "contactInfo": "Información de contacto",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "emailNote": "Enviaremos tus enlaces de descarga a este correo",
+    "billingInfo": "Información de facturación",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "country": "País",
+    "paymentMethod": "Método de pago",
+    "creditCard": "Tarjeta de crédito / débito",
+    "poweredByStripe": "Powered by Stripe",
+    "completeOrder": "Completar pedido",
+    "processing": "Procesando...",
+    "secureCheckout": "Pago seguro con Stripe. Tu información de pago está encriptada."
+  },
+  "footer": {
+    "about": "Acerca de Digistore1",
+    "aboutDesc": "Tu mercado de confianza para productos digitales de alta calidad. Descarga al instante y comienza a crear hoy.",
+    "shop": "Tienda",
+    "allProducts": "Todos los productos",
+    "newArrivals": "Novedades",
+    "bestSellers": "Más vendidos",
+    "support": "Soporte",
+    "helpCenter": "Centro de ayuda",
+    "contactUs": "Contáctanos",
+    "faq": "Preguntas frecuentes",
+    "refundPolicy": "Política de reembolso",
+    "legal": "Legal",
+    "terms": "Términos de servicio",
+    "privacy": "Política de privacidad",
+    "licenses": "Información de licencia",
+    "cookies": "Política de cookies",
+    "copyright": "Todos los derechos reservados."
+  }
+}
+

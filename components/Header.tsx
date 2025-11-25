@@ -1,0 +1,296 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import Logo from "./Logo";
+import MobileMenu from "./MobileMenu";
+import { Search, ShoppingCart, User, Menu, Globe, LogOut, Settings } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useCartStore } from "@/store/cartStore";
+import { useAuth } from "@/contexts/AuthContext";
+// import LanguageSwitcher from "./LanguageSwitcher"; // Temporarily disabled
+
+export default function Header() {
+  const pathname = usePathname();
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const [clickedItem, setClickedItem] = useState<string | null>(null);
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("EN");
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const { itemCount, openCart } = useCartStore();
+  const { user, logout, isAuthenticated } = useAuth();
+  const cartItemsCount = mounted ? itemCount() : 0;
+
+  const handleClick = (item: string) => {
+    setClickedItem(item);
+    setTimeout(() => setClickedItem(null), 300);
+  };
+
+  const languages = [
+    { code: "EN", name: "English", flag: "🇺🇸" },
+    { code: "AR", name: "العربية", flag: "🇸🇦" },
+    { code: "ES", name: "Español", flag: "🇪🇸" },
+    { code: "FR", name: "Français", flag: "🇫🇷" },
+    { code: "DE", name: "Deutsch", flag: "🇩🇪" },
+  ];
+
+  const handleLanguageChange = (code: string) => {
+    setSelectedLanguage(code);
+    setLanguageMenuOpen(false);
+    // Here you would typically update the i18n locale
+    console.log(`Language changed to: ${code}`);
+  };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b border-gray-300 bg-white shadow-md">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+        {/* Top Bar */}
+        <div className="flex h-24 items-center justify-between gap-4">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <Logo />
+          </div>
+
+          {/* Search Bar - Desktop */}
+          <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+            <div className="relative w-full">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search for digital products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-12 pl-12 pr-4 rounded-full border-2 border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/20 focus:outline-none transition-all text-sm bg-gray-50 focus:bg-white shadow-sm hover:border-gray-400"
+              />
+            </div>
+          </div>
+
+          {/* Right Actions */}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {/* Language Switcher - Functional */}
+            <div className="relative hidden lg:block">
+              <button
+                onClick={() => setLanguageMenuOpen(!languageMenuOpen)}
+                className={cn(
+                  "flex items-center gap-2 px-4 h-10 rounded-full transition-all",
+                  "hover:bg-gray-100",
+                  clickedItem === 'language' && "scale-95 bg-primary/20",
+                  languageMenuOpen && "bg-gray-100"
+                )}
+              >
+                <Globe className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-700">{selectedLanguage}</span>
+                <svg className={cn("w-4 h-4 text-gray-600 transition-transform", languageMenuOpen && "rotate-180")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Language Dropdown */}
+              {languageMenuOpen && (
+                <>
+                  {/* Backdrop */}
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setLanguageMenuOpen(false)}
+                  ></div>
+
+                  {/* Dropdown Menu */}
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          handleClick('language');
+                          handleLanguageChange(lang.code);
+                        }}
+                        className={cn(
+                          "w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left",
+                          selectedLanguage === lang.code && "bg-primary/5"
+                        )}
+                      >
+                        <span className="text-2xl">{lang.flag}</span>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-gray-900">{lang.name}</div>
+                          <div className="text-xs text-gray-500">{lang.code}</div>
+                        </div>
+                        {selectedLanguage === lang.code && (
+                          <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Account / User Menu */}
+            {isAuthenticated && user ? (
+              <div className="relative hidden sm:block">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className={cn(
+                    "flex items-center gap-2 px-4 h-10 rounded-full transition-all hover:bg-gray-100",
+                    userMenuOpen && "bg-gray-100"
+                  )}
+                >
+                  {user.avatar ? (
+                    <img src={user.avatar} alt={user.name} className="w-6 h-6 rounded-full" />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-teal-600 flex items-center justify-center text-white text-xs font-medium">
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <span className="hidden lg:inline text-sm font-medium text-gray-700">
+                    {user.name}
+                  </span>
+                </button>
+
+                {userMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setUserMenuOpen(false)}
+                    ></div>
+
+                    <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-200 py-2 z-50">
+                      <div className="px-4 py-3 border-b border-gray-200">
+                        <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                        <p className="text-xs text-gray-500">{user.email}</p>
+                        <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full bg-teal-100 text-teal-800">
+                          {user.role}
+                        </span>
+                      </div>
+
+                      <div className="py-1">
+                        <Link
+                          href="/account"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
+                        >
+                          <User className="w-4 h-4 text-gray-600" />
+                          <span className="text-sm text-gray-700">My Account</span>
+                        </Link>
+
+                        {user.role === 'VENDOR' && (
+                          <Link
+                            href="/vendor/dashboard"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
+                          >
+                            <Settings className="w-4 h-4 text-gray-600" />
+                            <span className="text-sm text-gray-700">Vendor Dashboard</span>
+                          </Link>
+                        )}
+
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            logout();
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors text-left"
+                        >
+                          <LogOut className="w-4 h-4 text-gray-600" />
+                          <span className="text-sm text-gray-700">Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => handleClick('login')}
+                className={cn(
+                  "hidden sm:flex items-center gap-2 px-4 h-10 rounded-full transition-all",
+                  pathname === '/login'
+                    ? "bg-primary/10 text-primary"
+                    : "hover:bg-gray-100",
+                  clickedItem === 'login' && "scale-95 bg-primary/20"
+                )}
+              >
+                <User className={cn(
+                  "w-5 h-5",
+                  pathname === '/login' ? "text-primary" : "text-gray-600"
+                )} />
+                <span className={cn(
+                  "hidden lg:inline text-sm font-medium",
+                  pathname === '/login' ? "text-primary" : "text-gray-700"
+                )}>
+                  Sign In
+                </span>
+              </Link>
+            )}
+
+            {/* Cart */}
+            <button
+              onClick={() => {
+                handleClick('cart');
+                openCart();
+              }}
+              className={cn(
+                "relative flex items-center gap-2 px-4 h-10 rounded-full transition-all",
+                "hover:bg-gray-100",
+                clickedItem === 'cart' && "scale-95 bg-primary/20"
+              )}
+            >
+              <ShoppingCart className="w-5 h-5 text-gray-600" />
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {cartItemsCount}
+                </span>
+              )}
+              <span className="hidden lg:inline text-sm font-medium text-gray-700">
+                Cart
+              </span>
+            </button>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              onClick={() => {
+                handleClick('menu');
+                setMobileDrawerOpen(!mobileDrawerOpen);
+              }}
+              className={cn(
+                "lg:hidden p-2 rounded-lg transition-all",
+                "hover:bg-gray-100",
+                clickedItem === 'menu' && "scale-95 bg-primary/20"
+              )}
+            >
+              <Menu className="w-6 h-6 text-gray-600" />
+            </button>
+          </div>
+        </div>
+
+        {/* Search Bar - Mobile */}
+        <div className="md:hidden pb-4">
+          <div className="relative w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-12 pl-12 pr-4 rounded-full border-2 border-gray-200 focus:border-primary focus:outline-none transition-colors text-sm"
+            />
+          </div>
+        </div>
+
+      </div>
+
+      {/* Mobile Drawer Menu */}
+      <MobileMenu isOpen={mobileDrawerOpen} onClose={() => setMobileDrawerOpen(false)} />
+    </header>
+  );
+}
+

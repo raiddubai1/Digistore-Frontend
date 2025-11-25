@@ -1,0 +1,135 @@
+{
+  "common": {
+    "search": "بحث",
+    "cart": "السلة",
+    "account": "الحساب",
+    "language": "اللغة",
+    "home": "الرئيسية",
+    "products": "المنتجات",
+    "categories": "الفئات",
+    "about": "من نحن",
+    "contact": "اتصل بنا",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "logout": "تسجيل الخروج",
+    "viewAll": "عرض الكل",
+    "addToCart": "أضف إلى السلة",
+    "buyNow": "اشتر الآن",
+    "learnMore": "اعرف المزيد",
+    "continueShopping": "متابعة التسوق",
+    "proceedToCheckout": "إتمام الطلب"
+  },
+  "home": {
+    "hero": {
+      "title": "منتجات رقمية متميزة",
+      "subtitle": "قم بتنزيل كتب إلكترونية وقوالب وأدوات رقمية عالية الجودة على الفور. ابدأ في إنشاء محتوى رائع اليوم.",
+      "browseProducts": "تصفح المنتجات",
+      "viewCategories": "عرض الفئات"
+    },
+    "features": {
+      "instantDownload": {
+        "title": "تنزيل فوري",
+        "description": "احصل على منتجاتك الرقمية فورًا بعد الشراء. لا انتظار، لا متاعب."
+      },
+      "securePayment": {
+        "title": "دفع آمن",
+        "description": "معاملاتك محمية بتشفير معياري صناعي."
+      },
+      "highQuality": {
+        "title": "جودة عالية",
+        "description": "يتم اختيار جميع المنتجات بعناية لضمان أعلى معايير الجودة."
+      }
+    },
+    "stats": {
+      "products": "منتج رقمي",
+      "customers": "عميل سعيد",
+      "rating": "متوسط التقييم",
+      "support": "دعم"
+    },
+    "sections": {
+      "featured": "منتجات مميزة",
+      "featuredDesc": "منتجات رقمية متميزة مختارة بعناية",
+      "bestsellers": "الأكثر مبيعًا",
+      "bestsellersDesc": "المنتجات الأكثر شعبية هذا الشهر",
+      "newArrivals": "وصل حديثًا",
+      "newArrivalsDesc": "أحدث الإضافات إلى مجموعتنا"
+    },
+    "cta": {
+      "title": "هل أنت مستعد للبدء؟",
+      "description": "انضم إلى آلاف العملاء الراضين وقم بتنزيل منتجك الرقمي الأول اليوم.",
+      "button": "ابدأ التسوق"
+    }
+  },
+  "products": {
+    "title": "جميع المنتجات",
+    "description": "تصفح مجموعتنا من {count} منتج رقمي متميز",
+    "filters": "الفلاتر",
+    "clearAll": "مسح الكل",
+    "categories": "الفئات",
+    "priceRange": "نطاق السعر",
+    "rating": "التقييم",
+    "under20": "أقل من $20",
+    "range2050": "$20 - $50",
+    "over50": "أكثر من $50",
+    "stars4plus": "4+ نجوم",
+    "stars5": "5 نجوم",
+    "showing": "عرض",
+    "sortBy": "ترتيب حسب",
+    "mostPopular": "الأكثر شعبية",
+    "newest": "الأحدث",
+    "priceLowHigh": "السعر: من الأقل للأعلى",
+    "priceHighLow": "السعر: من الأعلى للأقل",
+    "highestRated": "الأعلى تقييمًا",
+    "noProducts": "لم يتم العثور على منتجات تطابق الفلاتر.",
+    "downloads": "تنزيل",
+    "reviews": "مراجعة"
+  },
+  "cart": {
+    "title": "سلة التسوق",
+    "empty": "سلتك فارغة",
+    "emptyDesc": "أضف بعض المنتجات للبدء!",
+    "subtotal": "المجموع الفرعي",
+    "total": "الإجمالي",
+    "checkout": "إتمام الطلب",
+    "continueShopping": "متابعة التسوق",
+    "license": "الترخيص",
+    "quantity": "الكمية"
+  },
+  "checkout": {
+    "title": "إتمام الطلب",
+    "contactInfo": "معلومات الاتصال",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "you@example.com",
+    "emailNote": "سنرسل روابط التنزيل إلى هذا البريد الإلكتروني",
+    "billingInfo": "معلومات الفوترة",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "country": "الدولة",
+    "paymentMethod": "طريقة الدفع",
+    "creditCard": "بطاقة ائتمان / خصم",
+    "poweredByStripe": "مدعوم من Stripe",
+    "completeOrder": "إتمام الطلب",
+    "processing": "جاري المعالجة...",
+    "secureCheckout": "دفع آمن مدعوم من Stripe. معلومات الدفع الخاصة بك مشفرة."
+  },
+  "footer": {
+    "about": "عن Digistore1",
+    "aboutDesc": "سوقك الموثوق للمنتجات الرقمية عالية الجودة. قم بالتنزيل على الفور وابدأ في الإنشاء اليوم.",
+    "shop": "تسوق",
+    "allProducts": "جميع المنتجات",
+    "newArrivals": "وصل حديثًا",
+    "bestSellers": "الأكثر مبيعًا",
+    "support": "الدعم",
+    "helpCenter": "مركز المساعدة",
+    "contactUs": "اتصل بنا",
+    "faq": "الأسئلة الشائعة",
+    "refundPolicy": "سياسة الاسترداد",
+    "legal": "قانوني",
+    "terms": "شروط الخدمة",
+    "privacy": "سياسة الخصوصية",
+    "licenses": "معلومات الترخيص",
+    "cookies": "سياسة ملفات تعريف الارتباط",
+    "copyright": "جميع الحقوق محفوظة."
+  }
+}
+
