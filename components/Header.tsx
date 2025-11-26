@@ -51,9 +51,9 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-300 bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
         {/* Top Bar */}
-        <div className="flex h-24 items-center justify-between gap-4">
+        <div className="flex h-16 md:h-20 items-center justify-between gap-4">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Logo />
@@ -269,20 +269,6 @@ export default function Header() {
             >
               <Menu className="w-6 h-6 text-gray-600" />
             </button>
-          </div>
-        </div>
-
-        {/* Search Bar - Mobile */}
-        <div className="md:hidden pb-4">
-          <div className="relative w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-12 pl-12 pr-4 rounded-full border-2 border-gray-200 focus:border-primary focus:outline-none transition-colors text-sm"
-            />
           </div>
         </div>
 
