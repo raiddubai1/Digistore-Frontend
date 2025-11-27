@@ -1,28 +1,73 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Save, ArrowLeft } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { Save, ArrowLeft, Plus, X, Upload, FileText } from "lucide-react";
 import toast from "react-hot-toast";
 import ImageUpload from "@/components/ImageUpload";
+import Link from "next/link";
+
+interface Attribute {
+  id: string;
+  name: string;
+  slug: string;
+  type: string;
+  options: string[];
+  required: boolean;
+}
 
 export default function NewProductPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'en';
+
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [productFile, setProductFile] = useState<File | null>(null);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     shortDescription: "",
-    price: 0,
-    originalPrice: 0,
-    category: "Business and Marketing",
+    price: "",
+    originalPrice: "",
+    categoryId: "",
+    subcategory: "",
+    tags: [] as string[],
     fileType: "",
-    fileSize: "",
+    fileName: "",
+    whatsIncluded: [] as string[],
+    requirements: [] as string[],
     featured: false,
     bestseller: false,
     newArrival: true,
+    status: "DRAFT" as "DRAFT" | "PENDING" | "APPROVED" | "REJECTED",
   });
+
+  // Temporary inputs for arrays
+  const [newTag, setNewTag] = useState("");
+  const [newIncluded, setNewIncluded] = useState("");
+  const [newRequirement, setNewRequirement] = useState("");
+
+  // Load categories and attributes on mount
+  useEffect(() => {
+    // TODO: Replace with actual API calls
+    setCategories([
+      { id: "1", name: "Business and Marketing" },
+      { id: "2", name: "Personal Development" },
+      { id: "3", name: "Animals and Pets" },
+      { id: "4", name: "Home and Lifestyle" },
+      { id: "5", name: "Technology" },
+    ]);
+
+    setAttributes([
+      { id: "1", name: "File Format", slug: "file-format", type: "SELECT", options: ["PDF", "DOCX", "XLSX", "MP4"], required: true },
+      { id: "2", name: "Language", slug: "language", type: "MULTISELECT", options: ["English", "Arabic", "Spanish"], required: true },
+      { id: "3", name: "License Type", slug: "license-type", type: "SELECT", options: ["Personal", "Commercial"], required: false },
+    ]);
+  }, []);
 
   const handleImageUpload = (files: File[]) => {
     setUploadedImages([...uploadedImages, ...files]);
@@ -32,11 +77,57 @@ export default function NewProductPage() {
     setUploadedImages(uploadedImages.filter((_, i) => i !== index));
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProductFile(file);
+      setFormData({
+        ...formData,
+        fileName: file.name,
+        fileType: file.name.split('.').pop() || '',
+      });
+    }
+  };
+
+  // Array management functions
+  const addTag = () => {
+    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
+      setFormData({ ...formData, tags: [...formData.tags, newTag.trim()] });
+      setNewTag("");
+    }
+  };
+
+  const removeTag = (index: number) => {
+    setFormData({ ...formData, tags: formData.tags.filter((_, i) => i !== index) });
+  };
+
+  const addIncluded = () => {
+    if (newIncluded.trim()) {
+      setFormData({ ...formData, whatsIncluded: [...formData.whatsIncluded, newIncluded.trim()] });
+      setNewIncluded("");
+    }
+  };
+
+  const removeIncluded = (index: number) => {
+    setFormData({ ...formData, whatsIncluded: formData.whatsIncluded.filter((_, i) => i !== index) });
+  };
+
+  const addRequirement = () => {
+    if (newRequirement.trim()) {
+      setFormData({ ...formData, requirements: [...formData.requirements, newRequirement.trim()] });
+      setNewRequirement("");
+    }
+  };
+
+  const removeRequirement = (index: number) => {
+    setFormData({ ...formData, requirements: formData.requirements.filter((_, i) => i !== index) });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validation
-    if (!formData.title || !formData.description || formData.price <= 0) {
+    if (!formData.title || !formData.description || !formData.price || !formData.categoryId) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -46,24 +137,44 @@ export default function NewProductPage() {
       return;
     }
 
-    // In a real app, this would upload images and create product in database
+    if (!productFile) {
+      toast.error("Please upload the product file");
+      return;
+    }
+
+    // Check required attributes
+    const missingAttributes = attributes
+      .filter(attr => attr.required && !selectedAttributes[attr.id])
+      .map(attr => attr.name);
+
+    if (missingAttributes.length > 0) {
+      toast.error(`Please fill in required attributes: ${missingAttributes.join(', ')}`);
+      return;
+    }
+
+    // TODO: In a real app, this would upload files and create product in database
+    console.log("Form Data:", formData);
+    console.log("Attributes:", selectedAttributes);
+    console.log("Images:", uploadedImages);
+    console.log("Product File:", productFile);
+
     toast.success("Product created successfully!");
-    router.push("/admin/products");
+    router.push(`/${locale}/admin/products`);
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button
-          onClick={() => router.push("/admin/products")}
+        <Link
+          href={`/${locale}/admin/products`}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
-        </button>
+        </Link>
         <div>
-          <h1 className="text-2xl font-bold">Add New Product</h1>
-          <p className="text-gray-600">Create a new digital product</p>
+          <h1 className="text-2xl font-bold text-gray-900">Add New Product</h1>
+          <p className="text-sm text-gray-500">Create a new digital product</p>
         </div>
       </div>
 
@@ -74,55 +185,57 @@ export default function NewProductPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* Product Images */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold mb-4">Product Images</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Images *</h2>
               <ImageUpload
                 onUpload={handleImageUpload}
                 onRemove={handleImageRemove}
                 maxFiles={5}
                 maxSizeMB={5}
               />
+              <p className="text-xs text-gray-500 mt-2">Upload up to 5 images. First image will be the thumbnail.</p>
             </div>
 
             {/* Basic Information */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold mb-4">Basic Information</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Product Title <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="e.g., The Complete Guide to Digital Marketing"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Short Description
                   </label>
                   <input
                     type="text"
                     value={formData.shortDescription}
                     onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                    placeholder="Brief one-line description"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="Brief one-line description (max 160 characters)"
+                    maxLength={160}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Full Description <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                    rows={8}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="Detailed product description..."
                     required
                   />
@@ -132,121 +245,369 @@ export default function NewProductPage() {
 
             {/* Pricing */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold mb-4">Pricing</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Pricing</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Price (USD) <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                    required
-                  />
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.price}
+                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                      className="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="0.00"
+                      required
+                    />
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Original Price (Optional)
                   </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.originalPrice}
-                    onChange={(e) => setFormData({ ...formData, originalPrice: parseFloat(e.target.value) })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                  />
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.originalPrice}
+                      onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
+                      className="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Show discount if higher than price</p>
                 </div>
+              </div>
+            </div>
+
+            {/* Product File Upload */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Product File *</h2>
+              <div className="space-y-4">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                  <input
+                    type="file"
+                    id="product-file"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.mp4,.mp3,.psd,.ai"
+                  />
+                  <label htmlFor="product-file" className="cursor-pointer">
+                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-sm font-semibold text-gray-700 mb-1">
+                      {productFile ? productFile.name : "Click to upload product file"}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      PDF, DOCX, XLSX, ZIP, MP4, MP3, PSD, AI (Max 100MB)
+                    </p>
+                  </label>
+                </div>
+                {productFile && (
+                  <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <FileText className="w-5 h-5 text-green-600" />
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-green-900">{productFile.name}</p>
+                      <p className="text-xs text-green-600">
+                        {(productFile.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setProductFile(null)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Tags */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Tags</h2>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="Add a tag (press Enter)"
+                  />
+                  <button
+                    type="button"
+                    onClick={addTag}
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+                {formData.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {formData.tags.map((tag, index) => (
+                      <div
+                        key={index}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-lg"
+                      >
+                        <span className="text-sm font-medium">{tag}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeTag(index)}
+                          className="text-primary hover:text-primary/70 transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs text-gray-500">Add keywords to help customers find your product</p>
+              </div>
+            </div>
+
+            {/* What's Included */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">What's Included</h2>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newIncluded}
+                    onChange={(e) => setNewIncluded(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addIncluded())}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="e.g., PDF eBook (press Enter)"
+                  />
+                  <button
+                    type="button"
+                    onClick={addIncluded}
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+                {formData.whatsIncluded.length > 0 && (
+                  <ul className="space-y-2">
+                    {formData.whatsIncluded.map((item, index) => (
+                      <li key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                        <span className="text-sm text-gray-700">✓ {item}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeIncluded(index)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className="text-xs text-gray-500">List what customers will receive with this product</p>
+              </div>
+            </div>
+
+            {/* Requirements */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Requirements</h2>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newRequirement}
+                    onChange={(e) => setNewRequirement(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addRequirement())}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="e.g., PDF Reader (press Enter)"
+                  />
+                  <button
+                    type="button"
+                    onClick={addRequirement}
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+                {formData.requirements.length > 0 && (
+                  <ul className="space-y-2">
+                    {formData.requirements.map((item, index) => (
+                      <li key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                        <span className="text-sm text-gray-700">• {item}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeRequirement(index)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className="text-xs text-gray-500">List any software or tools needed to use this product</p>
               </div>
             </div>
           </div>
 
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
-            {/* Category & File Info */}
+            {/* Category */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold mb-4">Category & File</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Category *</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Main Category
                   </label>
                   <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                    value={formData.categoryId}
+                    onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    required
                   >
-                    <option>Business and Marketing</option>
-                    <option>Personal Development</option>
-                    <option>Animals and Pets</option>
-                    <option>Home and Lifestyle</option>
-                    <option>Technology</option>
-                    <option>Society and Politics</option>
+                    <option value="">Select a category</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    File Type
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Subcategory (Optional)
                   </label>
                   <input
                     type="text"
-                    value={formData.fileType}
-                    onChange={(e) => setFormData({ ...formData, fileType: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                    placeholder="pdf, xlsx, zip"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    File Size
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.fileSize}
-                    onChange={(e) => setFormData({ ...formData, fileSize: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                    placeholder="12.5 MB"
+                    value={formData.subcategory}
+                    onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="e.g., Social Media Marketing"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Status */}
+            {/* Attributes */}
+            {attributes.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Attributes</h2>
+                <div className="space-y-4">
+                  {attributes.map((attr) => (
+                    <div key={attr.id}>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        {attr.name} {attr.required && <span className="text-red-500">*</span>}
+                      </label>
+                      {attr.type === "SELECT" && (
+                        <select
+                          value={selectedAttributes[attr.id] || ""}
+                          onChange={(e) => setSelectedAttributes({ ...selectedAttributes, [attr.id]: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                          required={attr.required}
+                        >
+                          <option value="">Select {attr.name}</option>
+                          {attr.options.map((option) => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
+                        </select>
+                      )}
+                      {attr.type === "MULTISELECT" && (
+                        <select
+                          multiple
+                          value={selectedAttributes[attr.id]?.split(',') || []}
+                          onChange={(e) => {
+                            const values = Array.from(e.target.selectedOptions, option => option.value);
+                            setSelectedAttributes({ ...selectedAttributes, [attr.id]: values.join(',') });
+                          }}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                          required={attr.required}
+                          size={Math.min(attr.options.length, 4)}
+                        >
+                          {attr.options.map((option) => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
+                        </select>
+                      )}
+                      {attr.type === "TEXT" && (
+                        <input
+                          type="text"
+                          value={selectedAttributes[attr.id] || ""}
+                          onChange={(e) => setSelectedAttributes({ ...selectedAttributes, [attr.id]: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                          required={attr.required}
+                        />
+                      )}
+                      {attr.type === "NUMBER" && (
+                        <input
+                          type="number"
+                          value={selectedAttributes[attr.id] || ""}
+                          onChange={(e) => setSelectedAttributes({ ...selectedAttributes, [attr.id]: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                          required={attr.required}
+                        />
+                      )}
+                      {attr.type === "BOOLEAN" && (
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedAttributes[attr.id] === "true"}
+                            onChange={(e) => setSelectedAttributes({ ...selectedAttributes, [attr.id]: e.target.checked ? "true" : "false" })}
+                            className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                          />
+                          <span className="text-sm text-gray-600">Yes</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Product Status */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold mb-4">Status</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Status</h2>
               <div className="space-y-3">
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={formData.featured}
                     onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
                     className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                   />
-                  <span className="text-sm">Featured Product</span>
+                  <div>
+                    <span className="text-sm font-medium text-gray-900">Featured Product</span>
+                    <p className="text-xs text-gray-500">Show on homepage</p>
+                  </div>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={formData.bestseller}
                     onChange={(e) => setFormData({ ...formData, bestseller: e.target.checked })}
                     className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                   />
-                  <span className="text-sm">Bestseller</span>
+                  <div>
+                    <span className="text-sm font-medium text-gray-900">Bestseller</span>
+                    <p className="text-xs text-gray-500">Mark as bestseller</p>
+                  </div>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={formData.newArrival}
                     onChange={(e) => setFormData({ ...formData, newArrival: e.target.checked })}
                     className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                   />
-                  <span className="text-sm">New Arrival</span>
+                  <div>
+                    <span className="text-sm font-medium text-gray-900">New Arrival</span>
+                    <p className="text-xs text-gray-500">Show as new product</p>
+                  </div>
                 </label>
               </div>
             </div>
@@ -255,11 +616,14 @@ export default function NewProductPage() {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-full font-semibold hover:shadow-lg transition-all"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-semibold hover:shadow-lg transition-all"
               >
                 <Save className="w-5 h-5" />
                 Create Product
               </button>
+              <p className="text-xs text-gray-500 text-center mt-3">
+                Product will be saved as {formData.status}
+              </p>
             </div>
           </div>
         </div>
