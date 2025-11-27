@@ -1,9 +1,13 @@
 "use client";
 
 import { DollarSign, ShoppingCart, Package, Users, TrendingUp, Download } from "lucide-react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
 
 export default function AdminDashboard() {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'en';
   // Mock data
   const stats = [
     {
@@ -129,8 +133,8 @@ export default function AdminDashboard() {
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
         <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <a
-            href="/admin/products"
+          <Link
+            href={`/${locale}/admin/products`}
             className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl hover:border-primary transition-colors"
           >
             <Package className="w-8 h-8 text-primary" />
@@ -138,9 +142,9 @@ export default function AdminDashboard() {
               <div className="font-semibold">Add Product</div>
               <div className="text-sm text-gray-500">Create new product</div>
             </div>
-          </a>
-          <a
-            href="/admin/orders"
+          </Link>
+          <Link
+            href={`/${locale}/admin/orders`}
             className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl hover:border-primary transition-colors"
           >
             <ShoppingCart className="w-8 h-8 text-primary" />
@@ -148,9 +152,9 @@ export default function AdminDashboard() {
               <div className="font-semibold">View Orders</div>
               <div className="text-sm text-gray-500">Manage all orders</div>
             </div>
-          </a>
-          <a
-            href="/admin/customers"
+          </Link>
+          <Link
+            href={`/${locale}/admin/customers`}
             className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl hover:border-primary transition-colors"
           >
             <Users className="w-8 h-8 text-primary" />
@@ -158,7 +162,7 @@ export default function AdminDashboard() {
               <div className="font-semibold">View Customers</div>
               <div className="text-sm text-gray-500">Customer management</div>
             </div>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

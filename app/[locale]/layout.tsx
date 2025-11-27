@@ -2,11 +2,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import Header from "@/components/Header";
-import MegaMenu from "@/components/MegaMenu";
-import Footer from "@/components/Footer";
-import BottomNav from "@/components/BottomNav";
-import Cart from "@/components/Cart";
+import ConditionalLayout from "@/components/ConditionalLayout";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@/contexts/AuthContext";
 
@@ -52,14 +48,9 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages}>
       <div className="flex flex-col min-h-screen">
         <AuthProvider>
-          <Header />
-          <MegaMenu />
-          <main className="flex-1 pb-16 lg:pb-0">
+          <ConditionalLayout>
             {children}
-          </main>
-          <Footer />
-          <BottomNav />
-          <Cart />
+          </ConditionalLayout>
           <Toaster
             position="top-right"
             toastOptions={{
