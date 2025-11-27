@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown, TrendingUp, Sparkles, Clock, Tag, Home, Briefcase, Code, Heart, Palette, DollarSign, ArrowRight, Flame, Zap } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ChevronDown, TrendingUp, Sparkles, Clock, Tag, Home, Briefcase, Code, Heart, Palette, DollarSign, ArrowRight, Flame, Zap, ShoppingBag } from "lucide-react";
 
 const categories = [
   {
@@ -131,6 +132,8 @@ const featuredSections = [
 ];
 
 export default function MegaMenu() {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'en';
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [clickedLink, setClickedLink] = useState<string | null>(null);
@@ -173,7 +176,7 @@ export default function MegaMenu() {
               {/* Quick Links */}
               <div className="hidden lg:flex items-center gap-6">
                 <Link
-                  href="/"
+                  href={`/${locale}`}
                   onClick={() => handleLinkClick('home')}
                   className={`text-sm font-medium text-gray-700 hover:text-primary transition-all flex items-center gap-1 ${
                     clickedLink === 'home' ? 'scale-95' : ''
@@ -183,7 +186,17 @@ export default function MegaMenu() {
                   Home
                 </Link>
                 <Link
-                  href="/products?filter=trending"
+                  href={`/${locale}/products`}
+                  onClick={() => handleLinkClick('shop')}
+                  className={`text-sm font-medium text-gray-700 hover:text-primary transition-all flex items-center gap-1 ${
+                    clickedLink === 'shop' ? 'scale-95' : ''
+                  }`}
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  Shop
+                </Link>
+                <Link
+                  href={`/${locale}/products?filter=trending`}
                   onClick={() => handleLinkClick('trending')}
                   className={`text-sm font-medium text-gray-700 hover:text-primary transition-all flex items-center gap-1 ${
                     clickedLink === 'trending' ? 'scale-95' : ''
@@ -193,7 +206,7 @@ export default function MegaMenu() {
                   Trending
                 </Link>
                 <Link
-                  href="/products?filter=new"
+                  href={`/${locale}/products?filter=new`}
                   onClick={() => handleLinkClick('new')}
                   className={`text-sm font-medium text-gray-700 hover:text-primary transition-all flex items-center gap-1 ${
                     clickedLink === 'new' ? 'scale-95' : ''
@@ -203,7 +216,7 @@ export default function MegaMenu() {
                   New Arrivals
                 </Link>
                 <Link
-                  href="/products?filter=bestsellers"
+                  href={`/${locale}/products?filter=bestsellers`}
                   onClick={() => handleLinkClick('bestsellers')}
                   className={`text-sm font-medium text-gray-700 hover:text-primary transition-all flex items-center gap-1 ${
                     clickedLink === 'bestsellers' ? 'scale-95' : ''
@@ -213,7 +226,7 @@ export default function MegaMenu() {
                   Best Sellers
                 </Link>
                 <Link
-                  href="/products?filter=deals"
+                  href={`/${locale}/products?filter=deals`}
                   onClick={() => handleLinkClick('deals')}
                   className={`text-sm font-medium text-red-600 hover:text-red-700 transition-all flex items-center gap-1 ${
                     clickedLink === 'deals' ? 'scale-95' : ''
@@ -300,7 +313,7 @@ export default function MegaMenu() {
                           ?.subcategories.map((sub) => (
                             <Link
                               key={sub.name}
-                              href={`/products?category=${activeCategory}&subcategory=${sub.name}`}
+                              href={`/${locale}/products?category=${activeCategory}&subcategory=${sub.name}`}
                               className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-[#F7F7F7] transition-all group"
                             >
                               <span className="text-sm text-gray-700 group-hover:text-gray-900 group-hover:font-medium transition-all">
@@ -340,7 +353,7 @@ export default function MegaMenu() {
                           {section.items.map((item) => (
                             <li key={item}>
                               <Link
-                                href={`/products?search=${item}`}
+                                href={`/${locale}/products?search=${item}`}
                                 className="text-sm text-gray-700 transition-all duration-[250ms] ease-in-out block px-3 py-2 rounded-lg hover:bg-[#F7F7F7] group flex items-center justify-between"
                               >
                                 <span>{item}</span>
