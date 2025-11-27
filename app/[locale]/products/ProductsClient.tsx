@@ -25,6 +25,13 @@ export default function ProductsClient() {
   // Fetch categories on mount
   useEffect(() => {
     const fetchCategories = async () => {
+      // Check if API URL is configured
+      if (!process.env.NEXT_PUBLIC_API_URL) {
+        console.log("API URL not configured, using demo categories");
+        setCategories(demoCategories as any);
+        return;
+      }
+
       try {
         const fetchedCategories = await getCategories();
         // Filter only parent categories
@@ -44,6 +51,16 @@ export default function ProductsClient() {
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
+
+      // Check if API URL is configured
+      if (!process.env.NEXT_PUBLIC_API_URL) {
+        console.log("API URL not configured, using demo products");
+        setProducts(demoProducts);
+        setTotal(demoProducts.length);
+        setLoading(false);
+        return;
+      }
+
       try {
         // Build filters
         const filters: any = {
@@ -156,23 +173,27 @@ export default function ProductsClient() {
                 <h3 className="font-semibold text-sm text-gray-700 mb-3">Categories</h3>
                 <div className="space-y-2">
                   {categories.length > 0 ? (
-                    categories.map((category) => (
-                      <label
-                        key={category.id}
-                        className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedCategories.includes(category.slug)}
-                          onChange={() => toggleCategory(category.slug)}
-                          className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-                        />
-                        <span className="text-sm flex-1">{category.name}</span>
-                        <span className="text-xs text-gray-400">
-                          {category._count?.products || 0}
-                        </span>
-                      </label>
-                    ))
+                    categories.map((category) => {
+                      // Handle both API format (_count.products) and demo format (productCount)
+                      const productCount = (category as any)._count?.products || (category as any).productCount || 0;
+                      return (
+                        <label
+                          key={category.id}
+                          className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedCategories.includes(category.slug)}
+                            onChange={() => toggleCategory(category.slug)}
+                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                          />
+                          <span className="text-sm flex-1">{category.name}</span>
+                          <span className="text-xs text-gray-400">
+                            {productCount}
+                          </span>
+                        </label>
+                      );
+                    })
                   ) : (
                     <p className="text-sm text-gray-500">Loading categories...</p>
                   )}
