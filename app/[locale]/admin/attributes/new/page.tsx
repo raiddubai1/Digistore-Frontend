@@ -1,0 +1,285 @@
+"use client";
+
+import { useState } from "react";
+import { ArrowLeft, Save, Plus, X } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+type AttributeType = "TEXT" | "NUMBER" | "SELECT" | "MULTISELECT" | "COLOR" | "BOOLEAN";
+
+export default function NewAttributePage() {
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'en';
+
+  const [formData, setFormData] = useState({
+    name: "",
+    slug: "",
+    description: "",
+    type: "TEXT" as AttributeType,
+    options: [] as string[],
+    required: false,
+    active: true,
+    order: 0,
+  });
+
+  const [newOption, setNewOption] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: API call to create attribute
+    console.log("Creating attribute:", formData);
+  };
+
+  const generateSlug = (name: string) => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  };
+
+  const handleNameChange = (name: string) => {
+    setFormData({
+      ...formData,
+      name,
+      slug: generateSlug(name),
+    });
+  };
+
+  const addOption = () => {
+    if (newOption.trim() && !formData.options.includes(newOption.trim())) {
+      setFormData({
+        ...formData,
+        options: [...formData.options, newOption.trim()],
+      });
+      setNewOption("");
+    }
+  };
+
+  const removeOption = (index: number) => {
+    setFormData({
+      ...formData,
+      options: formData.options.filter((_, i) => i !== index),
+    });
+  };
+
+  const needsOptions = formData.type === "SELECT" || formData.type === "MULTISELECT";
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <Link
+          href={`/${locale}/admin/attributes`}
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">New Attribute</h1>
+          <p className="text-sm text-gray-500 mt-1">Create a new product attribute</p>
+        </div>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="max-w-3xl">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6">
+          {/* Name */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Attribute Name *
+            </label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              placeholder="e.g., File Format"
+              required
+            />
+          </div>
+
+          {/* Slug */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Slug *
+            </label>
+            <input
+              type="text"
+              value={formData.slug}
+              onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
+              placeholder="e.g., file-format"
+              required
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              URL-friendly version of the name (auto-generated)
+            </p>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Description
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              rows={3}
+              placeholder="Brief description of this attribute"
+            />
+          </div>
+
+          {/* Type */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Attribute Type *
+            </label>
+            <select
+              value={formData.type}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value as AttributeType, options: [] })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            >
+              <option value="TEXT">Text</option>
+              <option value="NUMBER">Number</option>
+              <option value="SELECT">Select (Single Choice)</option>
+              <option value="MULTISELECT">Multi-Select (Multiple Choices)</option>
+              <option value="COLOR">Color</option>
+              <option value="BOOLEAN">Boolean (Yes/No)</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.type === "TEXT" && "Free text input"}
+              {formData.type === "NUMBER" && "Numeric value only"}
+              {formData.type === "SELECT" && "Single selection from predefined options"}
+              {formData.type === "MULTISELECT" && "Multiple selections from predefined options"}
+              {formData.type === "COLOR" && "Color picker"}
+              {formData.type === "BOOLEAN" && "True/False or Yes/No"}
+            </p>
+          </div>
+
+          {/* Options (for SELECT and MULTISELECT) */}
+          {needsOptions && (
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Options *
+              </label>
+              <div className="space-y-3">
+                {/* Add Option Input */}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newOption}
+                    onChange={(e) => setNewOption(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addOption())}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="Enter an option"
+                  />
+                  <button
+                    type="button"
+                    onClick={addOption}
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Options List */}
+                {formData.options.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {formData.options.map((option, index) => (
+                      <div
+                        key={index}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg"
+                      >
+                        <span className="text-sm">{option}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeOption(index)}
+                          className="text-gray-500 hover:text-red-600 transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {formData.options.length === 0 && (
+                  <p className="text-xs text-gray-500">
+                    Add at least one option for this attribute type
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Order */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Display Order
+            </label>
+            <input
+              type="number"
+              value={formData.order}
+              onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              min="0"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Lower numbers appear first
+            </p>
+          </div>
+
+          {/* Required */}
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="required"
+              checked={formData.required}
+              onChange={(e) => setFormData({ ...formData, required: e.target.checked })}
+              className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+            />
+            <label htmlFor="required" className="text-sm font-medium text-gray-700">
+              Required (must be filled when adding products)
+            </label>
+          </div>
+
+          {/* Active */}
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="active"
+              checked={formData.active}
+              onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
+              className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+            />
+            <label htmlFor="active" className="text-sm font-medium text-gray-700">
+              Active (visible to vendors when adding products)
+            </label>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
+            <button
+              type="submit"
+              className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-semibold"
+              disabled={needsOptions && formData.options.length === 0}
+            >
+              <Save className="w-4 h-4" />
+              Create Attribute
+            </button>
+            <Link
+              href={`/${locale}/admin/attributes`}
+              className="px-6 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
+            >
+              Cancel
+            </Link>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+

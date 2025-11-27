@@ -15,6 +15,7 @@ import {
   BarChart3,
   FolderTree,
   Star,
+  Tag,
 } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,6 +24,7 @@ const getNavigation = (locale: string) => [
   { name: "Dashboard", href: `/${locale}/admin`, icon: LayoutDashboard },
   { name: "Products", href: `/${locale}/admin/products`, icon: Package },
   { name: "Categories", href: `/${locale}/admin/categories`, icon: FolderTree },
+  { name: "Attributes", href: `/${locale}/admin/attributes`, icon: Tag },
   { name: "Orders", href: `/${locale}/admin/orders`, icon: ShoppingCart },
   { name: "Customers", href: `/${locale}/admin/customers`, icon: Users },
   { name: "Reviews", href: `/${locale}/admin/reviews`, icon: Star },
