@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 
 interface ProtectedRouteProps {
@@ -13,25 +13,35 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({
   children,
   allowedRoles,
-  redirectTo = '/en/login',
+  redirectTo,
 }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Get current locale from pathname
+  const getCurrentLocale = () => {
+    const localeMatch = pathname?.match(/^\/([a-z]{2})\//);
+    return localeMatch ? localeMatch[1] : 'en';
+  };
 
   useEffect(() => {
     if (!loading) {
+      const locale = getCurrentLocale();
+
       // Not authenticated
       if (!user) {
-        router.push(redirectTo);
+        const loginPath = redirectTo || `/${locale}/login`;
+        router.push(loginPath);
         return;
       }
 
       // Check role authorization
       if (allowedRoles && !allowedRoles.includes(user.role)) {
-        router.push('/en/unauthorized');
+        router.push(`/${locale}/unauthorized`);
       }
     }
-  }, [user, loading, allowedRoles, redirectTo, router]);
+  }, [user, loading, allowedRoles, redirectTo, router, pathname]);
 
   // Show loading state
   if (loading) {

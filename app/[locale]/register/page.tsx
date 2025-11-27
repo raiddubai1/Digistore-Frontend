@@ -1,11 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
-import { Mail, Lock, User, Eye, EyeOff, Store, ShoppingBag } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, Store, ShoppingBag, ArrowLeft } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-export default function RegisterPage() {
+interface RegisterPageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export default function RegisterPage({ params }: RegisterPageProps) {
+  const { locale } = use(params);
   const { register } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
@@ -15,13 +21,19 @@ export default function RegisterPage() {
     role: 'CUSTOMER' as 'CUSTOMER' | 'VENDOR',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      toast.error('Password must be at least 8 characters');
       return;
     }
 
@@ -33,7 +45,7 @@ export default function RegisterPage() {
         email: formData.email,
         password: formData.password,
         role: formData.role,
-      });
+      }, locale);
     } catch (error) {
       // Error is handled in AuthContext
     } finally {
@@ -42,8 +54,17 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-6">
+        {/* Back to Home */}
+        <Link
+          href={`/${locale}`}
+          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Home
+        </Link>
+
         {/* Header */}
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -51,7 +72,7 @@ export default function RegisterPage() {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Already have an account?{' '}
-            <Link href="/login" className="font-medium text-teal-600 hover:text-teal-500">
+            <Link href={`/${locale}/login`} className="font-medium text-teal-600 hover:text-teal-500">
               Sign in
             </Link>
           </p>
@@ -62,10 +83,10 @@ export default function RegisterPage() {
           <button
             type="button"
             onClick={() => setFormData({ ...formData, role: 'CUSTOMER' })}
-            className={`flex flex-col items-center p-4 border-2 rounded-lg transition-all ${
+            className={`flex flex-col items-center p-6 border-2 rounded-xl transition-all shadow-sm hover:shadow-md ${
               formData.role === 'CUSTOMER'
-                ? 'border-teal-600 bg-teal-50'
-                : 'border-gray-300 hover:border-gray-400'
+                ? 'border-teal-600 bg-teal-50 shadow-md'
+                : 'border-gray-300 hover:border-gray-400 bg-white'
             }`}
           >
             <ShoppingBag className={`h-8 w-8 mb-2 ${formData.role === 'CUSTOMER' ? 'text-teal-600' : 'text-gray-400'}`} />
@@ -78,10 +99,10 @@ export default function RegisterPage() {
           <button
             type="button"
             onClick={() => setFormData({ ...formData, role: 'VENDOR' })}
-            className={`flex flex-col items-center p-4 border-2 rounded-lg transition-all ${
+            className={`flex flex-col items-center p-6 border-2 rounded-xl transition-all shadow-sm hover:shadow-md ${
               formData.role === 'VENDOR'
-                ? 'border-teal-600 bg-teal-50'
-                : 'border-gray-300 hover:border-gray-400'
+                ? 'border-teal-600 bg-teal-50 shadow-md'
+                : 'border-gray-300 hover:border-gray-400 bg-white'
             }`}
           >
             <Store className={`h-8 w-8 mb-2 ${formData.role === 'VENDOR' ? 'text-teal-600' : 'text-gray-400'}`} />
@@ -93,7 +114,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6 bg-white p-8 rounded-2xl shadow-xl" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             {/* Name */}
             <div>
@@ -186,13 +207,24 @@ export default function RegisterPage() {
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
-                  type="password"
+                  type={showConfirmPassword ? 'text' : 'password'}
                   required
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="appearance-none relative block w-full pl-10 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                  className="appearance-none relative block w-full pl-10 pr-10 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
                   placeholder="Confirm your password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
               </div>
             </div>
           </div>
@@ -211,11 +243,11 @@ export default function RegisterPage() {
           {/* Terms */}
           <p className="text-xs text-center text-gray-600">
             By creating an account, you agree to our{' '}
-            <Link href="/terms" className="text-teal-600 hover:text-teal-500">
+            <Link href={`/${locale}/terms`} className="text-teal-600 hover:text-teal-500">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="/privacy" className="text-teal-600 hover:text-teal-500">
+            <Link href={`/${locale}/privacy`} className="text-teal-600 hover:text-teal-500">
               Privacy Policy
             </Link>
           </p>

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authAPI } from '@/lib/api';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 interface User {
@@ -12,6 +12,7 @@ interface User {
   avatar?: string;
   role: 'CUSTOMER' | 'VENDOR' | 'ADMIN';
   emailVerified: boolean;
+  status: string;
   vendorProfile?: {
     id: string;
     businessName: string;
@@ -28,9 +29,10 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: RegisterData) => Promise<void>;
+  login: (email: string, password: string, locale?: string) => Promise<void>;
+  register: (data: RegisterData, locale?: string) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
   isAuthenticated: boolean;
   isVendor: boolean;
   isAdmin: boolean;
@@ -50,6 +52,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Get current locale from pathname
+  const getCurrentLocale = () => {
+    const localeMatch = pathname?.match(/^\/([a-z]{2})\//);
+    return localeMatch ? localeMatch[1] : 'en';
+  };
 
   // Load user on mount
   useEffect(() => {
@@ -75,7 +84,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const refreshUser = async () => {
+    try {
+      const response = await authAPI.getCurrentUser();
+      setUser(response.data.data.user);
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+    }
+  };
+
+  const login = async (email: string, password: string, locale?: string) => {
     try {
       const response = await authAPI.login(email, password);
       const { user, accessToken, refreshToken } = response.data.data;
@@ -89,13 +107,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       toast.success('Login successful!');
 
+      // Use provided locale or current locale
+      const currentLocale = locale || getCurrentLocale();
+
       // Redirect based on role
       if (user.role === 'VENDOR') {
-        router.push('/en/vendor/dashboard');
+        router.push(`/${currentLocale}/vendor/dashboard`);
       } else if (user.role === 'ADMIN') {
-        router.push('/en/admin');
+        router.push(`/${currentLocale}/admin`);
       } else {
-        router.push('/en');
+        router.push(`/${currentLocale}`);
       }
     } catch (error: any) {
       const message = error.response?.data?.message || 'Login failed';
@@ -104,7 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (data: RegisterData) => {
+  const register = async (data: RegisterData, locale?: string) => {
     try {
       const response = await authAPI.register(data);
       const { user, accessToken, refreshToken } = response.data.data;
@@ -118,11 +139,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       toast.success('Registration successful! Please verify your email.');
 
+      // Use provided locale or current locale
+      const currentLocale = locale || getCurrentLocale();
+
       // Redirect based on role
       if (data.role === 'VENDOR') {
-        router.push('/en/vendor/dashboard');
+        router.push(`/${currentLocale}/vendor/dashboard`);
       } else {
-        router.push('/en');
+        router.push(`/${currentLocale}`);
       }
     } catch (error: any) {
       const message = error.response?.data?.message || 'Registration failed';
@@ -140,7 +164,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
 
     toast.success('Logged out successfully');
-    router.push('/en');
+
+    const currentLocale = getCurrentLocale();
+    router.push(`/${currentLocale}`);
   };
 
   const value: AuthContextType = {
@@ -149,6 +175,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     register,
     logout,
+    refreshUser,
     isAuthenticated: !!user,
     isVendor: user?.role === 'VENDOR',
     isAdmin: user?.role === 'ADMIN',

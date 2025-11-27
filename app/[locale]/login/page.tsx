@@ -1,11 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
-export default function LoginPage() {
+interface LoginPageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export default function LoginPage({ params }: LoginPageProps) {
+  const { locale } = use(params);
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,7 +22,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      await login(email, password, locale);
     } catch (error) {
       // Error is handled in AuthContext
     } finally {
@@ -26,8 +31,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
+        {/* Back to Home */}
+        <Link
+          href={`/${locale}`}
+          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Home
+        </Link>
+
         {/* Header */}
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -35,24 +49,24 @@ export default function LoginPage() {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
-            <Link href="/register" className="font-medium text-teal-600 hover:text-teal-500">
+            <Link href={`/${locale}/register`} className="font-medium text-teal-600 hover:text-teal-500">
               create a new account
             </Link>
           </p>
         </div>
 
         {/* Demo Accounts */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm font-medium text-blue-900 mb-2">Demo Accounts:</p>
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 shadow-sm">
+          <p className="text-sm font-medium text-blue-900 mb-2">🎯 Demo Accounts:</p>
           <div className="text-xs text-blue-800 space-y-1">
-            <p>Customer: customer@example.com / customer123456</p>
-            <p>Vendor: vendor@example.com / vendor123456</p>
-            <p>Admin: admin@digistore1.com / admin123456</p>
+            <p>👤 Customer: customer@example.com / customer123456</p>
+            <p>🏪 Vendor: vendor@example.com / vendor123456</p>
+            <p>⚙️ Admin: admin@digistore1.com / admin123!</p>
           </div>
         </div>
 
         {/* Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6 bg-white p-8 rounded-2xl shadow-xl" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             {/* Email */}
             <div>
@@ -127,7 +141,7 @@ export default function LoginPage() {
             </div>
 
             <div className="text-sm">
-              <Link href="/forgot-password" className="font-medium text-teal-600 hover:text-teal-500">
+              <Link href={`/${locale}/forgot-password`} className="font-medium text-teal-600 hover:text-teal-500">
                 Forgot your password?
               </Link>
             </div>
