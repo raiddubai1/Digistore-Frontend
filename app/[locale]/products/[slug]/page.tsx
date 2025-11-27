@@ -41,8 +41,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   if (process.env.NEXT_PUBLIC_API_URL) {
     try {
+      let categorySlug: string | undefined;
+      if (typeof product.category === 'string') {
+        categorySlug = product.category;
+      } else if (product.category && typeof product.category === 'object') {
+        categorySlug = (product.category as any).slug;
+      }
+
       const response = await getProducts({
-        category: product.category?.slug || product.category,
+        category: categorySlug,
         limit: 4
       });
       if (response.products && response.products.length > 0) {
@@ -59,7 +66,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (process.env.NEXT_PUBLIC_API_URL) {
     try {
       const apiReviews = await getProductReviews(product.id);
-      if (apiReviews && apiReviews.length > 0) reviews = apiReviews;
+      if (apiReviews && apiReviews.length > 0) {
+        // Map API reviews to match Review type
+        reviews = apiReviews.map(review => ({
+          ...review,
+          userName: review.user.name,
+          userAvatar: review.user.avatar,
+          createdAt: new Date(review.createdAt),
+        }));
+      }
     } catch (error) {
       console.error("Error fetching reviews, using demo data:", error);
     }

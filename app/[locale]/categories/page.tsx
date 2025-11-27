@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { demoCategories } from "@/data/demo-products";
 import { getCategories } from "@/lib/api/categories";
+import type { Category } from "@/types";
 import { ArrowRight, Briefcase, User, Home, Code, Globe, Heart, Package } from "lucide-react";
 
 const categoryIcons: Record<string, any> = {
@@ -21,14 +22,19 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
   const { locale } = await params;
 
   // Use demo data by default (API integration can be enabled when backend is ready)
-  let categories = demoCategories;
+  let categories: Category[] = demoCategories;
 
   // Try to fetch from API if available
   if (process.env.NEXT_PUBLIC_API_URL) {
     try {
       const allCategories = await getCategories();
-      // Filter only parent categories (no parentId)
-      const parentCategories = allCategories.filter(cat => !cat.parentId);
+      // Filter only parent categories (no parentId) and map to match Category type
+      const parentCategories = allCategories
+        .filter(cat => !cat.parentId)
+        .map(cat => ({
+          ...cat,
+          productCount: cat._count?.products || 0,
+        }));
       if (parentCategories && parentCategories.length > 0) {
         categories = parentCategories;
       }
