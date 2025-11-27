@@ -1,6 +1,6 @@
 import { Product } from "@/types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 export interface ProductsResponse {
   products: Product[];
@@ -24,9 +24,14 @@ export interface ProductFilters {
 }
 
 export async function getProducts(filters: ProductFilters = {}): Promise<ProductsResponse> {
+  // If no API URL is configured, throw error to trigger fallback
+  if (!API_URL) {
+    throw new Error("API URL not configured");
+  }
+
   try {
     const params = new URLSearchParams();
-    
+
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         params.append(key, String(value));
@@ -53,6 +58,10 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Product
 }
 
 export async function getProductBySlug(slug: string): Promise<Product> {
+  if (!API_URL) {
+    throw new Error("API URL not configured");
+  }
+
   try {
     const response = await fetch(`${API_URL}/products/${slug}`, {
       method: "GET",
@@ -77,6 +86,10 @@ export async function getProductBySlug(slug: string): Promise<Product> {
 }
 
 export async function getFeaturedProducts(): Promise<Product[]> {
+  if (!API_URL) {
+    throw new Error("API URL not configured");
+  }
+
   try {
     const response = await fetch(`${API_URL}/products/featured`, {
       method: "GET",
@@ -98,6 +111,10 @@ export async function getFeaturedProducts(): Promise<Product[]> {
 }
 
 export async function getBestsellers(): Promise<Product[]> {
+  if (!API_URL) {
+    throw new Error("API URL not configured");
+  }
+
   try {
     const response = await fetch(`${API_URL}/products/bestsellers`, {
       method: "GET",
@@ -119,6 +136,10 @@ export async function getBestsellers(): Promise<Product[]> {
 }
 
 export async function getNewArrivals(): Promise<Product[]> {
+  if (!API_URL) {
+    throw new Error("API URL not configured");
+  }
+
   try {
     const response = await fetch(`${API_URL}/products/new-arrivals`, {
       method: "GET",

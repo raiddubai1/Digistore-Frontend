@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 export interface Category {
   id: string;
@@ -34,6 +34,10 @@ export interface CategoryResponse {
 }
 
 export async function getCategories(): Promise<Category[]> {
+  if (!API_URL) {
+    throw new Error("API URL not configured");
+  }
+
   try {
     const response = await fetch(`${API_URL}/categories`, {
       method: "GET",
@@ -56,6 +60,10 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category> {
+  if (!API_URL) {
+    throw new Error("API URL not configured");
+  }
+
   try {
     const response = await fetch(`${API_URL}/categories/${slug}`, {
       method: "GET",

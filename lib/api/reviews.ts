@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 export interface Review {
   id: string;
@@ -33,6 +33,10 @@ export interface CreateReviewData {
 }
 
 export async function getProductReviews(productId: string): Promise<Review[]> {
+  if (!API_URL) {
+    throw new Error("API URL not configured");
+  }
+
   try {
     const response = await fetch(`${API_URL}/reviews/product/${productId}`, {
       method: "GET",
@@ -58,6 +62,10 @@ export async function createReview(
   reviewData: CreateReviewData,
   token: string
 ): Promise<Review> {
+  if (!API_URL) {
+    throw new Error("API URL not configured");
+  }
+
   try {
     const response = await fetch(`${API_URL}/reviews`, {
       method: "POST",
@@ -86,6 +94,10 @@ export async function updateReview(
   reviewData: Partial<CreateReviewData>,
   token: string
 ): Promise<Review> {
+  if (!API_URL) {
+    throw new Error("API URL not configured");
+  }
+
   try {
     const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
       method: "PUT",
@@ -110,6 +122,10 @@ export async function updateReview(
 }
 
 export async function deleteReview(reviewId: string, token: string): Promise<void> {
+  if (!API_URL) {
+    throw new Error("API URL not configured");
+  }
+
   try {
     const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
       method: "DELETE",
