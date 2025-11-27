@@ -14,22 +14,30 @@ import {
   LogOut,
   BarChart3,
 } from "lucide-react";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import { useAuth } from "@/contexts/AuthContext";
 
-const navigation = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Products", href: "/admin/products", icon: Package },
-  { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
-  { name: "Customers", href: "/admin/customers", icon: Users },
-  { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
+const getNavigation = (locale: string) => [
+  { name: "Dashboard", href: `/${locale}/admin`, icon: LayoutDashboard },
+  { name: "Products", href: `/${locale}/admin/products`, icon: Package },
+  { name: "Orders", href: `/${locale}/admin/orders`, icon: ShoppingCart },
+  { name: "Customers", href: `/${locale}/admin/customers`, icon: Users },
+  { name: "Analytics", href: `/${locale}/admin/analytics`, icon: BarChart3 },
+  { name: "Settings", href: `/${locale}/admin/settings`, icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const { user, logout } = useAuth();
+
+  // Extract locale from pathname (e.g., /en/admin -> en)
+  const locale = pathname.split('/')[1] || 'en';
+  const navigation = getNavigation(locale);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <ProtectedRoute allowedRoles={['ADMIN']}>
+      <div className="min-h-screen bg-gray-50">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -86,19 +94,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="p-4 border-t border-gray-200">
             <div className="flex items-center gap-3 px-4 py-3 mb-2">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-semibold">
-                A
+                {user?.name?.charAt(0).toUpperCase() || 'A'}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm">Admin User</div>
-                <div className="text-xs text-gray-500">admin@digistore1.com</div>
+                <div className="font-semibold text-sm">{user?.name || 'Admin User'}</div>
+                <div className="text-xs text-gray-500">{user?.email || 'admin@digistore1.com'}</div>
               </div>
             </div>
-            <Link
-              href="/"
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+            <button
+              onClick={logout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
             >
               <LogOut className="w-5 h-5" />
-              <span className="font-medium">Back to Store</span>
+              <span className="font-medium">Logout</span>
+            </button>
+            <Link
+              href="/"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors mt-2"
+            >
+              <span className="font-medium">← Back to Store</span>
             </Link>
           </div>
         </div>
@@ -135,6 +149,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <main className="p-4 lg:p-8">{children}</main>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }
 
