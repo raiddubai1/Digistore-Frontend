@@ -4,21 +4,14 @@ import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { demoProducts, demoCategories } from "@/data/demo-products";
-import { getProducts } from "@/lib/api/products";
-import { getCategories, Category } from "@/lib/api/categories";
 import { Filter, Grid, List, X } from "lucide-react";
 import { Product } from "@/types";
-import toast from "react-hot-toast";
-
-// Check if API URL is configured (do this outside component to avoid re-evaluation)
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const USE_API = API_URL && API_URL.trim() !== "";
 
 export default function ProductsClient() {
-  const [products, setProducts] = useState<Product[]>(demoProducts);
-  const [categories, setCategories] = useState<Category[]>(demoCategories as any);
-  const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(demoProducts.length);
+  const [products, setProducts] = useState<Product[]>(demoProducts || []);
+  const [categories, setCategories] = useState<any[]>(demoCategories || []);
+  const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState((demoProducts || []).length);
   const [page, setPage] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
@@ -26,93 +19,60 @@ export default function ProductsClient() {
   const [sortBy, setSortBy] = useState<string>("popular");
   const [showFilters, setShowFilters] = useState(true);
 
-  // Fetch categories on mount
+  // Filter products based on selected filters
   useEffect(() => {
-    const fetchCategories = async () => {
-      // Check if API URL is configured
-      if (!USE_API) {
-        console.log("API URL not configured, using demo categories");
-        setCategories(demoCategories as any);
-        return;
-      }
+    let filtered = [...(demoProducts || [])];
 
-      try {
-        const fetchedCategories = await getCategories();
-        // Filter only parent categories
-        const parentCategories = fetchedCategories.filter(cat => !cat.parentId);
-        setCategories(parentCategories);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        // Fallback to demo categories
-        setCategories(demoCategories as any);
-      }
-    };
+    // Filter by category
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(product =>
+        selectedCategories.includes(product.category)
+      );
+    }
 
-    fetchCategories();
-  }, []);
+    // Filter by price range
+    if (selectedPriceRanges.length > 0) {
+      filtered = filtered.filter(product => {
+        const price = product.price;
+        return selectedPriceRanges.some(range => {
+          if (range === "under-20") return price < 20;
+          if (range === "20-50") return price >= 20 && price <= 50;
+          if (range === "over-50") return price > 50;
+          return false;
+        });
+      });
+    }
 
-  // Fetch products from API
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
+    // Filter by rating
+    if (selectedRatings.length > 0) {
+      filtered = filtered.filter(product => {
+        const rating = product.rating || 0;
+        return selectedRatings.some(r => {
+          if (r === "5") return rating >= 4.5;
+          if (r === "4") return rating >= 4 && rating < 4.5;
+          return false;
+        });
+      });
+    }
 
-      // Check if API URL is configured
-      if (!USE_API) {
-        console.log("API URL not configured, using demo products");
-        setProducts(demoProducts);
-        setTotal(demoProducts.length);
-        setLoading(false);
-        return;
-      }
+    // Sort products
+    if (sortBy === "price-low") {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price-high") {
+      filtered.sort((a, b) => b.price - a.price);
+    } else if (sortBy === "rating") {
+      filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    } else if (sortBy === "newest") {
+      filtered.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+    }
 
-      try {
-        // Build filters
-        const filters: any = {
-          page,
-          limit: 12,
-          sort: sortBy,
-        };
+    // Pagination
+    const startIndex = (page - 1) * 12;
+    const endIndex = startIndex + 12;
+    const paginatedProducts = filtered.slice(startIndex, endIndex);
 
-        // Add category filter
-        if (selectedCategories.length > 0) {
-          filters.category = selectedCategories[0]; // API supports single category for now
-        }
-
-        // Add price range filter
-        if (selectedPriceRanges.length > 0) {
-          selectedPriceRanges.forEach((range) => {
-            if (range === "under-20") {
-              filters.priceMax = 20;
-            } else if (range === "20-50") {
-              filters.priceMin = 20;
-              filters.priceMax = 50;
-            } else if (range === "over-50") {
-              filters.priceMin = 50;
-            }
-          });
-        }
-
-        // Add rating filter
-        if (selectedRatings.length > 0) {
-          const minRating = selectedRatings.includes("5") ? 5 : 4;
-          filters.rating = minRating;
-        }
-
-        const response = await getProducts(filters);
-        setProducts(response.products);
-        setTotal(response.total);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        toast.error("Failed to load products. Using demo data.");
-        // Fallback to demo data
-        setProducts(demoProducts);
-        setTotal(demoProducts.length);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
+    setProducts(paginatedProducts);
+    setTotal(filtered.length);
   }, [page, selectedCategories, selectedPriceRanges, selectedRatings, sortBy]);
 
   const toggleCategory = (category: string) => {
@@ -176,7 +136,7 @@ export default function ProductsClient() {
               <div className="mb-6">
                 <h3 className="font-semibold text-sm text-gray-700 mb-3">Categories</h3>
                 <div className="space-y-2">
-                  {categories.length > 0 ? (
+                  {categories && categories.length > 0 ? (
                     categories.map((category) => {
                       // Handle both API format (_count.products) and demo format (productCount)
                       const productCount = (category as any)._count?.products || (category as any).productCount || 0;
@@ -187,11 +147,11 @@ export default function ProductsClient() {
                         >
                           <input
                             type="checkbox"
-                            checked={selectedCategories.includes(category.slug)}
-                            onChange={() => toggleCategory(category.slug)}
+                            checked={selectedCategories.includes(category.slug || '')}
+                            onChange={() => toggleCategory(category.slug || '')}
                             className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                           />
-                          <span className="text-sm flex-1">{category.name}</span>
+                          <span className="text-sm flex-1">{category.name || 'Unknown'}</span>
                           <span className="text-xs text-gray-400">
                             {productCount}
                           </span>
@@ -199,7 +159,7 @@ export default function ProductsClient() {
                       );
                     })
                   ) : (
-                    <p className="text-sm text-gray-500">Loading categories...</p>
+                    <p className="text-sm text-gray-500">No categories available</p>
                   )}
                 </div>
               </div>
@@ -360,7 +320,7 @@ export default function ProductsClient() {
                   <ProductCardSkeleton key={i} />
                 ))}
               </div>
-            ) : products.length > 0 ? (
+            ) : products && products.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
@@ -379,7 +339,7 @@ export default function ProductsClient() {
             )}
 
             {/* Pagination */}
-            {!loading && products.length > 0 && (
+            {!loading && products && products.length > 0 && total > 12 && (
               <div className="mt-12 flex justify-center">
                 <div className="flex items-center gap-2">
                   <button
@@ -389,7 +349,7 @@ export default function ProductsClient() {
                   >
                     Previous
                   </button>
-                  {[...Array(Math.ceil(total / 12))].map((_, i) => (
+                  {total > 0 && [...Array(Math.ceil(total / 12))].map((_, i) => (
                     <button
                       key={i}
                       onClick={() => setPage(i + 1)}
