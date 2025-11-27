@@ -10,11 +10,15 @@ import { Filter, Grid, List, X } from "lucide-react";
 import { Product } from "@/types";
 import toast from "react-hot-toast";
 
+// Check if API URL is configured (do this outside component to avoid re-evaluation)
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const USE_API = API_URL && API_URL.trim() !== "";
+
 export default function ProductsClient() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>(demoProducts);
+  const [categories, setCategories] = useState<Category[]>(demoCategories as any);
   const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(0);
+  const [total, setTotal] = useState(demoProducts.length);
   const [page, setPage] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
@@ -26,7 +30,7 @@ export default function ProductsClient() {
   useEffect(() => {
     const fetchCategories = async () => {
       // Check if API URL is configured
-      if (!process.env.NEXT_PUBLIC_API_URL) {
+      if (!USE_API) {
         console.log("API URL not configured, using demo categories");
         setCategories(demoCategories as any);
         return;
@@ -53,7 +57,7 @@ export default function ProductsClient() {
       setLoading(true);
 
       // Check if API URL is configured
-      if (!process.env.NEXT_PUBLIC_API_URL) {
+      if (!USE_API) {
         console.log("API URL not configured, using demo products");
         setProducts(demoProducts);
         setTotal(demoProducts.length);

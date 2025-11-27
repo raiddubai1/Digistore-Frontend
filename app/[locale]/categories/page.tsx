@@ -89,7 +89,7 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
                     {/* Product Count */}
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-500">
-                        {category._count?.products || 0} products
+                        {category._count?.products || category.productCount || 0} products
                       </span>
                       <ArrowRight className="w-5 h-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
