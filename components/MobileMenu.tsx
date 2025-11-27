@@ -2,15 +2,29 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { X, ChevronDown, ChevronRight, Briefcase, Sparkles, Code, Heart, Palette, DollarSign, Flame, Zap, Tag, Globe, Check } from "lucide-react";
+import { X, ChevronDown, ChevronRight, Briefcase, Sparkles, Code, Heart, Palette, DollarSign, Flame, Zap, Tag, Globe, Check, LucideIcon, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCategories } from "@/hooks/useCategories";
 
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const categories = [
+// Icon mapping for categories
+const iconMap: Record<string, LucideIcon> = {
+  briefcase: Briefcase,
+  sparkles: Sparkles,
+  code: Code,
+  heart: Heart,
+  palette: Palette,
+  'dollar-sign': DollarSign,
+  user: Sparkles,
+  'paw-print': Heart,
+  home: Home,
+};
+
+const demoCategories = [
   {
     id: "business",
     name: "Business and Marketing",
@@ -134,6 +148,21 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const [selectedLanguage, setSelectedLanguage] = useState("EN");
   const [languageExpanded, setLanguageExpanded] = useState(false);
 
+  // Fetch categories from API
+  const { categories: apiCategories, loading } = useCategories();
+
+  // Use API categories if available, otherwise use demo categories
+  const categories = apiCategories.length > 0 ? apiCategories.map(cat => ({
+    id: cat.slug,
+    name: cat.name,
+    icon: iconMap[cat.icon || 'briefcase'] || Briefcase,
+    subcategories: cat.children?.map(child => ({
+      name: child.name,
+      count: child._count?.products || 0,
+      slug: child.slug,
+    })) || [],
+  })) : demoCategories;
+
   const toggleCategory = (categoryId: string) => {
     setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
   };
@@ -207,10 +236,10 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   {/* Subcategories */}
                   {isExpanded && (
                     <div className="mt-2 ml-8 space-y-1 animate-in slide-in-from-top-2 duration-200">
-                      {category.subcategories.map((sub) => (
+                      {category.subcategories.map((sub: any) => (
                         <Link
                           key={sub.name}
-                          href={`/products?category=${category.id}&subcategory=${sub.name}`}
+                          href={`/products?category=${sub.slug || sub.name}`}
                           onClick={onClose}
                           className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors group"
                         >

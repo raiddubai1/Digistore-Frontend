@@ -1,11 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, TrendingUp, Sparkles, Clock, Tag, Home, Briefcase, Code, Heart, Palette, DollarSign, ArrowRight, Flame, Zap, ShoppingBag } from "lucide-react";
+import { ChevronDown, TrendingUp, Sparkles, Clock, Tag, Home, Briefcase, Code, Heart, Palette, DollarSign, ArrowRight, Flame, Zap, ShoppingBag, LucideIcon } from "lucide-react";
+import { useCategories } from "@/hooks/useCategories";
 
-const categories = [
+// Icon mapping for categories
+const iconMap: Record<string, LucideIcon> = {
+  briefcase: Briefcase,
+  sparkles: Sparkles,
+  code: Code,
+  heart: Heart,
+  palette: Palette,
+  'dollar-sign': DollarSign,
+  user: Sparkles,
+  'paw-print': Heart,
+  home: Home,
+};
+
+const demoCategories = [
   {
     id: "business",
     name: "Business and Marketing",
@@ -138,9 +152,24 @@ export default function MegaMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [clickedLink, setClickedLink] = useState<string | null>(null);
 
+  // Fetch categories from API
+  const { categories: apiCategories, loading } = useCategories();
+
+  // Use API categories if available, otherwise use demo categories
+  const categories = apiCategories.length > 0 ? apiCategories.map(cat => ({
+    id: cat.slug,
+    name: cat.name,
+    icon: iconMap[cat.icon || 'briefcase'] || Briefcase,
+    subcategories: cat.children?.map(child => ({
+      name: child.name,
+      count: child._count?.products || 0,
+      slug: child.slug,
+    })) || [],
+  })) : demoCategories;
+
   const handleMouseEnter = () => {
     setIsOpen(true);
-    if (!activeCategory) {
+    if (!activeCategory && categories.length > 0) {
       setActiveCategory(categories[0].id); // Set first category as default
     }
   };
@@ -310,10 +339,10 @@ export default function MegaMenu() {
                       <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                         {categories
                           .find((c) => c.id === activeCategory)
-                          ?.subcategories.map((sub) => (
+                          ?.subcategories.map((sub: any) => (
                             <Link
                               key={sub.name}
-                              href={`/${locale}/products?category=${activeCategory}&subcategory=${sub.name}`}
+                              href={`/${locale}/products?category=${sub.slug || sub.name}`}
                               className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-[#F7F7F7] transition-all group"
                             >
                               <span className="text-sm text-gray-700 group-hover:text-gray-900 group-hover:font-medium transition-all">
