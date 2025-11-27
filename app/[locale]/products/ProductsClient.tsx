@@ -1,72 +1,78 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { demoProducts, demoCategories } from "@/data/demo-products";
+import { getProducts } from "@/lib/api/products";
 import { Filter, Grid, List, X } from "lucide-react";
 import { Product } from "@/types";
+import toast from "react-hot-toast";
 
 export default function ProductsClient() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string>("popular");
   const [showFilters, setShowFilters] = useState(true);
 
-  // Filter products
-  const filteredProducts = useMemo(() => {
-    let filtered = [...demoProducts];
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        // Build filters
+        const filters: any = {
+          page,
+          limit: 12,
+          sort: sortBy,
+        };
 
-    // Filter by category
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter((p) => selectedCategories.includes(p.category));
-    }
+        // Add category filter
+        if (selectedCategories.length > 0) {
+          filters.category = selectedCategories[0]; // API supports single category for now
+        }
 
-    // Filter by price range
-    if (selectedPriceRanges.length > 0) {
-      filtered = filtered.filter((p) => {
-        return selectedPriceRanges.some((range) => {
-          if (range === "under-20") return p.price < 20;
-          if (range === "20-50") return p.price >= 20 && p.price <= 50;
-          if (range === "over-50") return p.price > 50;
-          return false;
-        });
-      });
-    }
+        // Add price range filter
+        if (selectedPriceRanges.length > 0) {
+          selectedPriceRanges.forEach((range) => {
+            if (range === "under-20") {
+              filters.priceMax = 20;
+            } else if (range === "20-50") {
+              filters.priceMin = 20;
+              filters.priceMax = 50;
+            } else if (range === "over-50") {
+              filters.priceMin = 50;
+            }
+          });
+        }
 
-    // Filter by rating
-    if (selectedRatings.length > 0) {
-      filtered = filtered.filter((p) => {
-        return selectedRatings.some((rating) => {
-          if (rating === "4+") return p.rating >= 4;
-          if (rating === "5") return p.rating === 5;
-          return false;
-        });
-      });
-    }
+        // Add rating filter
+        if (selectedRatings.length > 0) {
+          const minRating = selectedRatings.includes("5") ? 5 : 4;
+          filters.rating = minRating;
+        }
 
-    // Sort products
-    switch (sortBy) {
-      case "newest":
-        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        break;
-      case "price-low":
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case "price-high":
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case "rating":
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      case "popular":
-      default:
-        filtered.sort((a, b) => b.downloadCount - a.downloadCount);
-        break;
-    }
+        const response = await getProducts(filters);
+        setProducts(response.products);
+        setTotal(response.total);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        toast.error("Failed to load products. Using demo data.");
+        // Fallback to demo data
+        setProducts(demoProducts);
+        setTotal(demoProducts.length);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return filtered;
-  }, [selectedCategories, selectedPriceRanges, selectedRatings, sortBy]);
+    fetchProducts();
+  }, [page, selectedCategories, selectedPriceRanges, selectedRatings, sortBy]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
@@ -221,7 +227,14 @@ export default function ProductsClient() {
                   Filters
                 </button>
                 <div className="text-sm text-gray-600">
-                  Showing <span className="font-semibold">{filteredProducts.length}</span> products
+                  {loading ? (
+                    <span>Loading products...</span>
+                  ) : (
+                    <>
+                      Showing <span className="font-semibold">{products.length}</span> of{" "}
+                      <span className="font-semibold">{total}</span> products
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -290,9 +303,15 @@ export default function ProductsClient() {
             )}
 
             {/* Products Grid */}
-            {filteredProducts.length > 0 ? (
+            {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => (
+                {[...Array(12)].map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : products.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
@@ -309,20 +328,34 @@ export default function ProductsClient() {
             )}
 
             {/* Pagination */}
-            {filteredProducts.length > 0 && (
+            {!loading && products.length > 0 && (
               <div className="mt-12 flex justify-center">
                 <div className="flex items-center gap-2">
-                  <button className="px-4 py-2 border border-gray-200 rounded-lg hover:border-primary transition-colors">
+                  <button
+                    onClick={() => setPage(Math.max(1, page - 1))}
+                    disabled={page === 1}
+                    className="px-4 py-2 border border-gray-200 rounded-lg hover:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
                     Previous
                   </button>
-                  <button className="px-4 py-2 bg-primary text-white rounded-lg">1</button>
-                  <button className="px-4 py-2 border border-gray-200 rounded-lg hover:border-primary transition-colors">
-                    2
-                  </button>
-                  <button className="px-4 py-2 border border-gray-200 rounded-lg hover:border-primary transition-colors">
-                    3
-                  </button>
-                  <button className="px-4 py-2 border border-gray-200 rounded-lg hover:border-primary transition-colors">
+                  {[...Array(Math.ceil(total / 12))].map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setPage(i + 1)}
+                      className={`px-4 py-2 rounded-lg transition-colors ${
+                        page === i + 1
+                          ? 'bg-primary text-white'
+                          : 'border border-gray-200 hover:border-primary'
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  )).slice(0, 5)}
+                  <button
+                    onClick={() => setPage(Math.min(Math.ceil(total / 12), page + 1))}
+                    disabled={page === Math.ceil(total / 12)}
+                    className="px-4 py-2 border border-gray-200 rounded-lg hover:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
                     Next
                   </button>
                 </div>

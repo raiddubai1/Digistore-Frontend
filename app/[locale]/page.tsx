@@ -1,12 +1,36 @@
 import Link from "next/link";
 import { ArrowRight, Download, Shield, Zap, Star } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
+import { getFeaturedProducts, getBestsellers, getNewArrivals } from "@/lib/api/products";
 import { demoProducts } from "@/data/demo-products";
 
-export default function Home() {
-  const featuredProducts = demoProducts.filter((p) => p.featured);
-  const bestsellerProducts = demoProducts.filter((p) => p.bestseller).slice(0, 3);
-  const newProducts = demoProducts.filter((p) => p.newArrival);
+interface HomeProps {
+  params: Promise<{ locale: string }>;
+}
+
+export default async function Home({ params }: HomeProps) {
+  const { locale } = await params;
+
+  // Fetch real data from API with fallback to demo data
+  let featuredProducts = [];
+  let bestsellerProducts = [];
+  let newProducts = [];
+
+  try {
+    [featuredProducts, bestsellerProducts, newProducts] = await Promise.all([
+      getFeaturedProducts(),
+      getBestsellers(),
+      getNewArrivals(),
+    ]);
+  } catch (error) {
+    console.error("Error fetching products, using demo data:", error);
+    // Fallback to demo data if API fails
+    featuredProducts = demoProducts.filter((p) => p.featured);
+    bestsellerProducts = demoProducts.filter((p) => p.bestseller).slice(0, 3);
+    newProducts = demoProducts.filter((p) => p.newArrival);
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section - Canva Inspired */}
@@ -62,14 +86,14 @@ export default function Home() {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center mb-6">
                 <Link
-                  href="/products"
+                  href={`/${locale}/products`}
                   className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-full font-semibold hover:shadow-2xl transition-all hover:scale-105 text-base shadow-lg"
                 >
                   Browse Products
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
-                  href="/categories"
+                  href={`/${locale}/categories`}
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 rounded-full font-semibold hover:border-primary hover:bg-white transition-all text-base shadow-lg"
                 >
                   View Categories
@@ -296,7 +320,7 @@ export default function Home() {
               </p>
             </div>
             <Link
-              href="/products"
+              href={`/${locale}/products`}
               className="text-primary font-semibold hover:text-primary-dark flex items-center gap-2"
             >
               View All
@@ -323,7 +347,7 @@ export default function Home() {
               </p>
             </div>
             <Link
-              href="/products?filter=bestsellers"
+              href={`/${locale}/products?filter=bestsellers`}
               className="text-primary font-semibold hover:text-primary-dark flex items-center gap-2"
             >
               View All
@@ -351,7 +375,7 @@ export default function Home() {
                 </p>
               </div>
               <Link
-                href="/products?filter=new"
+                href={`/${locale}/products?filter=new`}
                 className="text-primary font-semibold hover:text-primary-dark flex items-center gap-2"
               >
                 View All
@@ -379,7 +403,7 @@ export default function Home() {
               Join thousands of satisfied customers and download your first digital product today.
             </p>
             <Link
-              href="/products"
+              href={`/${locale}/products`}
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-full font-semibold hover:shadow-lg transition-all hover:scale-105"
             >
               Start Shopping
