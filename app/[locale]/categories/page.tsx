@@ -20,16 +20,21 @@ interface CategoriesPageProps {
 export default async function CategoriesPage({ params }: CategoriesPageProps) {
   const { locale } = await params;
 
-  // Fetch categories from API with fallback to demo data
-  let categories = [];
+  // Use demo data by default (API integration can be enabled when backend is ready)
+  let categories = demoCategories;
 
-  try {
-    const allCategories = await getCategories();
-    // Filter only parent categories (no parentId)
-    categories = allCategories.filter(cat => !cat.parentId);
-  } catch (error) {
-    console.error("Error fetching categories, using demo data:", error);
-    categories = demoCategories;
+  // Try to fetch from API if available
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    try {
+      const allCategories = await getCategories();
+      // Filter only parent categories (no parentId)
+      const parentCategories = allCategories.filter(cat => !cat.parentId);
+      if (parentCategories && parentCategories.length > 0) {
+        categories = parentCategories;
+      }
+    } catch (error) {
+      console.error("Error fetching categories, using demo data:", error);
+    }
   }
 
   return (

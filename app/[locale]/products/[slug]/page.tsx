@@ -17,13 +17,17 @@ interface ProductPageProps {
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug, locale } = await params;
 
-  // Fetch product from API with fallback to demo data
-  let product;
-  try {
-    product = await getProductBySlug(slug);
-  } catch (error) {
-    console.error("Error fetching product, using demo data:", error);
-    product = demoProducts.find((p) => p.slug === slug);
+  // Use demo data by default (API integration can be enabled when backend is ready)
+  let product = demoProducts.find((p) => p.slug === slug);
+
+  // Try to fetch from API if available
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    try {
+      const apiProduct = await getProductBySlug(slug);
+      if (apiProduct) product = apiProduct;
+    } catch (error) {
+      console.error("Error fetching product, using demo data:", error);
+    }
   }
 
   if (!product) {
@@ -31,27 +35,34 @@ export default async function ProductPage({ params }: ProductPageProps) {
   }
 
   // Get related products (same category)
-  let relatedProducts = [];
-  try {
-    const response = await getProducts({
-      category: product.category?.slug || product.category,
-      limit: 4
-    });
-    relatedProducts = response.products.filter((p: any) => p.id !== product.id).slice(0, 3);
-  } catch (error) {
-    console.error("Error fetching related products:", error);
-    relatedProducts = demoProducts
-      .filter((p) => p.category === product.category && p.id !== product.id)
-      .slice(0, 3);
+  let relatedProducts = demoProducts
+    .filter((p) => p.category === product.category && p.id !== product.id)
+    .slice(0, 3);
+
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    try {
+      const response = await getProducts({
+        category: product.category?.slug || product.category,
+        limit: 4
+      });
+      if (response.products && response.products.length > 0) {
+        relatedProducts = response.products.filter((p: any) => p.id !== product.id).slice(0, 3);
+      }
+    } catch (error) {
+      console.error("Error fetching related products:", error);
+    }
   }
 
   // Get reviews for this product
-  let reviews = [];
-  try {
-    reviews = await getProductReviews(product.id);
-  } catch (error) {
-    console.error("Error fetching reviews, using demo data:", error);
-    reviews = getDemoReviews(product.id);
+  let reviews = getDemoReviews(product.id);
+
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    try {
+      const apiReviews = await getProductReviews(product.id);
+      if (apiReviews && apiReviews.length > 0) reviews = apiReviews;
+    } catch (error) {
+      console.error("Error fetching reviews, using demo data:", error);
+    }
   }
 
   const averageRating = reviews.length > 0

@@ -12,23 +12,27 @@ interface HomeProps {
 export default async function Home({ params }: HomeProps) {
   const { locale } = await params;
 
-  // Fetch real data from API with fallback to demo data
-  let featuredProducts = [];
-  let bestsellerProducts = [];
-  let newProducts = [];
+  // Use demo data by default (API integration can be enabled when backend is ready)
+  let featuredProducts = demoProducts.filter((p) => p.featured);
+  let bestsellerProducts = demoProducts.filter((p) => p.bestseller).slice(0, 3);
+  let newProducts = demoProducts.filter((p) => p.newArrival);
 
-  try {
-    [featuredProducts, bestsellerProducts, newProducts] = await Promise.all([
-      getFeaturedProducts(),
-      getBestsellers(),
-      getNewArrivals(),
-    ]);
-  } catch (error) {
-    console.error("Error fetching products, using demo data:", error);
-    // Fallback to demo data if API fails
-    featuredProducts = demoProducts.filter((p) => p.featured);
-    bestsellerProducts = demoProducts.filter((p) => p.bestseller).slice(0, 3);
-    newProducts = demoProducts.filter((p) => p.newArrival);
+  // Try to fetch from API if available
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    try {
+      const [featured, bestsellers, newArrivals] = await Promise.all([
+        getFeaturedProducts(),
+        getBestsellers(),
+        getNewArrivals(),
+      ]);
+
+      if (featured && featured.length > 0) featuredProducts = featured;
+      if (bestsellers && bestsellers.length > 0) bestsellerProducts = bestsellers;
+      if (newArrivals && newArrivals.length > 0) newProducts = newArrivals;
+    } catch (error) {
+      console.error("Error fetching products, using demo data:", error);
+      // Continue with demo data
+    }
   }
 
   return (
