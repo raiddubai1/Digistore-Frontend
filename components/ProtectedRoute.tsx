@@ -13,7 +13,7 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({
   children,
   allowedRoles,
-  redirectTo = '/login',
+  redirectTo = '/en/login',
 }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -28,7 +28,7 @@ export default function ProtectedRoute({
 
       // Check role authorization
       if (allowedRoles && !allowedRoles.includes(user.role)) {
-        router.push('/unauthorized');
+        router.push('/en/unauthorized');
       }
     }
   }, [user, loading, allowedRoles, redirectTo, router]);

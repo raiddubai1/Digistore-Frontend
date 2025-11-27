@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ShieldAlert, Home, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function UnauthorizedPage() {
   const { user } = useAuth();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'en';
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-orange-50 px-4">
@@ -40,16 +43,16 @@ export default function UnauthorizedPage() {
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/"
+            href={`/${locale}`}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors"
           >
             <Home className="w-5 h-5" />
             Go to Homepage
           </Link>
-          
+
           {!user && (
             <Link
-              href="/login"
+              href={`/${locale}/login`}
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-700 border-2 border-gray-300 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
             >
               Sign In

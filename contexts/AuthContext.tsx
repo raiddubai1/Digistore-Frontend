@@ -91,11 +91,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Redirect based on role
       if (user.role === 'VENDOR') {
-        router.push('/vendor/dashboard');
+        router.push('/en/vendor/dashboard');
       } else if (user.role === 'ADMIN') {
-        router.push('/admin/dashboard');
+        router.push('/en/admin');
       } else {
-        router.push('/');
+        router.push('/en');
       }
     } catch (error: any) {
       const message = error.response?.data?.message || 'Login failed';
@@ -120,9 +120,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Redirect based on role
       if (data.role === 'VENDOR') {
-        router.push('/vendor/dashboard');
+        router.push('/en/vendor/dashboard');
       } else {
-        router.push('/');
+        router.push('/en');
       }
     } catch (error: any) {
       const message = error.response?.data?.message || 'Registration failed';
@@ -140,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
 
     toast.success('Logged out successfully');
-    router.push('/');
+    router.push('/en');
   };
 
   const value: AuthContextType = {

@@ -55,7 +55,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <Link href="/admin" className="flex items-center gap-2">
+            <Link href={`/${locale}/admin`} className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                 <LayoutDashboard className="w-5 h-5 text-white" />
               </div>
@@ -109,7 +109,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <span className="font-medium">Logout</span>
             </button>
             <Link
-              href="/"
+              href={`/${locale}`}
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors mt-2"
             >
               <span className="font-medium">← Back to Store</span>
@@ -136,7 +136,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
             <div className="flex items-center gap-4">
               <Link
-                href="/"
+                href={`/${locale}`}
                 className="text-sm text-gray-600 hover:text-primary transition-colors"
               >
                 View Store →
