@@ -13,6 +13,8 @@ import {
   X,
   LogOut,
   BarChart3,
+  FolderTree,
+  Star,
 } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,8 +22,10 @@ import { useAuth } from "@/contexts/AuthContext";
 const getNavigation = (locale: string) => [
   { name: "Dashboard", href: `/${locale}/admin`, icon: LayoutDashboard },
   { name: "Products", href: `/${locale}/admin/products`, icon: Package },
+  { name: "Categories", href: `/${locale}/admin/categories`, icon: FolderTree },
   { name: "Orders", href: `/${locale}/admin/orders`, icon: ShoppingCart },
   { name: "Customers", href: `/${locale}/admin/customers`, icon: Users },
+  { name: "Reviews", href: `/${locale}/admin/reviews`, icon: Star },
   { name: "Analytics", href: `/${locale}/admin/analytics`, icon: BarChart3 },
   { name: "Settings", href: `/${locale}/admin/settings`, icon: Settings },
 ];
