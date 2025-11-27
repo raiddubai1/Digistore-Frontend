@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { demoProducts } from "@/data/demo-products";
 import { getProductReviews, calculateAverageRating } from "@/data/demo-reviews";
 import { Star, Download, ShoppingCart, Heart, Share2, Check } from "lucide-react";
@@ -8,11 +9,11 @@ import AddToCartButton from "@/components/AddToCartButton";
 import ProductReviews from "@/components/ProductReviews";
 
 interface ProductPageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const product = demoProducts.find((p) => p.slug === slug);
 
   if (!product) {
@@ -32,16 +33,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Breadcrumb */}
-        <div className="text-sm text-gray-500 mb-8">
-          <a href="/" className="hover:text-primary">Home</a>
-          <span className="mx-2">/</span>
-          <a href="/products" className="hover:text-primary">Products</a>
-          <span className="mx-2">/</span>
-          <a href={`/products?category=${product.category}`} className="hover:text-primary">
+        <div className="text-sm text-gray-500 mb-8 flex items-center flex-wrap gap-2">
+          <Link href={`/${locale}`} className="hover:text-primary transition-colors">
+            Home
+          </Link>
+          <span>/</span>
+          <Link href={`/${locale}/products`} className="hover:text-primary transition-colors">
+            Products
+          </Link>
+          <span>/</span>
+          <Link
+            href={`/${locale}/products?category=${product.category}`}
+            className="hover:text-primary transition-colors"
+          >
             {product.category}
-          </a>
-          <span className="mx-2">/</span>
-          <span className="text-gray-900">{product.title}</span>
+          </Link>
+          <span>/</span>
+          <span className="text-gray-900 font-medium">{product.title}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
