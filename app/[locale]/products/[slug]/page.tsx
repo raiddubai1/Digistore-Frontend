@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { demoProducts } from "@/data/demo-products";
-import { getProductReviews, calculateAverageRating } from "@/data/demo-reviews";
+import { getProductReviews as getDemoReviews, calculateAverageRating } from "@/data/demo-reviews";
+import { getProductBySlug, getProducts } from "@/lib/api/products";
+import { getProductReviews } from "@/lib/api/reviews";
 import { Star, Download, ShoppingCart, Heart, Share2, Check } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import ProductCard from "@/components/ProductCard";
@@ -14,20 +16,47 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug, locale } = await params;
-  const product = demoProducts.find((p) => p.slug === slug);
+
+  // Fetch product from API with fallback to demo data
+  let product;
+  try {
+    product = await getProductBySlug(slug);
+  } catch (error) {
+    console.error("Error fetching product, using demo data:", error);
+    product = demoProducts.find((p) => p.slug === slug);
+  }
 
   if (!product) {
     notFound();
   }
 
   // Get related products (same category)
-  const relatedProducts = demoProducts
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, 3);
+  let relatedProducts = [];
+  try {
+    const response = await getProducts({
+      category: product.category?.slug || product.category,
+      limit: 4
+    });
+    relatedProducts = response.products.filter((p: any) => p.id !== product.id).slice(0, 3);
+  } catch (error) {
+    console.error("Error fetching related products:", error);
+    relatedProducts = demoProducts
+      .filter((p) => p.category === product.category && p.id !== product.id)
+      .slice(0, 3);
+  }
 
   // Get reviews for this product
-  const reviews = getProductReviews(product.id);
-  const averageRating = calculateAverageRating(product.id);
+  let reviews = [];
+  try {
+    reviews = await getProductReviews(product.id);
+  } catch (error) {
+    console.error("Error fetching reviews, using demo data:", error);
+    reviews = getDemoReviews(product.id);
+  }
+
+  const averageRating = reviews.length > 0
+    ? reviews.reduce((acc: number, r: any) => acc + r.rating, 0) / reviews.length
+    : product.rating || 0;
 
   return (
     <div className="min-h-screen bg-white">
