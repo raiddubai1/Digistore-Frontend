@@ -5,12 +5,14 @@ import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { demoProducts, demoCategories } from "@/data/demo-products";
 import { getProducts } from "@/lib/api/products";
+import { getCategories, Category } from "@/lib/api/categories";
 import { Filter, Grid, List, X } from "lucide-react";
 import { Product } from "@/types";
 import toast from "react-hot-toast";
 
 export default function ProductsClient() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -19,6 +21,24 @@ export default function ProductsClient() {
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string>("popular");
   const [showFilters, setShowFilters] = useState(true);
+
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const fetchedCategories = await getCategories();
+        // Filter only parent categories
+        const parentCategories = fetchedCategories.filter(cat => !cat.parentId);
+        setCategories(parentCategories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        // Fallback to demo categories
+        setCategories(demoCategories as any);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // Fetch products from API
   useEffect(() => {
@@ -135,21 +155,27 @@ export default function ProductsClient() {
               <div className="mb-6">
                 <h3 className="font-semibold text-sm text-gray-700 mb-3">Categories</h3>
                 <div className="space-y-2">
-                  {demoCategories.map((category) => (
-                    <label
-                      key={category.id}
-                      className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedCategories.includes(category.name)}
-                        onChange={() => toggleCategory(category.name)}
-                        className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-                      />
-                      <span className="text-sm flex-1">{category.name}</span>
-                      <span className="text-xs text-gray-400">{category.productCount}</span>
-                    </label>
-                  ))}
+                  {categories.length > 0 ? (
+                    categories.map((category) => (
+                      <label
+                        key={category.id}
+                        className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes(category.slug)}
+                          onChange={() => toggleCategory(category.slug)}
+                          className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                        />
+                        <span className="text-sm flex-1">{category.name}</span>
+                        <span className="text-xs text-gray-400">
+                          {category._count?.products || 0}
+                        </span>
+                      </label>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">Loading categories...</p>
+                  )}
                 </div>
               </div>
 
