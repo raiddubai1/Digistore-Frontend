@@ -65,7 +65,7 @@ export default async function Home({ params }: HomeProps) {
               <div className="space-y-4">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
                   <span className="block text-gray-900">Your Gateway to</span>
-                  <span className="block bg-gradient-to-r from-gray-500 via-gray-400 to-[#ff6f61] bg-clip-text text-transparent">
+                  <span className="block bg-gradient-to-r from-gray-600 via-[#ff8a7a] to-[#ff6f61] bg-clip-text text-transparent">
                     Digital Excellence
                   </span>
                 </h1>
