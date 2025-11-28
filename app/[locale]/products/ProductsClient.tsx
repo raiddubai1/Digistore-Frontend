@@ -6,6 +6,9 @@ import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { demoProducts, demoCategories } from "@/data/demo-products";
 import { Filter, Grid, List, X } from "lucide-react";
 import { Product } from "@/types";
+import FloatingSortFilter from "@/components/FloatingSortFilter";
+import SortBottomSheet from "@/components/SortBottomSheet";
+import FilterBottomSheet from "@/components/FilterBottomSheet";
 
 export default function ProductsClient() {
   const [products, setProducts] = useState<Product[]>(demoProducts || []);
@@ -18,6 +21,10 @@ export default function ProductsClient() {
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string>("popular");
   const [showFilters, setShowFilters] = useState(true);
+
+  // Mobile bottom sheet states
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Filter products based on selected filters
   useEffect(() => {
@@ -114,8 +121,8 @@ export default function ProductsClient() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar - Categories & Filters */}
-          <aside className={`lg:w-64 flex-shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+          {/* Sidebar - Categories & Filters (Hidden on mobile - use bottom sheets instead) */}
+          <aside className="hidden lg:block lg:w-64 flex-shrink-0">
             <div className="bg-white rounded-2xl border border-gray-200 p-6 sticky top-24">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-bold text-lg flex items-center gap-2">
@@ -230,13 +237,6 @@ export default function ProductsClient() {
             {/* Toolbar */}
             <div className="bg-white rounded-2xl border border-gray-200 p-4 mb-6 flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  <Filter className="w-4 h-4" />
-                  Filters
-                </button>
                 <div className="text-sm text-gray-600">
                   {loading ? (
                     <span>Loading products...</span>
@@ -250,11 +250,11 @@ export default function ProductsClient() {
               </div>
 
               <div className="flex items-center gap-4">
-                {/* Sort */}
+                {/* Sort - Hidden on mobile (use bottom sheet instead) */}
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary"
+                  className="hidden lg:block px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary"
                 >
                   <option value="popular">Most Popular</option>
                   <option value="newest">Newest</option>
@@ -264,7 +264,7 @@ export default function ProductsClient() {
                 </select>
 
                 {/* View Toggle */}
-                <div className="hidden sm:flex gap-1 border border-gray-200 rounded-lg p-1">
+                <div className="hidden lg:flex gap-1 border border-gray-200 rounded-lg p-1">
                   <button className="p-2 rounded bg-primary text-white">
                     <Grid className="w-4 h-4" />
                   </button>
@@ -375,6 +375,35 @@ export default function ProductsClient() {
           </main>
         </div>
       </div>
+
+      {/* Mobile Floating Sort/Filter Buttons */}
+      <FloatingSortFilter
+        onSortClick={() => setIsSortOpen(true)}
+        onFilterClick={() => setIsFilterOpen(true)}
+        activeFiltersCount={selectedCategories.length + selectedPriceRanges.length + selectedRatings.length}
+      />
+
+      {/* Sort Bottom Sheet */}
+      <SortBottomSheet
+        isOpen={isSortOpen}
+        onClose={() => setIsSortOpen(false)}
+        currentSort={sortBy}
+        onSortChange={setSortBy}
+      />
+
+      {/* Filter Bottom Sheet */}
+      <FilterBottomSheet
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        categories={categories.map(cat => ({ id: cat.id, name: cat.name, slug: cat.slug || cat.name }))}
+        selectedCategories={selectedCategories}
+        selectedPriceRanges={selectedPriceRanges}
+        selectedRatings={selectedRatings}
+        onToggleCategory={toggleCategory}
+        onTogglePriceRange={togglePriceRange}
+        onToggleRating={toggleRating}
+        onClearAll={clearAllFilters}
+      />
     </div>
   );
 }
