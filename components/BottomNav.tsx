@@ -2,11 +2,10 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Home, Search, ShoppingCart, User, Heart } from "lucide-react";
+import { Home, ShoppingBag, ShoppingCart, User, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useState, useEffect } from "react";
-import SearchModal from "./SearchModal";
 
 interface NavItem {
   name: string;
@@ -20,12 +19,24 @@ export default function BottomNav() {
   const pathname = usePathname();
   const { itemCount, openCart } = useCartStore();
   const [mounted, setMounted] = useState(false);
-  const [searchModalOpen, setSearchModalOpen] = useState(false);
   const cartItemsCount = mounted ? itemCount() : 0;
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Check if a nav item is active
+  const isNavActive = (href?: string) => {
+    if (!href) return false;
+    // Handle locale prefix (e.g., /en, /ar)
+    const pathWithoutLocale = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+    const normalizedPath = pathWithoutLocale === '' ? '/' : pathWithoutLocale;
+
+    if (href === '/') {
+      return normalizedPath === '/';
+    }
+    return normalizedPath === href || normalizedPath.startsWith(href + '/');
+  };
 
   const navItems: NavItem[] = [
     {
@@ -34,9 +45,9 @@ export default function BottomNav() {
       icon: Home,
     },
     {
-      name: "Search",
-      icon: Search,
-      action: () => setSearchModalOpen(true),
+      name: "Shop",
+      href: "/products",
+      icon: ShoppingBag,
     },
     {
       name: "Cart",
@@ -71,26 +82,27 @@ export default function BottomNav() {
         <div className="grid grid-cols-5 h-16">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = item.href ? pathname === item.href || pathname?.startsWith(item.href + '/') : false;
+              const isActive = isNavActive(item.href);
 
               const content = (
-                <>
-                  {/* Active indicator bar */}
-                  {isActive && (
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-gray-600 to-[#ff6f61] rounded-b-full" />
-                  )}
-
-                  {/* Icon with badge */}
-                  <div className="relative">
+                <div className="flex flex-col items-center justify-center gap-0.5">
+                  {/* Icon with pill background when active (Etsy-style) */}
+                  <div
+                    className={cn(
+                      "relative flex items-center justify-center w-12 h-8 rounded-full transition-all duration-200",
+                      isActive ? "bg-gray-100" : "bg-transparent"
+                    )}
+                  >
                     <Icon
                       className={cn(
-                        "w-6 h-6 transition-all duration-200",
-                        isActive && "scale-110"
+                        "w-5 h-5 transition-all duration-200",
+                        isActive ? "text-gray-900" : "text-gray-500"
                       )}
-                      strokeWidth={isActive ? 2.5 : 2}
+                      strokeWidth={isActive ? 2.5 : 1.5}
                     />
+                    {/* Cart badge */}
                     {item.badge && cartItemsCount > 0 && (
-                      <span className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-r from-[#ff6f61] to-gray-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                      <span className="absolute -top-0.5 right-0.5 w-4 h-4 bg-[#ff6f61] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                         {cartItemsCount > 9 ? "9+" : cartItemsCount}
                       </span>
                     )}
@@ -99,16 +111,13 @@ export default function BottomNav() {
                   {/* Label */}
                   <span
                     className={cn(
-                      "text-[10px] font-medium transition-all duration-200",
-                      isActive ? "font-bold" : "font-normal"
+                      "text-[10px] transition-all duration-200",
+                      isActive ? "font-semibold text-gray-900" : "font-normal text-gray-500"
                     )}
                   >
                     {item.name}
                   </span>
-
-                  {/* Tap effect overlay */}
-                  <div className="absolute inset-0 bg-gray-100 opacity-0 active:opacity-100 transition-opacity rounded-lg pointer-events-none" />
-                </>
+                </div>
               );
 
               if (item.action) {
@@ -116,12 +125,7 @@ export default function BottomNav() {
                   <button
                     key={item.name}
                     onClick={item.action}
-                    className={cn(
-                      "flex flex-col items-center justify-center gap-1 transition-all duration-200 relative group",
-                      isActive
-                        ? "text-gray-900"
-                        : "text-gray-400 active:text-gray-600"
-                    )}
+                    className="flex items-center justify-center active:opacity-70 transition-opacity"
                   >
                     {content}
                   </button>
@@ -132,12 +136,7 @@ export default function BottomNav() {
                 <Link
                   key={item.name}
                   href={item.href!}
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-1 transition-all duration-200 relative group",
-                    isActive
-                      ? "text-gray-900"
-                      : "text-gray-400 active:text-gray-600"
-                  )}
+                  className="flex items-center justify-center active:opacity-70 transition-opacity"
                 >
                   {content}
                 </Link>
@@ -145,8 +144,6 @@ export default function BottomNav() {
             })}
           </div>
       </nav>
-
-      <SearchModal isOpen={searchModalOpen} onClose={() => setSearchModalOpen(false)} />
     </>
   );
 }
