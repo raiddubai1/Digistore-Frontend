@@ -54,11 +54,11 @@ export default async function Home({ params }: HomeProps) {
       </div>
 
       {/* Hero Section - Clean & Professional Design */}
-      <section className="pt-6 pb-12 md:pt-3.5 md:pb-16">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50 rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 lg:px-16 lg:py-[50px]">
+      <section className="pt-0 pb-12 md:pt-0 md:pb-16">
+        <div className="w-full">
+          <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50 shadow-xl border-b border-gray-100 px-6 sm:px-8 lg:px-16 py-8 md:py-12 lg:py-[50px]">
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
               {/* Left Column - Content */}
               <div className="text-center lg:text-left space-y-6">
               {/* Badge */}
