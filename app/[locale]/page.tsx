@@ -48,6 +48,11 @@ export default async function Home({ params }: HomeProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Build timestamp for debugging - REMOVE AFTER VERIFICATION */}
+      <div className="fixed bottom-4 right-4 bg-black text-white px-3 py-1 rounded text-xs z-[9999]">
+        Build: {new Date().toISOString()}
+      </div>
+
       {/* Hero Section - Clean & Professional Design */}
       <section className="pt-6 pb-12 md:pt-3.5 md:pb-16">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
