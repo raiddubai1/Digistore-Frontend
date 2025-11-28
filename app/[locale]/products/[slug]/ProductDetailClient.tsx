@@ -59,39 +59,43 @@ export default function ProductDetailClient({
   return (
     <>
       {/* ===== MOBILE LAYOUT ===== */}
-      <div className="lg:hidden min-h-screen bg-white pb-44">
-        {/* Sticky Header */}
-        <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
-          <div className="flex items-center justify-between px-4 py-3">
-            <Link href={`/${locale}/products`} className="p-2 -ml-2">
-              <ChevronLeft className="w-6 h-6 text-gray-700" />
-            </Link>
-            <div className="flex items-center gap-2">
-              <button 
-                onClick={() => setIsWishlisted(!isWishlisted)}
-                className="p-2"
-              >
-                <Heart 
-                  className={`w-6 h-6 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} 
-                />
-              </button>
-              <button onClick={handleShare} className="p-2">
-                <Share2 className="w-6 h-6 text-gray-700" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Image Carousel */}
+      <div className="lg:hidden min-h-screen bg-white pb-24">
+        {/* Image Carousel - Full width, edge to edge, with overlaid buttons */}
         <div className="relative">
-          <div className="aspect-square bg-gray-100">
+          <div className="aspect-[4/5] bg-gray-100">
             <img
               src={images[currentImageIndex]}
               alt={product.title}
               className="w-full h-full object-cover"
             />
           </div>
-          
+
+          {/* Floating Back Button - Inside Image */}
+          <Link
+            href={`/${locale}/products`}
+            className="absolute top-4 left-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md"
+          >
+            <ChevronLeft className="w-5 h-5 text-gray-800" />
+          </Link>
+
+          {/* Floating Action Buttons - Inside Image */}
+          <div className="absolute top-4 right-4 flex gap-2">
+            <button
+              onClick={handleShare}
+              className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md"
+            >
+              <Share2 className="w-5 h-5 text-gray-800" />
+            </button>
+            <button
+              onClick={() => setIsWishlisted(!isWishlisted)}
+              className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md"
+            >
+              <Heart
+                className={`w-5 h-5 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-800'}`}
+              />
+            </button>
+          </div>
+
           {/* Image Navigation Dots */}
           {images.length > 1 && (
             <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
@@ -100,27 +104,27 @@ export default function ProductDetailClient({
                   key={idx}
                   onClick={() => setCurrentImageIndex(idx)}
                   className={`w-2 h-2 rounded-full transition-all ${
-                    idx === currentImageIndex ? 'bg-white w-6' : 'bg-white/60'
+                    idx === currentImageIndex ? 'bg-white w-6 shadow' : 'bg-white/60'
                   }`}
                 />
               ))}
             </div>
           )}
 
-          {/* Badges */}
-          <div className="absolute top-4 left-4 flex flex-col gap-2">
+          {/* Badges - Bottom left of image */}
+          <div className="absolute bottom-4 left-4 flex flex-col gap-2">
             {product.discount && product.discount > 0 && (
-              <span className="px-3 py-1 bg-[#ff6f61] text-white text-sm font-bold rounded-full">
+              <span className="px-3 py-1 bg-[#ff6f61] text-white text-sm font-bold rounded-full shadow">
                 -{product.discount}% OFF
               </span>
             )}
             {product.bestseller && (
-              <span className="px-3 py-1 bg-orange-500 text-white text-sm font-bold rounded-full">
+              <span className="px-3 py-1 bg-orange-500 text-white text-sm font-bold rounded-full shadow">
                 🔥 Bestseller
               </span>
             )}
             {product.newArrival && (
-              <span className="px-3 py-1 bg-green-500 text-white text-sm font-bold rounded-full">
+              <span className="px-3 py-1 bg-green-500 text-white text-sm font-bold rounded-full shadow">
                 ✨ New
               </span>
             )}
@@ -156,17 +160,36 @@ export default function ProductDetailClient({
           </div>
 
           {/* Price */}
-          <div className="flex items-baseline gap-3 mb-4">
-            <span className="text-3xl font-bold text-gray-900">${product.price}</span>
+          <div className="flex items-baseline gap-3 mb-2">
+            <span className="text-2xl font-bold text-gray-900">${product.price}</span>
             {product.originalPrice && (
-              <span className="text-lg text-gray-400 line-through">${product.originalPrice}</span>
+              <>
+                <span className="text-base text-gray-400 line-through">${product.originalPrice}</span>
+                <span className="text-sm text-[#ff6f61] font-medium">({product.discount}% off)</span>
+              </>
             )}
           </div>
 
           {/* Short Description */}
           {product.shortDescription && (
-            <p className="text-gray-600 mb-4">{product.shortDescription}</p>
+            <p className="text-sm text-gray-600 mb-4">{product.shortDescription}</p>
           )}
+
+          {/* Action Buttons - Inline like Etsy */}
+          <div className="space-y-3 mb-4">
+            <button
+              onClick={handleAddToCart}
+              className="w-full py-3.5 bg-gray-100 text-gray-900 rounded-full font-semibold text-base active:scale-[0.98] transition-transform"
+            >
+              Add to cart
+            </button>
+            <button
+              onClick={handleAddToCart}
+              className="w-full flex items-center justify-center gap-2 py-3.5 bg-gray-900 text-white rounded-full font-semibold text-base active:scale-[0.98] transition-transform"
+            >
+              Buy it now
+            </button>
+          </div>
 
           {/* Divider */}
           <div className="border-t border-gray-100 my-4" />
@@ -319,17 +342,6 @@ export default function ProductDetailClient({
               </div>
             </div>
           )}
-        </div>
-
-        {/* Fixed Bottom Bar - positioned above bottom nav */}
-        <div className="fixed left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-40" style={{ bottom: 'calc(70px + env(safe-area-inset-bottom, 0px))' }}>
-          <button
-            onClick={handleAddToCart}
-            className="w-full flex items-center justify-center gap-2 py-4 bg-gray-900 text-white rounded-full font-semibold text-lg active:scale-[0.98] transition-transform"
-          >
-            <ShoppingCart className="w-5 h-5" />
-            Add to Cart - ${product.price}
-          </button>
         </div>
       </div>
 
