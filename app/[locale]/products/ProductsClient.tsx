@@ -6,7 +6,9 @@ import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { demoProducts, demoCategories } from "@/data/demo-products";
-import { Filter, Grid, List, X, Search, Star } from "lucide-react";
+import { Filter, Grid, List, X, Search, Star, Heart, ShoppingCart, Download } from "lucide-react";
+import { useCartStore } from "@/store/cartStore";
+import toast from "react-hot-toast";
 import { Product } from "@/types";
 import SortBottomSheet from "@/components/SortBottomSheet";
 import FilterBottomSheet from "@/components/FilterBottomSheet";
@@ -38,6 +40,9 @@ export default function ProductsClient() {
   // Mobile bottom sheet states
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  // View mode state (grid or list)
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -503,10 +508,16 @@ export default function ProductsClient() {
 
                 {/* View Toggle */}
                 <div className="hidden lg:flex gap-1 border border-gray-200 rounded-lg p-1">
-                  <button className="p-2 rounded bg-primary text-white">
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={`p-2 rounded transition-colors ${viewMode === "grid" ? "bg-gray-900 text-white" : "hover:bg-gray-100 text-gray-600"}`}
+                  >
                     <Grid className="w-4 h-4" />
                   </button>
-                  <button className="p-2 rounded hover:bg-gray-100">
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`p-2 rounded transition-colors ${viewMode === "list" ? "bg-gray-900 text-white" : "hover:bg-gray-100 text-gray-600"}`}
+                  >
                     <List className="w-4 h-4" />
                   </button>
                 </div>
@@ -551,19 +562,27 @@ export default function ProductsClient() {
               </div>
             )}
 
-            {/* Products Grid */}
+            {/* Products Grid/List */}
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className={viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-4"}>
                 {[...Array(12)].map((_, i) => (
                   <ProductCardSkeleton key={i} />
                 ))}
               </div>
             ) : products && products.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+              viewMode === "grid" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {products.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {products.map((product) => (
+                    <ProductListCard key={product.id} product={product} />
+                  ))}
+                </div>
+              )
             ) : (
               <div className="text-center py-12">
                 <p className="text-gray-500 mb-4">No products found matching your filters.</p>
@@ -640,3 +659,113 @@ export default function ProductsClient() {
   );
 }
 
+// List view card component for desktop
+function ProductListCard({ product }: { product: Product }) {
+  const { addItem } = useCartStore();
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addItem(product);
+    toast.success("Added to cart!");
+  };
+
+  return (
+    <Link href={`/products/${product.slug}`} className="group block">
+      <div className="bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all overflow-hidden flex">
+        {/* Image */}
+        <div className="relative w-48 h-48 flex-shrink-0 bg-gray-100">
+          {product.thumbnailUrl ? (
+            <img
+              src={product.thumbnailUrl}
+              alt={product.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Download className="w-12 h-12 text-gray-400" />
+            </div>
+          )}
+          {/* Badges */}
+          <div className="absolute top-2 left-2 flex flex-col gap-1">
+            {product.bestseller && (
+              <span className="px-2 py-0.5 bg-orange-500 text-white text-xs font-bold rounded-full">
+                🔥 Bestseller
+              </span>
+            )}
+            {product.newArrival && (
+              <span className="px-2 py-0.5 bg-green-500 text-white text-xs font-bold rounded-full">
+                ✨ New
+              </span>
+            )}
+            {product.discount && product.discount > 0 && (
+              <span className="px-2 py-0.5 bg-[#ff6f61] text-white text-xs font-bold rounded-full">
+                -{product.discount}%
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 p-4 flex flex-col">
+          {/* Category */}
+          <div className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">
+            {typeof product.category === 'string' ? product.category.replace(/-/g, ' ') : ''}
+          </div>
+
+          {/* Title */}
+          <h3 className="font-bold text-gray-900 text-lg mb-2 group-hover:text-[#ff6f61] transition-colors line-clamp-2">
+            {product.title}
+          </h3>
+
+          {/* Description */}
+          {product.shortDescription && (
+            <p className="text-sm text-gray-600 mb-3 line-clamp-2">{product.shortDescription}</p>
+          )}
+
+          {/* Rating */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-1">
+              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              <span className="text-sm font-semibold text-gray-900">{product.rating}</span>
+            </div>
+            <span className="text-xs text-gray-500">({product.reviewCount} reviews)</span>
+            <span className="text-xs text-gray-400">•</span>
+            <span className="text-xs text-gray-500">{product.downloadCount?.toLocaleString()} downloads</span>
+          </div>
+
+          {/* Price & Actions */}
+          <div className="flex items-center justify-between mt-auto">
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-gray-900">${product.price}</span>
+              {product.originalPrice && (
+                <span className="text-sm text-gray-400 line-through">${product.originalPrice}</span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsWishlisted(!isWishlisted);
+                }}
+                className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-colors ${
+                  isWishlisted ? 'border-red-500 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+              </button>
+              <button
+                onClick={handleAddToCart}
+                className="px-4 py-2 bg-gray-900 text-white rounded-full font-semibold text-sm hover:bg-gray-800 transition-colors flex items-center gap-2"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
