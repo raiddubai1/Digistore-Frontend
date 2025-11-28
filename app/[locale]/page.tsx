@@ -45,7 +45,7 @@ export default async function Home({ params }: HomeProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section - Clean & Professional Design */}
-      <section className="pt-6 pb-12 md:pt-8 md:pb-16">
+      <section className="pt-6 pb-12 md:pt-3.5 md:pb-16">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-cyan-50 rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 lg:p-16">
 
