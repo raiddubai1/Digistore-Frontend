@@ -62,7 +62,7 @@ export default function ProductDetailClient({
       <div className="lg:hidden min-h-screen bg-white pb-24">
         {/* Image Carousel - Full width, edge to edge, with overlaid buttons */}
         <div className="relative">
-          <div className="aspect-[4/5] bg-gray-100">
+          <div className="aspect-[4/3] bg-gray-100">
             <img
               src={images[currentImageIndex]}
               alt={product.title}
