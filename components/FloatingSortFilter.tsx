@@ -14,28 +14,28 @@ export default function FloatingSortFilter({
   activeFiltersCount = 0,
 }: FloatingSortFilterProps) {
   return (
-    // Positioned right above the bottom nav (h-16 = 64px + safe area)
-    <div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-0 right-0 z-40 lg:hidden">
-      <div className="flex bg-black">
+    // Positioned right above the bottom nav - centered pill buttons like ZARA
+    <div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom)+8px)] left-1/2 -translate-x-1/2 z-40 lg:hidden">
+      <div className="flex items-center gap-2">
         {/* Sort Button */}
         <button
           onClick={onSortClick}
-          className="flex-1 flex items-center justify-center gap-1.5 py-3 text-white text-xs font-medium tracking-wide active:bg-gray-800 transition-colors border-r border-gray-700"
+          className="flex items-center gap-1.5 px-4 py-2 bg-black text-white text-xs font-medium tracking-wide rounded-sm active:bg-gray-800 transition-colors"
         >
-          <ArrowUpDown className="w-3.5 h-3.5" />
+          <ArrowUpDown className="w-3 h-3" />
           SORT
         </button>
 
         {/* Filter Button */}
         <button
           onClick={onFilterClick}
-          className="relative flex-1 flex items-center justify-center gap-1.5 py-3 text-white text-xs font-medium tracking-wide active:bg-gray-800 transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 bg-black text-white text-xs font-medium tracking-wide rounded-sm active:bg-gray-800 transition-colors"
         >
-          <SlidersHorizontal className="w-3.5 h-3.5" />
+          <SlidersHorizontal className="w-3 h-3" />
           FILTER
           {/* Active Filters Badge */}
           {activeFiltersCount > 0 && (
-            <span className="ml-1 px-1.5 py-0.5 bg-white text-black text-[10px] font-bold rounded">
+            <span className="ml-1 w-4 h-4 bg-white text-black text-[10px] font-bold rounded-full flex items-center justify-center">
               {activeFiltersCount}
             </span>
           )}

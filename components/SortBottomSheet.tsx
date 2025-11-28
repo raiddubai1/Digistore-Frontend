@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { X, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +30,18 @@ export default function SortBottomSheet({
   currentSort,
   onSortChange,
 }: SortBottomSheetProps) {
+  // Lock body scroll when open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   const handleSelect = (value: string) => {
     onSortChange(value);
     onClose();
@@ -51,6 +64,7 @@ export default function SortBottomSheet({
           "fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl transition-transform duration-300 ease-out lg:hidden",
           isOpen ? "translate-y-0" : "translate-y-full"
         )}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Handle Bar */}
         <div className="flex justify-center pt-3 pb-2">
@@ -58,8 +72,8 @@ export default function SortBottomSheet({
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="text-xl font-bold">Sort By</h2>
+        <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100">
+          <h2 className="text-lg font-bold">Sort By</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -69,28 +83,25 @@ export default function SortBottomSheet({
         </div>
 
         {/* Options */}
-        <div className="px-4 py-2 pb-8">
+        <div className="px-4 py-2 pb-[calc(16px+env(safe-area-inset-bottom))]">
           {sortOptions.map((option) => (
             <button
               key={option.value}
               onClick={() => handleSelect(option.value)}
               className={cn(
-                "w-full flex items-center justify-between px-4 py-4 rounded-xl transition-colors",
+                "w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors",
                 currentSort === option.value
                   ? "bg-gray-900 text-white"
                   : "hover:bg-gray-100"
               )}
             >
-              <span className="font-medium">{option.label}</span>
+              <span className="font-medium text-sm">{option.label}</span>
               {currentSort === option.value && (
                 <Check className="w-5 h-5" />
               )}
             </button>
           ))}
         </div>
-
-        {/* Safe Area Padding for iPhone */}
-        <div className="h-safe-area-inset-bottom" />
       </div>
     </>
   );

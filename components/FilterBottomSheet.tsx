@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { X, Check, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +42,24 @@ export default function FilterBottomSheet({
 }: FilterBottomSheetProps) {
   const totalFilters = selectedCategories.length + selectedPriceRanges.length + selectedRatings.length;
 
+  // Lock body scroll when open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [isOpen]);
+
   return (
     <>
       {/* Backdrop */}
@@ -55,19 +74,20 @@ export default function FilterBottomSheet({
       {/* Bottom Sheet */}
       <div
         className={cn(
-          "fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl transition-transform duration-300 ease-out lg:hidden",
+          "fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl transition-transform duration-300 ease-out lg:hidden flex flex-col",
           isOpen ? "translate-y-0" : "translate-y-full"
         )}
-        style={{ maxHeight: '80vh' }}
+        style={{ maxHeight: '75vh' }}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Handle Bar */}
-        <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
+        <div className="flex justify-center pt-3 pb-2">
           <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
-          <h2 className="text-xl font-bold">Filters</h2>
+        <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100">
+          <h2 className="text-lg font-bold">Filters</h2>
           <div className="flex items-center gap-2">
             {totalFilters > 0 && (
               <button
@@ -75,7 +95,7 @@ export default function FilterBottomSheet({
                 className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-[#ff6f61] hover:bg-red-50 rounded-full transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
-                Clear All
+                Clear
               </button>
             )}
             <button
@@ -89,8 +109,8 @@ export default function FilterBottomSheet({
 
         {/* Scrollable Content */}
         <div
-          className="overflow-y-auto overscroll-contain px-6 py-4"
-          style={{ maxHeight: 'calc(80vh - 180px)' }}
+          className="flex-1 overflow-y-auto overscroll-contain touch-pan-y px-6 py-4"
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {/* Categories Section */}
           <div className="mb-6">
