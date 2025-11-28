@@ -65,7 +65,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen min-h-dvh overflow-x-hidden">
         <AuthProvider>
           <ConditionalLayout>
             {children}
