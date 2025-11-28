@@ -183,14 +183,14 @@ function MiniProductCard({ product }: { product: Product }) {
   return (
     <Link href={`/products/${product.slug}`} className="block">
       <div className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm active:scale-[0.98] transition-transform">
-        {/* Image */}
-        <div className="relative aspect-square bg-gradient-to-br from-gray-100 to-gray-50">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-gray-200 to-gray-100 flex items-center justify-center">
-              <span className="text-2xl">📦</span>
-            </div>
-          </div>
-          {/* Badge */}
+        {/* Product Image */}
+        <div className="relative aspect-square bg-gray-100">
+          <img
+            src={product.thumbnailUrl}
+            alt={product.title}
+            className="w-full h-full object-cover"
+          />
+          {/* Badges */}
           {product.discount && product.discount > 0 && (
             <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-[#ff6f61] text-white text-[10px] font-bold rounded">
               -{product.discount}%
@@ -198,7 +198,12 @@ function MiniProductCard({ product }: { product: Product }) {
           )}
           {product.bestseller && !product.discount && (
             <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded">
-              🔥
+              🔥 HOT
+            </span>
+          )}
+          {product.newArrival && !product.discount && !product.bestseller && (
+            <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded">
+              ✨ NEW
             </span>
           )}
         </div>
