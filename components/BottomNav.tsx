@@ -85,14 +85,14 @@ export default function BottomNav() {
               const isActive = isNavActive(item.href);
 
               const content = (
-                <div className="flex flex-col items-center justify-center gap-0.5">
-                  {/* Icon with pill background when active (Etsy-style) */}
-                  <div
-                    className={cn(
-                      "relative flex items-center justify-center w-12 h-8 rounded-full transition-all duration-200",
-                      isActive ? "bg-gray-100" : "bg-transparent"
-                    )}
-                  >
+                <div
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-0.5 px-4 py-1.5 rounded-2xl transition-all duration-200",
+                    isActive ? "bg-gray-100" : "bg-transparent"
+                  )}
+                >
+                  {/* Icon */}
+                  <div className="relative">
                     <Icon
                       className={cn(
                         "w-5 h-5 transition-all duration-200",
@@ -102,7 +102,7 @@ export default function BottomNav() {
                     />
                     {/* Cart badge */}
                     {item.badge && cartItemsCount > 0 && (
-                      <span className="absolute -top-0.5 right-0.5 w-4 h-4 bg-[#ff6f61] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#ff6f61] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                         {cartItemsCount > 9 ? "9+" : cartItemsCount}
                       </span>
                     )}
