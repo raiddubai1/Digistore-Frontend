@@ -124,83 +124,88 @@ export default async function Home({ params }: HomeProps) {
               <div className="relative h-[450px] flex items-center justify-center">
                 {/* Laptop Container */}
                 <div className="relative animate-float">
-                  {/* Laptop Screen */}
-                  <div className="relative w-[420px] h-[280px] bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-t-2xl border-8 border-gray-800 shadow-2xl">
-                    {/* Screen Bezel */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black rounded-lg overflow-hidden">
+                  {/* Laptop Screen - Ultra Thin Bezel MacBook Style */}
+                  <div className="relative w-[440px] h-[290px] bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700/50">
+                    {/* Ultra Thin Bezel */}
+                    <div className="absolute inset-[6px] bg-black rounded-lg overflow-hidden">
                       {/* Screen Content - Product Thumbnails */}
-                      <div className="absolute inset-4 bg-gradient-to-br from-gray-100 to-white rounded-lg p-4 overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100 p-5 overflow-hidden">
                         {/* Browser Bar */}
-                        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200">
+                        <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200">
                           <div className="flex gap-1.5">
-                            <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
-                            <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
-                            <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                            <div className="w-3 h-3 rounded-full bg-red-500 shadow-sm"></div>
+                            <div className="w-3 h-3 rounded-full bg-yellow-500 shadow-sm"></div>
+                            <div className="w-3 h-3 rounded-full bg-green-500 shadow-sm"></div>
                           </div>
-                          <div className="flex-1 h-5 bg-gray-100 rounded-md"></div>
+                          <div className="flex-1 h-6 bg-gray-100 rounded-lg border border-gray-200"></div>
                         </div>
 
                         {/* Product Grid */}
                         <div className="grid grid-cols-3 gap-3">
                           {/* Product Card 1 */}
-                          <div className="bg-gradient-to-br from-[#ff6f61] to-orange-400 rounded-lg p-3 shadow-md animate-pulse-slow">
-                            <div className="w-full h-12 bg-white/30 rounded mb-2"></div>
-                            <div className="h-1.5 bg-white/40 rounded mb-1"></div>
-                            <div className="h-1.5 bg-white/30 rounded w-2/3"></div>
+                          <div className="bg-gradient-to-br from-[#ff6f61] to-orange-500 rounded-xl p-3 shadow-lg animate-pulse-slow transform hover:scale-105 transition-transform">
+                            <div className="w-full h-14 bg-white/30 rounded-lg mb-2 backdrop-blur-sm"></div>
+                            <div className="h-2 bg-white/50 rounded mb-1"></div>
+                            <div className="h-2 bg-white/40 rounded w-2/3"></div>
                           </div>
 
                           {/* Product Card 2 */}
-                          <div className="bg-gradient-to-br from-gray-500 to-gray-600 rounded-lg p-3 shadow-md animate-pulse-slow" style={{ animationDelay: '0.2s' }}>
-                            <div className="w-full h-12 bg-white/30 rounded mb-2"></div>
-                            <div className="h-1.5 bg-white/40 rounded mb-1"></div>
-                            <div className="h-1.5 bg-white/30 rounded w-2/3"></div>
+                          <div className="bg-gradient-to-br from-gray-600 to-gray-700 rounded-xl p-3 shadow-lg animate-pulse-slow transform hover:scale-105 transition-transform" style={{ animationDelay: '0.2s' }}>
+                            <div className="w-full h-14 bg-white/30 rounded-lg mb-2 backdrop-blur-sm"></div>
+                            <div className="h-2 bg-white/50 rounded mb-1"></div>
+                            <div className="h-2 bg-white/40 rounded w-2/3"></div>
                           </div>
 
                           {/* Product Card 3 */}
-                          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-3 shadow-md animate-pulse-slow" style={{ animationDelay: '0.4s' }}>
-                            <div className="w-full h-12 bg-white/30 rounded mb-2"></div>
-                            <div className="h-1.5 bg-white/40 rounded mb-1"></div>
-                            <div className="h-1.5 bg-white/30 rounded w-2/3"></div>
+                          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-3 shadow-lg animate-pulse-slow transform hover:scale-105 transition-transform" style={{ animationDelay: '0.4s' }}>
+                            <div className="w-full h-14 bg-white/30 rounded-lg mb-2 backdrop-blur-sm"></div>
+                            <div className="h-2 bg-white/50 rounded mb-1"></div>
+                            <div className="h-2 bg-white/40 rounded w-2/3"></div>
                           </div>
 
                           {/* Product Card 4 */}
-                          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-3 shadow-md animate-pulse-slow" style={{ animationDelay: '0.6s' }}>
-                            <div className="w-full h-12 bg-white/30 rounded mb-2"></div>
-                            <div className="h-1.5 bg-white/40 rounded mb-1"></div>
-                            <div className="h-1.5 bg-white/30 rounded w-2/3"></div>
+                          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-3 shadow-lg animate-pulse-slow transform hover:scale-105 transition-transform" style={{ animationDelay: '0.6s' }}>
+                            <div className="w-full h-14 bg-white/30 rounded-lg mb-2 backdrop-blur-sm"></div>
+                            <div className="h-2 bg-white/50 rounded mb-1"></div>
+                            <div className="h-2 bg-white/40 rounded w-2/3"></div>
                           </div>
 
                           {/* Product Card 5 */}
-                          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-3 shadow-md animate-pulse-slow" style={{ animationDelay: '0.8s' }}>
-                            <div className="w-full h-12 bg-white/30 rounded mb-2"></div>
-                            <div className="h-1.5 bg-white/40 rounded mb-1"></div>
-                            <div className="h-1.5 bg-white/30 rounded w-2/3"></div>
+                          <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-3 shadow-lg animate-pulse-slow transform hover:scale-105 transition-transform" style={{ animationDelay: '0.8s' }}>
+                            <div className="w-full h-14 bg-white/30 rounded-lg mb-2 backdrop-blur-sm"></div>
+                            <div className="h-2 bg-white/50 rounded mb-1"></div>
+                            <div className="h-2 bg-white/40 rounded w-2/3"></div>
                           </div>
 
                           {/* Product Card 6 */}
-                          <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg p-3 shadow-md animate-pulse-slow" style={{ animationDelay: '1s' }}>
-                            <div className="w-full h-12 bg-white/30 rounded mb-2"></div>
-                            <div className="h-1.5 bg-white/40 rounded mb-1"></div>
-                            <div className="h-1.5 bg-white/30 rounded w-2/3"></div>
+                          <div className="bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl p-3 shadow-lg animate-pulse-slow transform hover:scale-105 transition-transform" style={{ animationDelay: '1s' }}>
+                            <div className="w-full h-14 bg-white/30 rounded-lg mb-2 backdrop-blur-sm"></div>
+                            <div className="h-2 bg-white/50 rounded mb-1"></div>
+                            <div className="h-2 bg-white/40 rounded w-2/3"></div>
                           </div>
                         </div>
                       </div>
 
                       {/* Screen Glare Effect */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none"></div>
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none"></div>
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-2xl rounded-full pointer-events-none"></div>
                     </div>
 
-                    {/* Camera Notch */}
-                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-700 rounded-full"></div>
+                    {/* Camera Notch - Smaller and more subtle */}
+                    <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-gray-800 rounded-full ring-1 ring-gray-700"></div>
                   </div>
 
-                  {/* Laptop Base */}
-                  <div className="relative w-[480px] h-3 bg-gradient-to-b from-gray-300 to-gray-400 rounded-b-xl -mt-1 shadow-lg">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+                  {/* Laptop Base - Sleeker MacBook Style */}
+                  <div className="relative w-[480px] h-2 bg-gradient-to-b from-slate-400 via-slate-300 to-slate-400 shadow-xl" style={{ clipPath: 'polygon(8% 0%, 92% 0%, 100% 100%, 0% 100%)' }}>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
                   </div>
 
-                  {/* Laptop Shadow */}
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[500px] h-8 bg-gray-900/20 blur-2xl rounded-full"></div>
+                  {/* Keyboard Deck - Visible part */}
+                  <div className="relative w-[500px] h-1 bg-gradient-to-b from-slate-300 to-slate-400 -mt-0.5" style={{ clipPath: 'polygon(6% 0%, 94% 0%, 100% 100%, 0% 100%)' }}>
+                  </div>
+
+                  {/* Laptop Shadow - More realistic */}
+                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[520px] h-12 bg-gradient-radial from-gray-900/30 via-gray-900/10 to-transparent blur-2xl rounded-full"></div>
                 </div>
 
                 {/* Floating UI Elements Around Laptop */}
