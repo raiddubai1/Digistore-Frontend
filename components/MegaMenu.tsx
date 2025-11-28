@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  ChevronDown, TrendingUp, Sparkles, Clock, Tag, Home, Briefcase, Code, 
-  Heart, Palette, DollarSign, ArrowRight, Flame, Zap, ShoppingBag, 
+import {
+  ChevronDown, TrendingUp, Sparkles, Clock, Tag, Home, Briefcase, Code,
+  Heart, Palette, DollarSign, ArrowRight, Flame, Zap, Menu,
   LucideIcon, Star, Gift, Rocket
 } from "lucide-react";
 import { useCategories } from "@/hooks/useCategories";
@@ -144,7 +144,7 @@ export default function MegaMenu() {
                   ? 'bg-gray-100 text-gray-900'
                   : 'text-gray-700 hover:text-gray-500 hover:bg-gray-50'
               }`}>
-                <ShoppingBag className="w-4 h-4" />
+                <Menu className="w-4 h-4" />
                 All Categories
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
               </button>
