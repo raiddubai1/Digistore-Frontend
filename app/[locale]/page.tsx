@@ -56,11 +56,11 @@ export default async function Home({ params }: HomeProps) {
       {/* Hero Section - Clean & Professional Design */}
       <section className="pt-0 pb-12 md:pt-0 md:pb-16">
         <div className="w-full">
-          <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50 shadow-xl border-b border-gray-100 px-6 sm:px-8 lg:px-16 py-8 md:py-12 lg:py-[50px]">
+          <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50 shadow-xl border-b border-gray-100 px-6 sm:px-8 lg:px-16 py-6 md:py-8 lg:py-[40px]">
 
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
               {/* Left Column - Content */}
-              <div className="text-center lg:text-left space-y-8">
+              <div className="text-center lg:text-left space-y-10">
               {/* Main Heading */}
               <div className="space-y-4">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
@@ -75,7 +75,7 @@ export default async function Home({ params }: HomeProps) {
               </div>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   href={`/${locale}/products`}
                   className="inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 transition-all hover:scale-105"
@@ -119,24 +119,11 @@ export default async function Home({ params }: HomeProps) {
 
             {/* Right Column - Animated Laptop Mockup */}
             <div className="relative hidden lg:block">
-              {/* Badge - Moved from left side */}
-              <div className="flex justify-center mb-6">
-                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-gray-100">
-                  <span className="flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-gray-500 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gray-500"></span>
-                  </span>
-                  <span className="text-sm font-bold bg-gradient-to-r from-gray-500 to-[#ff6f61] bg-clip-text text-transparent">
-                    40,000+ Premium Digital Products
-                  </span>
-                </div>
-              </div>
-
-              <div className="relative h-[450px] flex items-center justify-center">
+              <div className="relative h-[500px] flex items-center justify-center">
                 {/* Laptop Container */}
                 <div className="relative animate-float">
                   {/* Laptop Screen - Modern White/Silver Design */}
-                  <div className="relative w-[450px] h-[300px] rounded-2xl bg-gradient-to-br from-white via-gray-50 to-gray-100 p-3 shadow-2xl border-2 border-gray-200">
+                  <div className="relative w-[520px] h-[350px] rounded-2xl bg-gradient-to-br from-white via-gray-50 to-gray-100 p-3 shadow-2xl border-2 border-gray-200">
                     {/* Screen Display */}
                     <div className="relative w-full h-full bg-gradient-to-br from-blue-50 via-white to-orange-50 rounded-xl overflow-hidden shadow-inner border border-gray-200">
                       {/* Screen Content - Product Thumbnails */}
@@ -206,14 +193,14 @@ export default async function Home({ params }: HomeProps) {
                   </div>
 
                   {/* Laptop Base/Keyboard - Modern White Design */}
-                  <div className="relative w-[520px] h-4 bg-gradient-to-b from-gray-100 via-white to-gray-200 rounded-b-3xl shadow-xl border-x-2 border-b-2 border-gray-200 -mt-1">
+                  <div className="relative w-[600px] h-4 bg-gradient-to-b from-gray-100 via-white to-gray-200 rounded-b-3xl shadow-xl border-x-2 border-b-2 border-gray-200 -mt-1">
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent"></div>
                     {/* Keyboard hint */}
                     <div className="absolute top-1 left-1/2 -translate-x-1/2 w-32 h-0.5 bg-gray-300 rounded-full"></div>
                   </div>
 
                   {/* Laptop Shadow */}
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[540px] h-10 bg-gray-400/20 blur-3xl rounded-full"></div>
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[620px] h-10 bg-gray-400/20 blur-3xl rounded-full"></div>
                 </div>
 
                 {/* Floating UI Elements Around Laptop */}
