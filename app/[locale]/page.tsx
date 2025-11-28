@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Download, Shield, Zap, Star } from "lucide-react";
+import { ArrowRight, Download, Shield, Zap, Star, Sparkles, TrendingUp, Users, Award, CheckCircle, Rocket, Gift, Tag, ShoppingCart, Package } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import OfferOfTheDay from "@/components/OfferOfTheDay";
@@ -43,309 +43,313 @@ export default async function Home({ params }: HomeProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section - Modern Premium Design */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-cyan-50 pt-12 pb-20 md:pt-16 md:pb-32">
-        {/* Animated Background Shapes */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Large Circle - Top Right */}
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl animate-pulse"></div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section - Clean & Professional Design */}
+      <section className="pt-6 pb-12 md:pt-3.5 md:pb-16">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50 rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 lg:px-16 lg:py-[50px]">
 
-          {/* Medium Circle - Bottom Left */}
-          <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-gradient-to-tr from-accent/20 to-primary/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-
-          {/* Small Circle - Top Left */}
-          <div className="absolute top-20 left-20 w-40 h-40 bg-gradient-to-br from-secondary/30 to-accent/30 rounded-full blur-2xl animate-bounce"></div>
-
-          {/* Floating Shapes */}
-          <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-gradient-to-br from-pink-300/20 to-purple-300/20 rounded-3xl rotate-12 blur-xl animate-float"></div>
-          <div className="absolute bottom-1/3 left-1/3 w-24 h-24 bg-gradient-to-br from-blue-300/20 to-teal-300/20 rounded-2xl -rotate-12 blur-xl animate-float-delayed"></div>
-
-          {/* Soft Glow Spots - Premium Feel */}
-          <div className="absolute top-1/3 left-1/2 w-96 h-96 bg-gradient-radial from-primary/10 via-transparent to-transparent rounded-full blur-3xl"></div>
-          <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-gradient-radial from-secondary/10 via-transparent to-transparent rounded-full blur-3xl"></div>
-
-          {/* Grid Pattern Overlay */}
-          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left Column - Text Content */}
-            <div className="text-center lg:text-left lg:-mt-[60px]">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+              {/* Left Column - Content */}
+              <div className="text-center lg:text-left space-y-6">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg mb-4 border border-white/20">
-                <span className="flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-gray-100">
+                <span className="flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-gray-500 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gray-500"></span>
                 </span>
-                <span className="text-sm font-semibold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                  40,000+ Digital Products Available
+                <span className="text-sm font-bold bg-gradient-to-r from-gray-500 to-[#ff6f61] bg-clip-text text-transparent">
+                  40,000+ Premium Digital Products
                 </span>
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-5 leading-[1.1]">
-                <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent block">
-                  Premium Digital
-                </span>
-                <span className="text-gray-900 block">Products Marketplace</span>
-              </h1>
+              {/* Main Heading */}
+              <div className="space-y-3">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
+                  <span className="block text-gray-900">Your Gateway to</span>
+                  <span className="block bg-gradient-to-r from-gray-500 via-gray-400 to-[#ff6f61] bg-clip-text text-transparent">
+                    Digital Excellence
+                  </span>
+                </h1>
+                <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                  Discover, download, and deploy premium digital products instantly. From templates to tools, we've got everything you need to succeed. 🚀
+                </p>
+              </div>
 
-              <p className="text-base md:text-lg text-gray-600 mb-6 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                Download high-quality eBooks, templates, and digital tools instantly. Start creating amazing content today. 🚀
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center mb-6">
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   href={`/${locale}/products`}
-                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-indigo-600 text-white rounded-[15px] font-semibold hover:shadow-xl hover:shadow-primary/25 transition-all hover:scale-105 text-base shadow-lg"
+                  className="inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 transition-all hover:scale-105"
                 >
-                  Browse Products
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  Explore Products
                 </Link>
                 <Link
                   href={`/${locale}/categories`}
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white border-2 border-gray-200 text-secondary rounded-[15px] font-semibold hover:border-primary hover:text-primary transition-all text-base shadow-lg"
+                  className="inline-flex items-center justify-center px-8 py-3.5 bg-white border-2 border-gray-200 text-gray-900 rounded-full font-bold text-base hover:border-gray-300 hover:bg-gray-50 transition-all shadow-md hover:shadow-lg"
                 >
-                  View Categories
+                  Browse Categories
                 </Link>
               </div>
 
-              {/* Trust Badges */}
-              <div className="flex flex-wrap gap-6 justify-center lg:justify-start items-center text-sm text-gray-600">
+              {/* Trust Indicators */}
+              <div className="flex flex-wrap gap-8 justify-center lg:justify-start items-center pt-4">
                 <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="font-semibold">4.9/5 Rating</span>
+                  <div className="flex -space-x-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-gray-400 to-gray-500 border-2 border-white"></div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#ff6f61] to-gray-400 border-2 border-white"></div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 border-2 border-white"></div>
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-bold text-gray-900">50,000+</div>
+                    <div className="text-xs text-gray-500">Happy Customers</div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-green-500" />
-                  <span className="font-semibold">Secure Checkout</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Download className="w-5 h-5 text-blue-500" />
-                  <span className="font-semibold">Instant Access</span>
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-bold text-gray-900">4.9/5</div>
+                    <div className="text-xs text-gray-500">Rating</div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Column - Premium 3D Floating Cards */}
-            <div className="relative hidden lg:block xl:ml-8">
-              {/* Soft Background Glows */}
-              <div className="absolute inset-0 -z-10">
-                <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-gradient-radial from-purple-200/40 via-pink-200/20 to-transparent rounded-full blur-3xl"></div>
-                <div className="absolute bottom-1/3 left-1/4 w-72 h-72 bg-gradient-radial from-blue-200/40 via-cyan-200/20 to-transparent rounded-full blur-3xl"></div>
+            {/* Right Column - Animated Laptop Mockup */}
+            <div className="relative hidden lg:block">
+              <div className="relative h-[450px] flex items-center justify-center">
+                {/* Laptop Container */}
+                <div className="relative animate-float">
+                  {/* Laptop Screen - Modern White/Silver Design */}
+                  <div className="relative w-[450px] h-[300px] rounded-2xl bg-gradient-to-br from-white via-gray-50 to-gray-100 p-3 shadow-2xl border-2 border-gray-200">
+                    {/* Screen Display */}
+                    <div className="relative w-full h-full bg-gradient-to-br from-blue-50 via-white to-orange-50 rounded-xl overflow-hidden shadow-inner border border-gray-200">
+                      {/* Screen Content - Product Thumbnails */}
+                      <div className="absolute inset-0 p-4 overflow-hidden">
+                        {/* Browser Bar */}
+                        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-300">
+                          <div className="flex gap-1.5">
+                            <div className="w-3 h-3 rounded-full bg-gradient-to-br from-red-400 to-red-500 shadow"></div>
+                            <div className="w-3 h-3 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 shadow"></div>
+                            <div className="w-3 h-3 rounded-full bg-gradient-to-br from-green-400 to-green-500 shadow"></div>
+                          </div>
+                          <div className="flex-1 h-6 bg-white rounded-lg border border-gray-300 shadow-sm"></div>
+                        </div>
+
+                        {/* Product Grid */}
+                        <div className="grid grid-cols-3 gap-2.5">
+                          {/* Product Card 1 - Orange */}
+                          <div className="bg-gradient-to-br from-[#ff6f61] to-orange-500 rounded-lg p-2.5 shadow-lg animate-pulse-slow transform hover:scale-105 transition-all">
+                            <div className="w-full h-12 bg-white/40 rounded-md mb-1.5 backdrop-blur-sm border border-white/50"></div>
+                            <div className="h-1.5 bg-white/60 rounded mb-1"></div>
+                            <div className="h-1.5 bg-white/50 rounded w-2/3"></div>
+                          </div>
+
+                          {/* Product Card 2 - Gray */}
+                          <div className="bg-gradient-to-br from-gray-500 to-gray-600 rounded-lg p-2.5 shadow-lg animate-pulse-slow transform hover:scale-105 transition-all" style={{ animationDelay: '0.2s' }}>
+                            <div className="w-full h-12 bg-white/40 rounded-md mb-1.5 backdrop-blur-sm border border-white/50"></div>
+                            <div className="h-1.5 bg-white/60 rounded mb-1"></div>
+                            <div className="h-1.5 bg-white/50 rounded w-2/3"></div>
+                          </div>
+
+                          {/* Product Card 3 - Blue */}
+                          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-2.5 shadow-lg animate-pulse-slow transform hover:scale-105 transition-all" style={{ animationDelay: '0.4s' }}>
+                            <div className="w-full h-12 bg-white/40 rounded-md mb-1.5 backdrop-blur-sm border border-white/50"></div>
+                            <div className="h-1.5 bg-white/60 rounded mb-1"></div>
+                            <div className="h-1.5 bg-white/50 rounded w-2/3"></div>
+                          </div>
+
+                          {/* Product Card 4 - Purple */}
+                          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-2.5 shadow-lg animate-pulse-slow transform hover:scale-105 transition-all" style={{ animationDelay: '0.6s' }}>
+                            <div className="w-full h-12 bg-white/40 rounded-md mb-1.5 backdrop-blur-sm border border-white/50"></div>
+                            <div className="h-1.5 bg-white/60 rounded mb-1"></div>
+                            <div className="h-1.5 bg-white/50 rounded w-2/3"></div>
+                          </div>
+
+                          {/* Product Card 5 - Green */}
+                          <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg p-2.5 shadow-lg animate-pulse-slow transform hover:scale-105 transition-all" style={{ animationDelay: '0.8s' }}>
+                            <div className="w-full h-12 bg-white/40 rounded-md mb-1.5 backdrop-blur-sm border border-white/50"></div>
+                            <div className="h-1.5 bg-white/60 rounded mb-1"></div>
+                            <div className="h-1.5 bg-white/50 rounded w-2/3"></div>
+                          </div>
+
+                          {/* Product Card 6 - Pink */}
+                          <div className="bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg p-2.5 shadow-lg animate-pulse-slow transform hover:scale-105 transition-all" style={{ animationDelay: '1s' }}>
+                            <div className="w-full h-12 bg-white/40 rounded-md mb-1.5 backdrop-blur-sm border border-white/50"></div>
+                            <div className="h-1.5 bg-white/60 rounded mb-1"></div>
+                            <div className="h-1.5 bg-white/50 rounded w-2/3"></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Screen Glare Effect */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none"></div>
+                    </div>
+
+                    {/* Camera */}
+                    <div className="absolute top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 rounded-full shadow-inner"></div>
+                  </div>
+
+                  {/* Laptop Base/Keyboard - Modern White Design */}
+                  <div className="relative w-[520px] h-4 bg-gradient-to-b from-gray-100 via-white to-gray-200 rounded-b-3xl shadow-xl border-x-2 border-b-2 border-gray-200 -mt-1">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent"></div>
+                    {/* Keyboard hint */}
+                    <div className="absolute top-1 left-1/2 -translate-x-1/2 w-32 h-0.5 bg-gray-300 rounded-full"></div>
+                  </div>
+
+                  {/* Laptop Shadow */}
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[540px] h-10 bg-gray-400/20 blur-3xl rounded-full"></div>
+                </div>
+
+                {/* Floating UI Elements Around Laptop */}
+                {/* Shopping Cart Icon */}
+                <div className="absolute top-8 right-8 w-16 h-16 bg-gradient-to-br from-[#ff6f61] to-orange-500 rounded-2xl shadow-xl flex items-center justify-center animate-float-delayed">
+                  <ShoppingCart className="w-8 h-8 text-white" />
+                </div>
+
+                {/* Star Rating */}
+                <div className="absolute top-32 left-4 bg-white rounded-xl shadow-xl px-4 py-3 animate-float">
+                  <div className="flex gap-1 mb-1">
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  </div>
+                  <p className="text-xs font-bold text-gray-700">4.9/5 Rating</p>
+                </div>
+
+                {/* Download Icon */}
+                <div className="absolute bottom-24 left-8 w-14 h-14 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl shadow-xl flex items-center justify-center animate-float" style={{ animationDelay: '0.5s' }}>
+                  <Package className="w-7 h-7 text-white" />
+                </div>
+
+                {/* Notification Badge */}
+                <div className="absolute bottom-8 right-12 bg-white rounded-full shadow-xl px-4 py-2 animate-float-delayed">
+                  <p className="text-xs font-bold text-gray-700">🎉 New Products!</p>
+                </div>
               </div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </section>
 
-              {/* Floating Cards Container */}
-              <div className="relative h-[520px] scale-95 xl:scale-100">
-
-                {/* Card 1 - Purple Gradient - Top Right */}
-                <div className="absolute top-0 right-0 w-64 h-80 transform rotate-[6deg] hover:rotate-[2deg] transition-all duration-500 animate-float">
-                  <div className="relative w-full h-full rounded-3xl bg-gradient-to-br from-purple-400/90 via-pink-400/90 to-purple-500/90 backdrop-blur-xl shadow-[0_20px_60px_-15px_rgba(147,51,234,0.4)] border border-white/20 overflow-hidden">
-                    {/* Glassmorphism overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-
-                    {/* Abstract UI Elements */}
-                    <div className="absolute top-6 left-6 right-6">
-                      <div className="h-2 w-3/4 bg-white/20 rounded-full mb-3"></div>
-                      <div className="h-2 w-1/2 bg-white/15 rounded-full"></div>
-                    </div>
-
-                    <div className="absolute top-24 left-6 right-6 space-y-3">
-                      <div className="h-16 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10"></div>
-                      <div className="h-16 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10"></div>
-                    </div>
-
-                    <div className="absolute bottom-6 left-6 right-6">
-                      <div className="h-12 bg-white/20 rounded-xl backdrop-blur-sm border border-white/20"></div>
-                    </div>
-
-                    {/* Decorative circles */}
-                    <div className="absolute top-1/2 right-4 w-20 h-20 bg-white/5 rounded-full blur-xl"></div>
-                    <div className="absolute bottom-1/4 left-4 w-16 h-16 bg-white/5 rounded-full blur-lg"></div>
-                  </div>
+      {/* Features Section - Modern Cards */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <div className="group relative p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-white border-2 border-gray-100 hover:border-gray-300 transition-all hover:shadow-xl hover:shadow-gray-100 hover:-translate-y-1">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-2xl"></div>
+              <div className="relative">
+                <div className="w-14 h-14 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg">
+                  <Download className="w-7 h-7 text-white" />
                 </div>
+                <h3 className="text-xl font-bold mb-3 text-gray-900">Instant Download</h3>
+                <p className="text-gray-600 leading-relaxed text-sm">
+                  Get your digital products immediately after purchase. No waiting, no hassle. Start using right away.
+                </p>
+              </div>
+            </div>
 
-                {/* Card 2 - Blue/Teal Gradient - Middle Left */}
-                <div className="absolute top-28 left-0 w-60 h-72 transform rotate-[-5deg] hover:rotate-[-2deg] transition-all duration-500 animate-float-delayed">
-                  <div className="relative w-full h-full rounded-3xl bg-gradient-to-br from-blue-400/90 via-cyan-400/90 to-teal-500/90 backdrop-blur-xl shadow-[0_20px_60px_-15px_rgba(59,130,246,0.4)] border border-white/20 overflow-hidden">
-                    {/* Glassmorphism overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-
-                    {/* Abstract UI Grid */}
-                    <div className="absolute top-6 left-6 right-6">
-                      <div className="grid grid-cols-3 gap-2">
-                        <div className="h-12 bg-white/15 rounded-xl"></div>
-                        <div className="h-12 bg-white/15 rounded-xl"></div>
-                        <div className="h-12 bg-white/15 rounded-xl"></div>
-                      </div>
-                    </div>
-
-                    <div className="absolute top-28 left-6 right-6">
-                      <div className="h-24 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10 mb-3"></div>
-                      <div className="h-2 w-2/3 bg-white/20 rounded-full mb-2"></div>
-                      <div className="h-2 w-1/2 bg-white/15 rounded-full"></div>
-                    </div>
-
-                    {/* Decorative elements */}
-                    <div className="absolute bottom-6 right-6 w-24 h-24 bg-white/5 rounded-full blur-xl"></div>
-                    <div className="absolute top-1/3 left-1/4 w-3 h-3 bg-white/30 rounded-full"></div>
-                    <div className="absolute top-1/2 right-1/3 w-2 h-2 bg-white/30 rounded-full"></div>
-                  </div>
+            {/* Feature 2 */}
+            <div className="group relative p-8 rounded-2xl bg-gradient-to-br from-orange-50 to-white border-2 border-orange-100 hover:border-orange-300 transition-all hover:shadow-xl hover:shadow-orange-100 hover:-translate-y-1">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-400/20 to-transparent rounded-full blur-2xl"></div>
+              <div className="relative">
+                <div className="w-14 h-14 bg-gradient-to-br from-[#ff6f61] to-[#ff6f61] rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg">
+                  <Shield className="w-7 h-7 text-white" />
                 </div>
+                <h3 className="text-xl font-bold mb-3 text-gray-900">Secure Payment</h3>
+                <p className="text-gray-600 leading-relaxed text-sm">
+                  Your transactions are protected with industry-standard encryption. Shop with confidence.
+                </p>
+              </div>
+            </div>
 
-                {/* Card 3 - Orange/Pink Gradient - Bottom Right */}
-                <div className="absolute bottom-0 right-16 w-56 h-64 transform rotate-[8deg] hover:rotate-[3deg] transition-all duration-500 animate-float">
-                  <div className="relative w-full h-full rounded-3xl bg-gradient-to-br from-orange-400/90 via-red-400/90 to-pink-500/90 backdrop-blur-xl shadow-[0_20px_60px_-15px_rgba(249,115,22,0.4)] border border-white/20 overflow-hidden">
-                    {/* Glassmorphism overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-
-                    {/* Abstract Chart/Graph */}
-                    <div className="absolute top-6 left-6 right-6">
-                      <div className="h-2 w-1/2 bg-white/20 rounded-full mb-4"></div>
-                      <div className="flex items-end gap-2 h-20">
-                        <div className="flex-1 bg-white/15 rounded-t-lg h-12"></div>
-                        <div className="flex-1 bg-white/15 rounded-t-lg h-16"></div>
-                        <div className="flex-1 bg-white/20 rounded-t-lg h-20"></div>
-                        <div className="flex-1 bg-white/15 rounded-t-lg h-14"></div>
-                      </div>
-                    </div>
-
-                    <div className="absolute bottom-6 left-6 right-6 space-y-2">
-                      <div className="h-2 w-full bg-white/15 rounded-full"></div>
-                      <div className="h-2 w-3/4 bg-white/15 rounded-full"></div>
-                      <div className="h-2 w-1/2 bg-white/15 rounded-full"></div>
-                    </div>
-
-                    {/* Decorative circles */}
-                    <div className="absolute top-1/3 right-4 w-16 h-16 bg-white/5 rounded-full blur-lg"></div>
-                    <div className="absolute bottom-1/3 left-6 w-2 h-2 bg-white/40 rounded-full"></div>
-                    <div className="absolute top-1/2 right-1/3 w-2 h-2 bg-white/40 rounded-full"></div>
-                  </div>
+            {/* Feature 3 */}
+            <div className="group relative p-8 rounded-2xl bg-gradient-to-br from-green-50 to-white border-2 border-green-100 hover:border-green-300 transition-all hover:shadow-xl hover:shadow-green-100 hover:-translate-y-1">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-transparent rounded-full blur-2xl"></div>
+              <div className="relative">
+                <div className="w-14 h-14 bg-gradient-to-br from-green-600 to-green-700 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg">
+                  <Award className="w-7 h-7 text-white" />
                 </div>
-
-                {/* Card 4 - Accent Purple/Blue - Small Top Left */}
-                <div className="absolute top-12 left-12 w-48 h-56 transform rotate-[-8deg] hover:rotate-[-4deg] transition-all duration-500 animate-float-delayed opacity-90">
-                  <div className="relative w-full h-full rounded-3xl bg-gradient-to-br from-indigo-400/80 via-purple-400/80 to-blue-500/80 backdrop-blur-xl shadow-[0_20px_60px_-15px_rgba(99,102,241,0.3)] border border-white/20 overflow-hidden">
-                    {/* Glassmorphism overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-
-                    {/* Abstract Circles Pattern */}
-                    <div className="absolute top-6 left-6 right-6">
-                      <div className="flex gap-2 mb-4">
-                        <div className="w-8 h-8 bg-white/20 rounded-full"></div>
-                        <div className="w-8 h-8 bg-white/15 rounded-full"></div>
-                        <div className="w-8 h-8 bg-white/10 rounded-full"></div>
-                      </div>
-                      <div className="h-2 w-2/3 bg-white/20 rounded-full mb-2"></div>
-                      <div className="h-2 w-1/2 bg-white/15 rounded-full"></div>
-                    </div>
-
-                    <div className="absolute top-28 left-6 right-6">
-                      <div className="h-20 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10"></div>
-                    </div>
-
-                    {/* Decorative elements */}
-                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
-                  </div>
-                </div>
-
+                <h3 className="text-xl font-bold mb-3 text-gray-900">Premium Quality</h3>
+                <p className="text-gray-600 leading-relaxed text-sm">
+                  All products are carefully curated to ensure the highest quality standards. Excellence guaranteed.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Download className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Instant Download</h3>
-              <p className="text-gray-600">
-                Get your digital products immediately after purchase. No waiting, no hassle.
-              </p>
+      {/* Stats Section - Modern Design */}
+      <section className="py-12 bg-gradient-to-r from-gray-500 via-gray-600 to-gray-500 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div className="space-y-2">
+              <div className="text-4xl md:text-5xl font-black text-white">40K+</div>
+              <div className="text-gray-100 font-medium text-sm md:text-base">Digital Products</div>
             </div>
-
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-secondary to-accent rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Secure Payment</h3>
-              <p className="text-gray-600">
-                Your transactions are protected with industry-standard encryption.
-              </p>
+            <div className="space-y-2">
+              <div className="text-4xl md:text-5xl font-black text-white">50K+</div>
+              <div className="text-gray-100 font-medium text-sm md:text-base">Happy Customers</div>
             </div>
-
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-accent to-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-8 h-8 text-white" />
+            <div className="space-y-2">
+              <div className="flex items-center justify-center gap-1 mb-2">
+                <Star className="w-5 h-5 md:w-6 md:h-6 fill-yellow-300 text-yellow-300" />
+                <span className="text-4xl md:text-5xl font-black text-white">4.9</span>
               </div>
-              <h3 className="text-xl font-bold mb-2">High Quality</h3>
-              <p className="text-gray-600">
-                All products are carefully curated to ensure the highest quality standards.
-              </p>
+              <div className="text-gray-100 font-medium text-sm md:text-base">Average Rating</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-4xl md:text-5xl font-black text-white">24/7</div>
+              <div className="text-gray-100 font-medium text-sm md:text-base">Support</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="bg-gray-50 py-12 md:py-16">
+      {/* Featured Products Section */}
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
-            <div>
-              <div className="text-4xl font-bold text-primary mb-2">40,000+</div>
-              <div className="text-gray-600">Digital Products</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-secondary mb-2">50,000+</div>
-              <div className="text-gray-600">Happy Customers</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-accent mb-2">4.9</div>
-              <div className="text-gray-600 flex items-center justify-center gap-1">
-                <Star className="w-4 h-4 fill-accent text-accent" />
-                Average Rating
-              </div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-primary mb-2">24/7</div>
-              <div className="text-gray-600">Support</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Want to Buy Best Products - Featured Products */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          {/* Section Header */}
           <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-secondary">
-              Want to Buy <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Best Products</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full mb-4">
+              <Sparkles className="w-4 h-4 text-gray-500" />
+              <span className="text-sm font-bold text-gray-500">FEATURED COLLECTION</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-black mb-3">
+              <span className="text-gray-900">Discover Our </span>
+              <span className="bg-gradient-to-r from-gray-500 to-[#ff6f61] bg-clip-text text-transparent">Best Products</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              From planners to eBooks — our featured picks for you
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Hand-picked premium digital products to boost your productivity and creativity
             </p>
           </div>
 
-          <div className="flex items-center justify-end mb-6">
-            <Link
-              href={`/${locale}/products`}
-              className="text-primary font-semibold hover:text-primary-dark flex items-center gap-2 group"
-            >
-              View All
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Products Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {featuredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
+          </div>
+
+          {/* View All Button */}
+          <div className="text-center">
+            <Link
+              href={`/${locale}/products`}
+              className="inline-flex items-center gap-3 px-8 py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 transition-all hover:scale-105 group"
+            >
+              View All Products
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </div>
       </section>
@@ -353,26 +357,28 @@ export default async function Home({ params }: HomeProps) {
       {/* Offer of the Day */}
       <OfferOfTheDay />
 
-      {/* Bestsellers */}
-      <section className="py-16 md:py-20 bg-gray-50">
+      {/* Bestsellers Section */}
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-3xl font-bold mb-2">Bestsellers</h2>
-              <p className="text-gray-600">
-                Most popular products this month
-              </p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 rounded-full mb-4">
+                <TrendingUp className="w-4 h-4 text-orange-600" />
+                <span className="text-sm font-bold text-orange-600">TRENDING NOW</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900">Bestsellers</h2>
+              <p className="text-lg text-gray-600 mt-2">Most popular products this month</p>
             </div>
             <Link
               href={`/${locale}/products?filter=bestsellers`}
-              className="text-primary font-semibold hover:text-primary-dark flex items-center gap-2"
+              className="hidden md:inline-flex items-center gap-2 text-gray-500 font-bold hover:gap-3 transition-all"
             >
               View All
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {bestsellerProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -385,25 +391,27 @@ export default async function Home({ params }: HomeProps) {
 
       {/* New Arrivals */}
       {newProducts.length > 0 && (
-        <section className="py-16 md:py-20 bg-white">
+        <section className="py-24 bg-white">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-12">
               <div>
-                <h2 className="text-3xl font-bold mb-2">New Arrivals</h2>
-                <p className="text-gray-600">
-                  Latest additions to our collection
-                </p>
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 rounded-full mb-4">
+                  <Sparkles className="w-4 h-4 text-green-600" />
+                  <span className="text-sm font-bold text-green-600">JUST ADDED</span>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-black text-gray-900">New Arrivals</h2>
+                <p className="text-lg text-gray-600 mt-2">Latest additions to our collection</p>
               </div>
               <Link
                 href={`/${locale}/products?filter=new`}
-                className="text-primary font-semibold hover:text-primary-dark flex items-center gap-2"
+                className="hidden md:inline-flex items-center gap-2 text-gray-500 font-bold hover:gap-3 transition-all"
               >
                 View All
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {newProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -415,30 +423,42 @@ export default async function Home({ params }: HomeProps) {
       {/* Blog Section */}
       <BlogSection />
 
-      {/* CTA Section */}
-      <section className="py-16 md:py-20 bg-gray-50">
+      {/* CTA Section - Modern Design */}
+      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="max-w-3xl mx-auto text-center bg-gradient-to-br from-secondary via-slate-900 to-secondary rounded-3xl p-12 relative overflow-hidden">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-500 via-gray-600 to-gray-700 p-12 md:p-16 text-center">
             {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary rounded-full blur-3xl animate-pulse"></div>
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent rounded-full blur-3xl animate-pulse delay-1000"></div>
-            </div>
+            <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
 
-            <div className="relative z-10">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-                Ready to Get Started?
+            <div className="relative z-10 max-w-3xl mx-auto space-y-6">
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/20 backdrop-blur-sm rounded-full">
+                <Gift className="w-5 h-5 text-white" />
+                <span className="text-sm font-bold text-white">LIMITED TIME OFFER</span>
+              </div>
+
+              <h2 className="text-3xl md:text-4xl font-black text-white leading-tight">
+                Ready to Transform Your Digital Journey?
               </h2>
-              <p className="text-lg text-gray-300 mb-8">
-                Join thousands of satisfied customers and download your first digital product today.
+              <p className="text-lg text-gray-100">
+                Join thousands of satisfied customers and download your first digital product today. Get 30% OFF on your first purchase!
               </p>
-              <Link
-                href={`/${locale}/products`}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-indigo-600 text-white rounded-[15px] font-semibold hover:shadow-xl hover:shadow-primary/25 transition-all hover:scale-105"
-              >
-                Start Shopping
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                <Link
+                  href={`/${locale}/products`}
+                  className="inline-flex items-center justify-center gap-3 px-8 py-3.5 bg-white text-gray-500 rounded-full font-bold text-base hover:shadow-xl transition-all hover:scale-105 group"
+                >
+                  Start Shopping Now
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  href={`/${locale}/deals`}
+                  className="inline-flex items-center justify-center gap-3 px-8 py-3.5 bg-gray-400/20 backdrop-blur-sm border-2 border-white/30 text-white rounded-full font-bold text-base hover:bg-gray-400/30 transition-all"
+                >
+                  <Tag className="w-5 h-5" />
+                  View Hot Deals
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -446,3 +466,5 @@ export default async function Home({ params }: HomeProps) {
     </div>
   );
 }
+
+
