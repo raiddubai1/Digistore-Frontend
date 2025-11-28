@@ -60,7 +60,7 @@ export default async function Home({ params }: HomeProps) {
 
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
               {/* Left Column - Content */}
-              <div className="text-center lg:text-left space-y-10">
+              <div className="text-center lg:text-left space-y-[50px]">
               {/* Main Heading */}
               <div className="space-y-4">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
