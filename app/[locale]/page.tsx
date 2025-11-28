@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, Download, Shield, Zap, Star, Sparkles, TrendingUp, Users, Award, CheckCircle, Rocket, Gift, Tag, ShoppingCart, Package } from "lucide-react";
+import { ArrowRight, Download, Shield, Star, Sparkles, TrendingUp, Award, Gift, Tag, ShoppingCart, Package } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
-import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import OfferOfTheDay from "@/components/OfferOfTheDay";
 import CategoriesSection from "@/components/CategoriesSection";
 import BlogSection from "@/components/BlogSection";
+import MobileHome from "@/components/MobileHome";
 import { getFeaturedProducts, getBestsellers, getNewArrivals } from "@/lib/api/products";
 import { getCategories } from "@/lib/api/categories";
 import { demoProducts, demoCategories } from "@/data/demo-products";
@@ -47,9 +47,22 @@ export default async function Home({ params }: HomeProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section - Mobile-First App-Style Design */}
-      <section className="pt-0 pb-8 lg:pb-16">
+    <>
+      {/* Mobile Home - Etsy-inspired clean design */}
+      <div className="lg:hidden">
+        <MobileHome
+          featuredProducts={featuredProducts}
+          bestsellerProducts={bestsellerProducts}
+          newProducts={newProducts}
+          categories={categories}
+          locale={locale}
+        />
+      </div>
+
+      {/* Desktop Home - Full featured layout */}
+      <div className="hidden lg:block min-h-screen bg-gray-50">
+      {/* Hero Section - Desktop Only */}
+      <section className="pt-0 pb-16">
         <div className="w-full">
           <div className="relative overflow-hidden bg-gradient-to-br from-[#F8FAFF] via-white to-[#FFF8F6] shadow-xl border-b border-gray-100 px-4 sm:px-8 lg:px-16 py-8 lg:py-[25px]">
 
@@ -309,50 +322,36 @@ export default async function Home({ params }: HomeProps) {
         </div>
       </section>
 
-      {/* Featured Products Section - Horizontal Scroll on Mobile */}
-      <section className="py-12 lg:py-24 bg-white">
-        <div className="max-w-7xl mx-auto">
+      {/* Featured Products Section */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-12">
           {/* Section Header */}
-          <div className="text-center mb-8 lg:mb-12 px-4 lg:px-12">
+          <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full mb-4">
               <Sparkles className="w-4 h-4 text-gray-500" />
               <span className="text-sm font-bold text-gray-500">FEATURED COLLECTION</span>
             </div>
-            <h2 className="text-2xl lg:text-3xl md:text-4xl font-black mb-3">
+            <h2 className="text-4xl font-black mb-3">
               <span className="text-gray-900">Discover Our </span>
               <span className="bg-gradient-to-r from-gray-500 to-[#ff6f61] bg-clip-text text-transparent">Best Products</span>
             </h2>
-            <p className="text-base lg:text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Hand-picked premium digital products
             </p>
           </div>
 
-          {/* Products - Horizontal Scroll on Mobile, Grid on Desktop */}
-          <div className="lg:px-12">
-            {/* Mobile: Horizontal Scroll */}
-            <div className="lg:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
-              <div className="flex gap-4 pb-4">
-                {featuredProducts.map((product) => (
-                  <div key={product.id} className="w-[280px] flex-shrink-0">
-                    <ProductCard product={product} />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Desktop: Grid */}
-            <div className="hidden lg:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {featuredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+          {/* Products Grid */}
+          <div className="grid grid-cols-3 gap-8 mb-12">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
 
           {/* View All Button */}
-          <div className="text-center mt-8 lg:mt-0 px-4">
+          <div className="text-center">
             <Link
               href={`/${locale}/products`}
-              className="inline-flex items-center gap-3 px-8 py-4 lg:py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 transition-all active:scale-95 lg:hover:scale-105 group w-full lg:w-auto justify-center"
+              className="inline-flex items-center gap-3 px-8 py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 transition-all hover:scale-105 group"
             >
               View All Products
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -364,46 +363,32 @@ export default async function Home({ params }: HomeProps) {
       {/* Offer of the Day */}
       <OfferOfTheDay />
 
-      {/* Bestsellers Section - Horizontal Scroll on Mobile */}
-      <section className="py-12 lg:py-24 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-8 lg:mb-12 px-4 lg:px-12">
+      {/* Bestsellers Section */}
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-12">
+          <div className="flex items-center justify-between mb-12">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 lg:px-4 py-1.5 lg:py-2 bg-orange-100 rounded-full mb-3 lg:mb-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 rounded-full mb-4">
                 <TrendingUp className="w-4 h-4 text-orange-600" />
-                <span className="text-xs lg:text-sm font-bold text-orange-600">TRENDING NOW</span>
+                <span className="text-sm font-bold text-orange-600">TRENDING NOW</span>
               </div>
-              <h2 className="text-2xl lg:text-4xl md:text-5xl font-black text-gray-900">Bestsellers</h2>
-              <p className="text-sm lg:text-lg text-gray-600 mt-1 lg:mt-2">Most popular this month</p>
+              <h2 className="text-5xl font-black text-gray-900">Bestsellers</h2>
+              <p className="text-lg text-gray-600 mt-2">Most popular this month</p>
             </div>
             <Link
               href={`/${locale}/products?filter=bestsellers`}
-              className="hidden md:inline-flex items-center gap-2 text-gray-500 font-bold hover:gap-3 transition-all"
+              className="inline-flex items-center gap-2 text-gray-500 font-bold hover:gap-3 transition-all"
             >
               View All
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
 
-          {/* Products - Horizontal Scroll on Mobile, Grid on Desktop */}
-          <div className="lg:px-12">
-            {/* Mobile: Horizontal Scroll */}
-            <div className="lg:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
-              <div className="flex gap-4 pb-4">
-                {bestsellerProducts.map((product) => (
-                  <div key={product.id} className="w-[280px] flex-shrink-0">
-                    <ProductCard product={product} />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Desktop: Grid */}
-            <div className="hidden lg:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {bestsellerProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+          {/* Products Grid */}
+          <div className="grid grid-cols-3 gap-8">
+            {bestsellerProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         </div>
       </section>
@@ -485,8 +470,7 @@ export default async function Home({ params }: HomeProps) {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }
-
-
