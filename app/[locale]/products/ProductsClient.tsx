@@ -8,7 +8,6 @@ import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { demoProducts, demoCategories } from "@/data/demo-products";
 import { Filter, Grid, List, X, Search, Star } from "lucide-react";
 import { Product } from "@/types";
-import FloatingSortFilter from "@/components/FloatingSortFilter";
 import SortBottomSheet from "@/components/SortBottomSheet";
 import FilterBottomSheet from "@/components/FilterBottomSheet";
 
@@ -200,57 +199,77 @@ export default function ProductsClient() {
           </form>
         </div>
 
-        {/* Category Pills */}
-        <div className="bg-white py-3 border-b border-gray-100">
-          <div className="overflow-x-auto scrollbar-hide">
-            <div className="flex gap-2 px-4">
-              <button
-                onClick={() => setSelectedCategories([])}
-                className={`px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 active:scale-95 transition-all text-sm font-medium ${
-                  selectedCategories.length === 0
-                    ? "bg-gray-900 text-white"
-                    : "bg-gray-100 text-gray-700"
-                }`}
-              >
-                All
-              </button>
-              {categories.slice(0, 6).map((category) => {
-                const config = categoryConfig[category.slug] || { emoji: "📦", bgColor: "bg-gray-100" };
-                const isSelected = selectedCategories.includes(category.slug);
-                return (
-                  <button
-                    key={category.id}
-                    onClick={() => toggleCategory(category.slug)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 active:scale-95 transition-all text-sm font-medium ${
-                      isSelected
-                        ? "bg-gray-900 text-white"
-                        : `${config.bgColor} text-gray-800`
-                    }`}
-                  >
-                    <span className="text-base">{config.emoji}</span>
-                    <span>{category.name.split(' ')[0]}</span>
-                  </button>
-                );
-              })}
-            </div>
+        {/* Category Grid - 2 rows */}
+        <div className="bg-white py-4 px-4 border-b border-gray-100">
+          <div className="grid grid-cols-3 gap-2">
+            {categories.slice(0, 6).map((category) => {
+              const config = categoryConfig[category.slug] || { emoji: "📦", bgColor: "bg-gray-100" };
+              const isSelected = selectedCategories.includes(category.slug);
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => toggleCategory(category.slug)}
+                  className={`flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-xl active:scale-95 transition-all ${
+                    isSelected
+                      ? "bg-gray-900 text-white"
+                      : `${config.bgColor} text-gray-800`
+                  }`}
+                >
+                  <span className="text-2xl">{config.emoji}</span>
+                  <span className="text-xs font-medium truncate w-full text-center">
+                    {category.name.split(' ')[0]}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Results Count & Active Filters */}
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-gray-600">
+        {/* Inline Toolbar: Results + Sort/Filter */}
+        <div className="bg-white px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium text-gray-900">
               {total} products
             </p>
             {hasActiveFilters && (
               <button
                 onClick={clearAllFilters}
-                className="text-sm font-medium text-[#ff6f61]"
+                className="text-xs font-medium text-[#ff6f61]"
               >
-                Clear filters
+                Clear
               </button>
             )}
           </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsSortOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 text-sm font-medium text-gray-700 active:bg-gray-50"
+            >
+              Sort
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setIsFilterOpen(true)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium active:bg-gray-50 ${
+                hasActiveFilters
+                  ? "border-gray-900 bg-gray-900 text-white"
+                  : "border-gray-200 text-gray-700"
+              }`}
+            >
+              Filter
+              {hasActiveFilters && (
+                <span className="w-4 h-4 rounded-full bg-white text-gray-900 text-xs flex items-center justify-center">
+                  {selectedCategories.length + selectedPriceRanges.length + selectedRatings.length}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Active Filters Row */}
+        <div className="px-4 py-2">
 
           {/* Active filter chips */}
           {hasActiveFilters && (
@@ -588,13 +607,6 @@ export default function ProductsClient() {
           </div>
         </div>
       </div>
-
-      {/* Mobile Floating Sort/Filter Buttons */}
-      <FloatingSortFilter
-        onSortClick={() => setIsSortOpen(true)}
-        onFilterClick={() => setIsFilterOpen(true)}
-        activeFiltersCount={selectedCategories.length + selectedPriceRanges.length + selectedRatings.length}
-      />
 
       {/* Sort Bottom Sheet */}
       <SortBottomSheet
