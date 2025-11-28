@@ -59,8 +59,14 @@ export default function BottomNav() {
   return (
     <>
       <nav
-        className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        className="fixed left-0 right-0 bg-white border-t border-gray-200 z-50 lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"
+        style={{
+          bottom: 0,
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          transform: 'translateZ(0)', // Force GPU layer to prevent bounce
+          WebkitBackfaceVisibility: 'hidden',
+          backfaceVisibility: 'hidden',
+        }}
       >
         <div className="grid grid-cols-5 h-16">
             {navItems.map((item) => {
