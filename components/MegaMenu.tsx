@@ -128,22 +128,21 @@ export default function MegaMenu() {
   const activeCategoryData = demoCategories.find(cat => cat.id === activeCategory);
 
   return (
-    <nav className="hidden lg:block border-b border-gray-200 bg-white">
+    <nav className="hidden lg:block border-b border-gray-200 bg-white relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
         <div className="flex items-center justify-between h-14">
           {/* Main Navigation Links */}
           <div className="flex items-center gap-1">
             {/* Categories Dropdown Trigger - First Item */}
-            <div
-              className="relative"
-              onMouseEnter={() => handleMouseEnter(demoCategories[0].id)}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                isOpen
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-700 hover:text-gray-500 hover:bg-gray-50'
-              }`}>
+            <div className="relative">
+              <button
+                onMouseEnter={() => handleMouseEnter(demoCategories[0].id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                  isOpen
+                    ? 'bg-gray-100 text-gray-900'
+                    : 'text-gray-700 hover:text-gray-500 hover:bg-gray-50'
+                }`}
+              >
                 <Menu className="w-4 h-4" />
                 All Categories
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
