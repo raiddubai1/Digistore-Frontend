@@ -40,7 +40,7 @@ export default function OfferOfTheDay() {
   };
 
   return (
-    <section className="py-12 md:py-16 bg-gradient-to-r from-primary via-indigo-600 to-accent relative overflow-hidden">
+    <section className="py-12 md:py-16 bg-gradient-to-r from-cyan-500 via-cyan-600 to-cyan-700 relative overflow-hidden">
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full blur-3xl animate-pulse"></div>
@@ -63,7 +63,7 @@ export default function OfferOfTheDay() {
             </p>
             <Link
               href="/products?filter=deals"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-primary rounded-[15px] font-semibold hover:shadow-2xl transition-all hover:scale-105 text-base"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-cyan-600 rounded-full font-semibold hover:shadow-2xl transition-all hover:scale-105 text-base"
             >
               Shop Now
               <ArrowRight className="w-5 h-5" />

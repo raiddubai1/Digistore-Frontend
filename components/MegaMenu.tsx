@@ -191,7 +191,7 @@ export default function MegaMenu() {
 
             <Link
               href="/deals"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:shadow-lg hover:shadow-gray-200 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-cyan-500 to-cyan-600 text-white hover:shadow-lg hover:shadow-cyan-200 transition-all"
             >
               <Tag className="w-4 h-4" />
               Hot Deals
