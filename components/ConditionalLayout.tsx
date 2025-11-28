@@ -35,7 +35,8 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
       <SplashScreen />
       <Header />
       <MegaMenu />
-      <main className="flex-1 pb-16 lg:pb-0">
+      {/* Main content - extra padding on mobile for bottom nav + safe area */}
+      <main className="flex-1 pb-[calc(64px+env(safe-area-inset-bottom,0px))] lg:pb-0">
         {children}
       </main>
       <Footer />
