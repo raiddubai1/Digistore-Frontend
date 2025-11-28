@@ -133,15 +133,7 @@ export default function MegaMenu() {
         <div className="flex items-center justify-between h-14">
           {/* Main Navigation Links */}
           <div className="flex items-center gap-1">
-            <Link
-              href="/"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all"
-            >
-              <Home className="w-4 h-4" />
-              Home
-            </Link>
-
-            {/* Categories Dropdown Trigger */}
+            {/* Categories Dropdown Trigger - First Item */}
             <div
               className="relative"
               onMouseEnter={() => handleMouseEnter(demoCategories[0].id)}
@@ -149,10 +141,18 @@ export default function MegaMenu() {
             >
               <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all">
                 <ShoppingBag className="w-4 h-4" />
-                Categories
+                All Categories
                 <ChevronDown className="w-3.5 h-3.5" />
               </button>
             </div>
+
+            <Link
+              href="/"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all"
+            >
+              <Home className="w-4 h-4" />
+              Home
+            </Link>
 
             <Link
               href="/products?filter=trending"
