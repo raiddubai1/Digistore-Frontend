@@ -12,7 +12,7 @@ export default function Footer() {
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-gray-500/10 to-transparent rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-#ff6f61/10 to-transparent rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-[#ff6f61]/10 to-transparent rounded-full blur-3xl"></div>
 
       <div className="relative z-10">
         {/* Main Footer Content */}
@@ -205,7 +205,7 @@ export default function Footer() {
         </div>
 
         {/* Decorative Bottom Gradient */}
-        <div className="h-1 bg-gradient-to-r from-gray-500 via-gray-600 to-#ff6f61"></div>
+        <div className="h-1 bg-gradient-to-r from-gray-500 via-gray-600 to-[#ff6f61]"></div>
       </div>
     </footer>
   );
