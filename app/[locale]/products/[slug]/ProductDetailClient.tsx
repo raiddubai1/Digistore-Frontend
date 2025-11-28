@@ -59,7 +59,7 @@ export default function ProductDetailClient({
   return (
     <>
       {/* ===== MOBILE LAYOUT ===== */}
-      <div className="lg:hidden min-h-screen bg-white pb-24">
+      <div className="lg:hidden min-h-screen bg-white pb-44">
         {/* Sticky Header */}
         <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
           <div className="flex items-center justify-between px-4 py-3">
@@ -321,8 +321,8 @@ export default function ProductDetailClient({
           )}
         </div>
 
-        {/* Fixed Bottom Bar */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}>
+        {/* Fixed Bottom Bar - positioned above bottom nav */}
+        <div className="fixed left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-40" style={{ bottom: 'calc(70px + env(safe-area-inset-bottom, 0px))' }}>
           <button
             onClick={handleAddToCart}
             className="w-full flex items-center justify-center gap-2 py-4 bg-gray-900 text-white rounded-full font-semibold text-lg active:scale-[0.98] transition-transform"
