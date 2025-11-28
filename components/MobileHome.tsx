@@ -42,7 +42,7 @@ export default function MobileHome({
     }
   };
 
-  // Product section component
+  // Product section component - 2-column grid layout
   const ProductSection = ({
     title,
     icon: Icon,
@@ -60,8 +60,8 @@ export default function MobileHome({
     badge?: string;
     badgeColor?: string;
   }) => (
-    <section className="mb-6">
-      <div className="flex items-center justify-between px-4 mb-3">
+    <section className="mb-6 px-4">
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Icon className={`w-5 h-5 ${iconColor}`} />
           <h2 className="text-lg font-bold text-gray-900">{title}</h2>
@@ -71,19 +71,15 @@ export default function MobileHome({
             </span>
           )}
         </div>
-        <Link href={seeAllLink} className="flex items-center text-sm font-medium text-gray-500">
+        <Link href={seeAllLink} className="flex items-center text-sm font-medium text-[#ff6f61]">
           See all
           <ChevronRight className="w-4 h-4" />
         </Link>
       </div>
-      <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-        <div className="flex gap-3 pb-2">
-          {products.slice(0, 6).map((product) => (
-            <div key={product.id} className="w-[160px] flex-shrink-0">
-              <MiniProductCard product={product} />
-            </div>
-          ))}
-        </div>
+      <div className="grid grid-cols-2 gap-3">
+        {products.slice(0, 4).map((product) => (
+          <MiniProductCard key={product.id} product={product} />
+        ))}
       </div>
     </section>
   );
@@ -166,7 +162,7 @@ export default function MobileHome({
         <section className="px-4 mt-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-gray-900">Explore Products</h2>
-            <Link href={`/${locale}/products`} className="flex items-center text-sm font-medium text-gray-500">
+            <Link href={`/${locale}/products`} className="flex items-center text-sm font-medium text-[#ff6f61]">
               View all
               <ChevronRight className="w-4 h-4" />
             </Link>
