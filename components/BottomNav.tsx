@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Home, Search, ShoppingCart, User, Grid } from "lucide-react";
+import { Home, Search, ShoppingCart, User, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useState, useEffect } from "react";
@@ -34,11 +34,6 @@ export default function BottomNav() {
       icon: Home,
     },
     {
-      name: "Categories",
-      href: "/categories",
-      icon: Grid,
-    },
-    {
       name: "Search",
       icon: Search,
       action: () => setSearchModalOpen(true),
@@ -50,6 +45,11 @@ export default function BottomNav() {
       action: () => openCart(),
     },
     {
+      name: "Wishlist",
+      href: "/wishlist",
+      icon: Heart,
+    },
+    {
       name: "Account",
       href: "/account",
       icon: User,
@@ -58,74 +58,85 @@ export default function BottomNav() {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 lg:hidden safe-area-bottom">
-        <div className="grid grid-cols-5 h-16">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = item.href ? pathname === item.href : false;
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 lg:hidden shadow-2xl">
+        {/* Safe area for iOS devices */}
+        <div className="pb-safe">
+          <div className="grid grid-cols-5 h-16">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = item.href ? pathname === item.href || pathname?.startsWith(item.href + '/') : false;
 
-            const content = (
-              <>
-                <div className="relative">
-                  <Icon
-                    className={cn(
-                      "w-6 h-6",
-                      isActive && "scale-110"
+              const content = (
+                <>
+                  {/* Active indicator bar */}
+                  {isActive && (
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-gray-600 to-[#ff6f61] rounded-b-full" />
+                  )}
+
+                  {/* Icon with badge */}
+                  <div className="relative">
+                    <Icon
+                      className={cn(
+                        "w-6 h-6 transition-all duration-200",
+                        isActive && "scale-110"
+                      )}
+                      strokeWidth={isActive ? 2.5 : 2}
+                    />
+                    {item.badge && cartItemsCount > 0 && (
+                      <span className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-r from-[#ff6f61] to-gray-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                        {cartItemsCount > 9 ? "9+" : cartItemsCount}
+                      </span>
                     )}
-                    strokeWidth={isActive ? 2.5 : 2}
-                  />
-                  {item.badge && cartItemsCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {cartItemsCount > 9 ? "9+" : cartItemsCount}
-                    </span>
-                  )}
-                </div>
-                <span
-                  className={cn(
-                    "text-xs font-medium",
-                    isActive && "font-semibold"
-                  )}
-                >
-                  {item.name}
-                </span>
-                {isActive && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-b-full" />
-                )}
-              </>
-            );
+                  </div>
 
-            if (item.action) {
+                  {/* Label */}
+                  <span
+                    className={cn(
+                      "text-[10px] font-medium transition-all duration-200",
+                      isActive ? "font-bold" : "font-normal"
+                    )}
+                  >
+                    {item.name}
+                  </span>
+
+                  {/* Tap effect overlay */}
+                  <div className="absolute inset-0 bg-gray-100 opacity-0 active:opacity-100 transition-opacity rounded-lg pointer-events-none" />
+                </>
+              );
+
+              if (item.action) {
+                return (
+                  <button
+                    key={item.name}
+                    onClick={item.action}
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-1 transition-all duration-200 relative group",
+                      isActive
+                        ? "text-gray-900"
+                        : "text-gray-400 active:text-gray-600"
+                    )}
+                  >
+                    {content}
+                  </button>
+                );
+              }
+
               return (
-                <button
+                <Link
                   key={item.name}
-                  onClick={item.action}
+                  href={item.href!}
                   className={cn(
-                    "flex flex-col items-center justify-center gap-1 transition-colors relative",
+                    "flex flex-col items-center justify-center gap-1 transition-all duration-200 relative group",
                     isActive
-                      ? "text-primary"
-                      : "text-gray-600 hover:text-gray-900"
+                      ? "text-gray-900"
+                      : "text-gray-400 active:text-gray-600"
                   )}
                 >
                   {content}
-                </button>
+                </Link>
               );
-            }
-
-            return (
-              <Link
-                key={item.name}
-                href={item.href!}
-                className={cn(
-                  "flex flex-col items-center justify-center gap-1 transition-colors relative",
-                  isActive
-                    ? "text-primary"
-                    : "text-gray-600 hover:text-gray-900"
-                )}
-              >
-                {content}
-              </Link>
-            );
-          })}
+            })}
+          </div>
         </div>
       </nav>
 

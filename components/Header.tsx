@@ -54,15 +54,14 @@ export default function Header() {
       "sticky top-0 z-50 w-full transition-all duration-300",
       scrolled ? "bg-white/95 backdrop-blur-lg shadow-lg" : "bg-white shadow-md"
     )}>
-      {/* Top Announcement Bar - Modern Gradient */}
-      <div className="bg-gradient-to-r from-gray-500 via-gray-600 to-gray-500 text-white py-1.5">
+      {/* Top Announcement Bar - Hidden on Mobile for App-like Feel */}
+      <div className="hidden lg:block bg-gradient-to-r from-gray-500 via-gray-600 to-gray-500 text-white py-1.5">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
           <div className="flex items-center justify-between text-sm">
             {/* Left - Special Offer Badge */}
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-yellow-300 animate-pulse" />
-              <span className="font-medium hidden sm:inline">Limited Time: 30% OFF on All Digital Products!</span>
-              <span className="font-medium sm:hidden">30% OFF Today!</span>
+              <span className="font-medium">Limited Time: 30% OFF on All Digital Products!</span>
             </div>
 
             {/* Right - Language & Support */}
@@ -113,7 +112,7 @@ export default function Header() {
               </div>
 
               {/* Support Link */}
-              <Link href="/support" className="text-sm font-medium hover:text-gray-200 transition-colors hidden lg:inline">
+              <Link href="/support" className="text-sm font-medium hover:text-gray-200 transition-colors">
                 24/7 Support
               </Link>
             </div>
@@ -121,9 +120,9 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Main Header */}
+      {/* Main Header - Compact on Mobile */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
-        <div className="flex h-20 items-center justify-between gap-4">
+        <div className="flex h-14 lg:h-20 items-center justify-between gap-4">
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileDrawerOpen(true)}
@@ -151,31 +150,42 @@ export default function Header() {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2">
-            {/* Search Icon - Mobile */}
-            <button className="lg:hidden p-2.5 hover:bg-gray-100 rounded-xl transition-colors">
-              <Search className="w-5 h-5 text-gray-700" />
-            </button>
-
-            {/* Wishlist */}
-            <Link
-              href="/wishlist"
-              className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors group hidden sm:block"
-            >
-              <Heart className="w-5 h-5 text-gray-700 group-hover:text-gray-500 transition-colors" />
-            </Link>
-
-            {/* Cart */}
+            {/* Cart - Mobile Only (Bottom nav handles other actions) */}
             <button
               onClick={openCart}
-              className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors group"
+              className="lg:hidden relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors group"
             >
               <ShoppingCart className="w-5 h-5 text-gray-700 group-hover:text-gray-500 transition-colors" />
               {cartItemsCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
-                  {cartItemsCount}
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-[#ff6f61] to-gray-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
+                  {cartItemsCount > 9 ? "9+" : cartItemsCount}
                 </span>
               )}
             </button>
+
+            {/* Desktop Actions */}
+            <div className="hidden lg:flex items-center gap-2">
+              {/* Wishlist */}
+              <Link
+                href="/wishlist"
+                className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors group"
+              >
+                <Heart className="w-5 h-5 text-gray-700 group-hover:text-gray-500 transition-colors" />
+              </Link>
+
+              {/* Cart */}
+              <button
+                onClick={openCart}
+                className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors group"
+              >
+                <ShoppingCart className="w-5 h-5 text-gray-700 group-hover:text-gray-500 transition-colors" />
+                {cartItemsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
+                    {cartItemsCount}
+                  </span>
+                )}
+              </button>
+            </div>
 
             {/* User Menu */}
             {isAuthenticated && user ? (

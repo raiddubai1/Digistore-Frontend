@@ -53,60 +53,60 @@ export default async function Home({ params }: HomeProps) {
         Build: {new Date().toISOString()}
       </div>
 
-      {/* Hero Section - Clean & Professional Design */}
-      <section className="pt-0 pb-12 md:pt-0 md:pb-16">
+      {/* Hero Section - Mobile-First App-Style Design */}
+      <section className="pt-0 pb-8 lg:pb-16">
         <div className="w-full">
-          <div className="relative overflow-hidden bg-gradient-to-br from-[#F8FAFF] via-white to-[#FFF8F6] shadow-xl border-b border-gray-100 px-6 sm:px-8 lg:px-16 py-6 md:py-8 lg:py-[25px]">
+          <div className="relative overflow-hidden bg-gradient-to-br from-[#F8FAFF] via-white to-[#FFF8F6] shadow-xl border-b border-gray-100 px-4 sm:px-8 lg:px-16 py-8 lg:py-[25px]">
 
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
               {/* Left Column - Content */}
-              <div className="text-center lg:text-left space-y-[50px] lg:pt-8">
+              <div className="text-center lg:text-left space-y-6 lg:space-y-[50px] lg:pt-8">
               {/* Main Heading */}
-              <div className="space-y-4">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
+              <div className="space-y-3 lg:space-y-4">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
                   <span className="block text-gray-900">Your Gateway to</span>
                   <span className="block bg-gradient-to-r from-gray-600 via-[#ff8a7a] to-[#ff6f61] bg-clip-text text-transparent">
                     Digital Excellence
                   </span>
                 </h1>
-                <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                  Discover, download, and deploy premium digital products instantly. From templates to tools, we've got everything you need to succeed. 🚀
+                <p className="text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                  Discover, download, and deploy premium digital products instantly. 🚀
                 </p>
               </div>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              {/* CTA Buttons - Full Width on Mobile */}
+              <div className="flex flex-col gap-3 lg:flex-row lg:gap-4 lg:justify-start">
                 <Link
                   href={`/${locale}/products`}
-                  className="inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 transition-all hover:scale-105"
+                  className="w-full lg:w-auto inline-flex items-center justify-center px-8 py-4 lg:py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 transition-all active:scale-95 lg:hover:scale-105"
                 >
                   Explore Products
                 </Link>
                 <Link
                   href={`/${locale}/categories`}
-                  className="inline-flex items-center justify-center px-8 py-3.5 bg-white border-2 border-gray-200 text-gray-900 rounded-full font-bold text-base hover:border-gray-300 hover:bg-gray-50 transition-all shadow-md hover:shadow-lg"
+                  className="w-full lg:w-auto inline-flex items-center justify-center px-8 py-4 lg:py-3.5 bg-white border-2 border-gray-200 text-gray-900 rounded-full font-bold text-base hover:border-gray-300 hover:bg-gray-50 transition-all shadow-md hover:shadow-lg active:scale-95"
                 >
                   Browse Categories
                 </Link>
               </div>
 
-              {/* Trust Indicators */}
-              <div className="flex flex-wrap gap-8 justify-center lg:justify-start items-center pt-4">
+              {/* Trust Indicators - Compact on Mobile */}
+              <div className="flex flex-wrap gap-6 lg:gap-8 justify-center lg:justify-start items-center">
                 <div className="flex items-center gap-2">
                   <div className="flex -space-x-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-gray-400 to-gray-500 border-2 border-white"></div>
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#ff6f61] to-gray-400 border-2 border-white"></div>
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 border-2 border-white"></div>
+                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-gradient-to-r from-gray-400 to-gray-500 border-2 border-white"></div>
+                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-gradient-to-r from-[#ff6f61] to-gray-400 border-2 border-white"></div>
+                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 border-2 border-white"></div>
                   </div>
                   <div className="text-left">
                     <div className="text-sm font-bold text-gray-900">50,000+</div>
-                    <div className="text-xs text-gray-500">Happy Customers</div>
+                    <div className="text-xs text-gray-500">Customers</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                      <Star key={i} className="w-4 h-4 lg:w-5 lg:h-5 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
                   <div className="text-left">
