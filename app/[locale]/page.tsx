@@ -56,7 +56,7 @@ export default async function Home({ params }: HomeProps) {
       {/* Hero Section - Clean & Professional Design */}
       <section className="pt-0 pb-12 md:pt-0 md:pb-16">
         <div className="w-full">
-          <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50 shadow-xl border-b border-gray-100 px-6 sm:px-8 lg:px-16 py-6 md:py-8 lg:py-[25px]">
+          <div className="relative overflow-hidden bg-gradient-to-br from-[#F8FAFF] via-white to-[#FFF8F6] shadow-xl border-b border-gray-100 px-6 sm:px-8 lg:px-16 py-6 md:py-8 lg:py-[25px]">
 
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
               {/* Left Column - Content */}
@@ -119,11 +119,11 @@ export default async function Home({ params }: HomeProps) {
 
             {/* Right Column - Animated Laptop Mockup */}
             <div className="relative hidden lg:block">
-              <div className="relative h-[500px] flex items-center justify-center">
+              <div className="relative h-[450px] flex items-center justify-center">
                 {/* Laptop Container */}
                 <div className="relative animate-float">
                   {/* Laptop Screen - Modern White/Silver Design */}
-                  <div className="relative w-[520px] h-[350px] rounded-2xl bg-gradient-to-br from-white via-gray-50 to-gray-100 p-3 shadow-2xl border-2 border-gray-200">
+                  <div className="relative w-[440px] h-[300px] rounded-2xl bg-gradient-to-br from-white via-gray-50 to-gray-100 p-3 shadow-2xl border-2 border-gray-200">
                     {/* Screen Display */}
                     <div className="relative w-full h-full bg-gradient-to-br from-blue-50 via-white to-orange-50 rounded-xl overflow-hidden shadow-inner border border-gray-200">
                       {/* Screen Content - Product Thumbnails */}
@@ -193,14 +193,14 @@ export default async function Home({ params }: HomeProps) {
                   </div>
 
                   {/* Laptop Base/Keyboard - Modern White Design */}
-                  <div className="relative w-[600px] h-4 bg-gradient-to-b from-gray-100 via-white to-gray-200 rounded-b-3xl shadow-xl border-x-2 border-b-2 border-gray-200 -mt-1">
+                  <div className="relative w-[510px] h-4 bg-gradient-to-b from-gray-100 via-white to-gray-200 rounded-b-3xl shadow-xl border-x-2 border-b-2 border-gray-200 -mt-1">
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent"></div>
                     {/* Keyboard hint */}
                     <div className="absolute top-1 left-1/2 -translate-x-1/2 w-32 h-0.5 bg-gray-300 rounded-full"></div>
                   </div>
 
                   {/* Laptop Shadow */}
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[620px] h-10 bg-gray-400/20 blur-3xl rounded-full"></div>
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[530px] h-10 bg-gray-400/20 blur-3xl rounded-full"></div>
                 </div>
 
                 {/* Floating UI Elements Around Laptop */}
