@@ -139,10 +139,14 @@ export default function MegaMenu() {
               onMouseEnter={() => handleMouseEnter(demoCategories[0].id)}
               onMouseLeave={handleMouseLeave}
             >
-              <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all">
+              <button className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                isOpen
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'text-gray-700 hover:text-gray-500 hover:bg-gray-50'
+              }`}>
                 <ShoppingBag className="w-4 h-4" />
                 All Categories
-                <ChevronDown className="w-3.5 h-3.5" />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
               </button>
             </div>
 
@@ -203,7 +207,7 @@ export default function MegaMenu() {
       {/* Mega Menu Dropdown Panel */}
       {isOpen && (
         <div
-          className="absolute left-0 right-0 top-full bg-white border-t border-gray-200 shadow-2xl z-50"
+          className="absolute left-0 right-0 top-full bg-white border-t-2 border-gray-300 shadow-2xl z-[100]"
           onMouseEnter={() => setIsOpen(true)}
           onMouseLeave={handleMouseLeave}
         >
