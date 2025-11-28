@@ -28,7 +28,7 @@ const demoCategories = [
     id: "business",
     name: "Business & Marketing",
     icon: Briefcase,
-    color: "from-gray-400 to-cyan-500",
+    color: "from-gray-400 to-#ff6f61",
     subcategories: [
       { name: "Digital Marketing", count: 234 },
       { name: "Social Media", count: 189 },
@@ -191,7 +191,7 @@ export default function MegaMenu() {
 
             <Link
               href="/deals"
-              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-cyan-500 to-cyan-600 text-white hover:shadow-lg hover:shadow-cyan-200 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-#ff6f61 to-#ff6f61 text-white hover:shadow-lg hover:shadow-orange-200 transition-all"
             >
               <Tag className="w-4 h-4" />
               Hot Deals

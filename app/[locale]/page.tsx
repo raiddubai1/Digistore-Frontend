@@ -47,7 +47,7 @@ export default async function Home({ params }: HomeProps) {
       {/* Hero Section - Clean & Professional Design */}
       <section className="pt-6 pb-12 md:pt-3.5 md:pb-16">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-cyan-50 rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 lg:px-16 lg:py-[50px]">
+          <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50 rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 lg:px-16 lg:py-[50px]">
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               {/* Left Column - Content */}
@@ -58,7 +58,7 @@ export default async function Home({ params }: HomeProps) {
                   <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-gray-500 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gray-500"></span>
                 </span>
-                <span className="text-sm font-bold bg-gradient-to-r from-gray-500 to-cyan-600 bg-clip-text text-transparent">
+                <span className="text-sm font-bold bg-gradient-to-r from-gray-500 to-#ff6f61 bg-clip-text text-transparent">
                   40,000+ Premium Digital Products
                 </span>
               </div>
@@ -67,7 +67,7 @@ export default async function Home({ params }: HomeProps) {
               <div className="space-y-3">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
                   <span className="block text-gray-900">Your Gateway to</span>
-                  <span className="block bg-gradient-to-r from-gray-500 via-gray-400 to-cyan-600 bg-clip-text text-transparent">
+                  <span className="block bg-gradient-to-r from-gray-500 via-gray-400 to-#ff6f61 bg-clip-text text-transparent">
                     Digital Excellence
                   </span>
                 </h1>
@@ -97,7 +97,7 @@ export default async function Home({ params }: HomeProps) {
                 <div className="flex items-center gap-2">
                   <div className="flex -space-x-2">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-gray-400 to-gray-500 border-2 border-white"></div>
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-gray-400 border-2 border-white"></div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-#ff6f61 to-gray-400 border-2 border-white"></div>
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 border-2 border-white"></div>
                   </div>
                   <div className="text-left">
@@ -145,7 +145,7 @@ export default async function Home({ params }: HomeProps) {
 
                 {/* Card 2 - Cyan Gradient */}
                 <div className="absolute top-24 left-0 w-56 h-72 transform -rotate-6 hover:-rotate-3 transition-all duration-500 animate-float-delayed">
-                  <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-cyan-500 via-cyan-600 to-gray-500 shadow-xl shadow-cyan-500/30 overflow-hidden border border-white/20">
+                  <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-#ff6f61 via-#ff6f61 to-gray-500 shadow-xl shadow-#ff6f61/30 overflow-hidden border border-white/20">
                     <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
                     <div className="absolute top-6 left-6 right-6">
                       <div className="grid grid-cols-3 gap-2">
@@ -164,7 +164,7 @@ export default async function Home({ params }: HomeProps) {
 
                 {/* Card 3 - Light Blue Gradient */}
                 <div className="absolute bottom-0 right-16 w-52 h-64 transform rotate-12 hover:rotate-6 transition-all duration-500 animate-float">
-                  <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-blue-400 via-gray-400 to-cyan-500 shadow-xl shadow-blue-400/30 overflow-hidden border border-white/20">
+                  <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-blue-400 via-gray-400 to-#ff6f61 shadow-xl shadow-blue-400/30 overflow-hidden border border-white/20">
                     <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
                     <div className="absolute top-6 left-6 right-6">
                       <div className="h-3 w-1/2 bg-white/30 rounded-full mb-4"></div>
@@ -207,10 +207,10 @@ export default async function Home({ params }: HomeProps) {
             </div>
 
             {/* Feature 2 */}
-            <div className="group relative p-8 rounded-2xl bg-gradient-to-br from-cyan-50 to-white border-2 border-cyan-100 hover:border-cyan-300 transition-all hover:shadow-xl hover:shadow-cyan-100 hover:-translate-y-1">
+            <div className="group relative p-8 rounded-2xl bg-gradient-to-br from-orange-50 to-white border-2 border-orange-100 hover:border-orange-300 transition-all hover:shadow-xl hover:shadow-orange-100 hover:-translate-y-1">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-400/20 to-transparent rounded-full blur-2xl"></div>
               <div className="relative">
-                <div className="w-14 h-14 bg-gradient-to-br from-cyan-600 to-cyan-700 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg">
+                <div className="w-14 h-14 bg-gradient-to-br from-#ff6f61 to-#ff6f61 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg">
                   <Shield className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-900">Secure Payment</h3>
@@ -276,7 +276,7 @@ export default async function Home({ params }: HomeProps) {
             </div>
             <h2 className="text-3xl md:text-4xl font-black mb-3">
               <span className="text-gray-900">Discover Our </span>
-              <span className="bg-gradient-to-r from-gray-500 to-cyan-600 bg-clip-text text-transparent">Best Products</span>
+              <span className="bg-gradient-to-r from-gray-500 to-#ff6f61 bg-clip-text text-transparent">Best Products</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Hand-picked premium digital products to boost your productivity and creativity
