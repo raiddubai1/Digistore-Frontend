@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Download, Shield, Zap, Star, Sparkles, TrendingUp, Users, Award, CheckCircle, Rocket, Gift, Tag } from "lucide-react";
+import { ArrowRight, Download, Shield, Zap, Star, Sparkles, TrendingUp, Users, Award, CheckCircle, Rocket, Gift, Tag, ShoppingCart, Package } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import OfferOfTheDay from "@/components/OfferOfTheDay";
@@ -119,67 +119,116 @@ export default async function Home({ params }: HomeProps) {
               </div>
             </div>
 
-            {/* Right Column - Modern 3D Visual */}
+            {/* Right Column - Animated Laptop Mockup */}
             <div className="relative hidden lg:block">
-              {/* Floating Cards Grid */}
-              <div className="relative h-[450px]">
-                {/* Card 1 - Blue Gradient */}
-                <div className="absolute top-0 right-0 w-64 h-80 transform rotate-6 hover:rotate-3 transition-all duration-500 animate-float">
-                  <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600 shadow-xl shadow-gray-400/30 overflow-hidden border border-white/20">
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-                    <div className="absolute top-6 left-6 right-6 space-y-3">
-                      <div className="h-3 w-3/4 bg-white/30 rounded-full"></div>
-                      <div className="h-3 w-1/2 bg-white/20 rounded-full"></div>
-                    </div>
-                    <div className="absolute top-24 left-6 right-6 space-y-3">
-                      <div className="h-20 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20"></div>
-                      <div className="h-20 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20"></div>
-                    </div>
-                    <div className="absolute bottom-6 left-6 right-6">
-                      <div className="h-14 bg-white/20 rounded-xl backdrop-blur-sm border border-white/30 flex items-center justify-center">
-                        <div className="w-8 h-8 bg-white/30 rounded-full"></div>
+              <div className="relative h-[450px] flex items-center justify-center">
+                {/* Laptop Container */}
+                <div className="relative animate-float">
+                  {/* Laptop Screen */}
+                  <div className="relative w-[420px] h-[280px] bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-t-2xl border-8 border-gray-800 shadow-2xl">
+                    {/* Screen Bezel */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black rounded-lg overflow-hidden">
+                      {/* Screen Content - Product Thumbnails */}
+                      <div className="absolute inset-4 bg-gradient-to-br from-gray-100 to-white rounded-lg p-4 overflow-hidden">
+                        {/* Browser Bar */}
+                        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-200">
+                          <div className="flex gap-1.5">
+                            <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                            <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                            <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                          </div>
+                          <div className="flex-1 h-5 bg-gray-100 rounded-md"></div>
+                        </div>
+
+                        {/* Product Grid */}
+                        <div className="grid grid-cols-3 gap-3">
+                          {/* Product Card 1 */}
+                          <div className="bg-gradient-to-br from-[#ff6f61] to-orange-400 rounded-lg p-3 shadow-md animate-pulse-slow">
+                            <div className="w-full h-12 bg-white/30 rounded mb-2"></div>
+                            <div className="h-1.5 bg-white/40 rounded mb-1"></div>
+                            <div className="h-1.5 bg-white/30 rounded w-2/3"></div>
+                          </div>
+
+                          {/* Product Card 2 */}
+                          <div className="bg-gradient-to-br from-gray-500 to-gray-600 rounded-lg p-3 shadow-md animate-pulse-slow" style={{ animationDelay: '0.2s' }}>
+                            <div className="w-full h-12 bg-white/30 rounded mb-2"></div>
+                            <div className="h-1.5 bg-white/40 rounded mb-1"></div>
+                            <div className="h-1.5 bg-white/30 rounded w-2/3"></div>
+                          </div>
+
+                          {/* Product Card 3 */}
+                          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-3 shadow-md animate-pulse-slow" style={{ animationDelay: '0.4s' }}>
+                            <div className="w-full h-12 bg-white/30 rounded mb-2"></div>
+                            <div className="h-1.5 bg-white/40 rounded mb-1"></div>
+                            <div className="h-1.5 bg-white/30 rounded w-2/3"></div>
+                          </div>
+
+                          {/* Product Card 4 */}
+                          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-3 shadow-md animate-pulse-slow" style={{ animationDelay: '0.6s' }}>
+                            <div className="w-full h-12 bg-white/30 rounded mb-2"></div>
+                            <div className="h-1.5 bg-white/40 rounded mb-1"></div>
+                            <div className="h-1.5 bg-white/30 rounded w-2/3"></div>
+                          </div>
+
+                          {/* Product Card 5 */}
+                          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-3 shadow-md animate-pulse-slow" style={{ animationDelay: '0.8s' }}>
+                            <div className="w-full h-12 bg-white/30 rounded mb-2"></div>
+                            <div className="h-1.5 bg-white/40 rounded mb-1"></div>
+                            <div className="h-1.5 bg-white/30 rounded w-2/3"></div>
+                          </div>
+
+                          {/* Product Card 6 */}
+                          <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg p-3 shadow-md animate-pulse-slow" style={{ animationDelay: '1s' }}>
+                            <div className="w-full h-12 bg-white/30 rounded mb-2"></div>
+                            <div className="h-1.5 bg-white/40 rounded mb-1"></div>
+                            <div className="h-1.5 bg-white/30 rounded w-2/3"></div>
+                          </div>
+                        </div>
                       </div>
+
+                      {/* Screen Glare Effect */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none"></div>
                     </div>
+
+                    {/* Camera Notch */}
+                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-700 rounded-full"></div>
                   </div>
+
+                  {/* Laptop Base */}
+                  <div className="relative w-[480px] h-3 bg-gradient-to-b from-gray-300 to-gray-400 rounded-b-xl -mt-1 shadow-lg">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+                  </div>
+
+                  {/* Laptop Shadow */}
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[500px] h-8 bg-gray-900/20 blur-2xl rounded-full"></div>
                 </div>
 
-                {/* Card 2 - Cyan Gradient */}
-                <div className="absolute top-24 left-0 w-56 h-72 transform -rotate-6 hover:-rotate-3 transition-all duration-500 animate-float-delayed">
-                  <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-[#ff6f61] via-[#ff6f61] to-gray-500 shadow-xl shadow-#ff6f61/30 overflow-hidden border border-white/20">
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-                    <div className="absolute top-6 left-6 right-6">
-                      <div className="grid grid-cols-3 gap-2">
-                        <div className="h-14 bg-white/20 rounded-xl"></div>
-                        <div className="h-14 bg-white/20 rounded-xl"></div>
-                        <div className="h-14 bg-white/20 rounded-xl"></div>
-                      </div>
-                    </div>
-                    <div className="absolute top-28 left-6 right-6 space-y-3">
-                      <div className="h-28 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20"></div>
-                      <div className="h-3 w-2/3 bg-white/30 rounded-full"></div>
-                      <div className="h-3 w-1/2 bg-white/20 rounded-full"></div>
-                    </div>
-                  </div>
+                {/* Floating UI Elements Around Laptop */}
+                {/* Shopping Cart Icon */}
+                <div className="absolute top-8 right-8 w-16 h-16 bg-gradient-to-br from-[#ff6f61] to-orange-500 rounded-2xl shadow-xl flex items-center justify-center animate-float-delayed">
+                  <ShoppingCart className="w-8 h-8 text-white" />
                 </div>
 
-                {/* Card 3 - Light Blue Gradient */}
-                <div className="absolute bottom-0 right-16 w-52 h-64 transform rotate-12 hover:rotate-6 transition-all duration-500 animate-float">
-                  <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-blue-400 via-gray-400 to-[#ff6f61] shadow-xl shadow-blue-400/30 overflow-hidden border border-white/20">
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-                    <div className="absolute top-6 left-6 right-6">
-                      <div className="h-3 w-1/2 bg-white/30 rounded-full mb-4"></div>
-                      <div className="flex items-end gap-2 h-24">
-                        <div className="flex-1 bg-white/20 rounded-t-lg h-14"></div>
-                        <div className="flex-1 bg-white/20 rounded-t-lg h-20"></div>
-                        <div className="flex-1 bg-white/30 rounded-t-lg h-24"></div>
-                        <div className="flex-1 bg-white/20 rounded-t-lg h-16"></div>
-                      </div>
-                    </div>
-                    <div className="absolute bottom-6 left-6 right-6 space-y-2">
-                      <div className="h-2 w-full bg-white/20 rounded-full"></div>
-                      <div className="h-2 w-3/4 bg-white/20 rounded-full"></div>
-                    </div>
+                {/* Star Rating */}
+                <div className="absolute top-32 left-4 bg-white rounded-xl shadow-xl px-4 py-3 animate-float">
+                  <div className="flex gap-1 mb-1">
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                   </div>
+                  <p className="text-xs font-bold text-gray-700">4.9/5 Rating</p>
+                </div>
+
+                {/* Download Icon */}
+                <div className="absolute bottom-24 left-8 w-14 h-14 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl shadow-xl flex items-center justify-center animate-float" style={{ animationDelay: '0.5s' }}>
+                  <Package className="w-7 h-7 text-white" />
+                </div>
+
+                {/* Notification Badge */}
+                <div className="absolute bottom-8 right-12 bg-white rounded-full shadow-xl px-4 py-2 animate-float-delayed">
+                  <p className="text-xs font-bold text-gray-700">🎉 New Products!</p>
                 </div>
               </div>
             </div>
