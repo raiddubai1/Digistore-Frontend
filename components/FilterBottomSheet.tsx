@@ -55,17 +55,18 @@ export default function FilterBottomSheet({
       {/* Bottom Sheet */}
       <div
         className={cn(
-          "fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl transition-transform duration-300 ease-out lg:hidden max-h-[85vh] flex flex-col",
+          "fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl transition-transform duration-300 ease-out lg:hidden",
           isOpen ? "translate-y-0" : "translate-y-full"
         )}
+        style={{ maxHeight: '80vh' }}
       >
         {/* Handle Bar */}
-        <div className="flex justify-center pt-3 pb-2">
+        <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
           <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
           <h2 className="text-xl font-bold">Filters</h2>
           <div className="flex items-center gap-2">
             {totalFilters > 0 && (
@@ -87,7 +88,10 @@ export default function FilterBottomSheet({
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div
+          className="overflow-y-auto overscroll-contain px-6 py-4"
+          style={{ maxHeight: 'calc(80vh - 180px)' }}
+        >
           {/* Categories Section */}
           <div className="mb-6">
             <h3 className="font-bold text-gray-900 mb-3">Categories</h3>
@@ -156,17 +160,14 @@ export default function FilterBottomSheet({
         </div>
 
         {/* Footer - Apply Button */}
-        <div className="px-6 py-4 border-t border-gray-100 bg-white">
+        <div className="px-6 py-4 border-t border-gray-100 bg-white flex-shrink-0 pb-[calc(16px+env(safe-area-inset-bottom))]">
           <button
             onClick={onClose}
-            className="w-full py-4 bg-gray-900 text-white font-bold rounded-full active:scale-[0.98] transition-transform"
+            className="w-full py-3.5 bg-gray-900 text-white font-bold rounded-full active:scale-[0.98] transition-transform"
           >
             Show Results {totalFilters > 0 && `(${totalFilters} filters)`}
           </button>
         </div>
-
-        {/* Safe Area Padding for iPhone */}
-        <div className="h-safe-area-inset-bottom bg-white" />
       </div>
     </>
   );

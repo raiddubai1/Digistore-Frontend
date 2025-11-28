@@ -14,27 +14,28 @@ export default function FloatingSortFilter({
   activeFiltersCount = 0,
 }: FloatingSortFilterProps) {
   return (
-    <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 lg:hidden">
-      <div className="flex items-center gap-3 bg-black/95 backdrop-blur-sm rounded-full px-2 py-2 shadow-2xl">
+    // Positioned right above the bottom nav (h-16 = 64px + safe area)
+    <div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-0 right-0 z-40 lg:hidden">
+      <div className="flex bg-black">
         {/* Sort Button */}
         <button
           onClick={onSortClick}
-          className="flex items-center gap-2 px-5 py-2.5 bg-white text-black rounded-full font-semibold text-sm active:scale-95 transition-transform"
+          className="flex-1 flex items-center justify-center gap-1.5 py-3 text-white text-xs font-medium tracking-wide active:bg-gray-800 transition-colors border-r border-gray-700"
         >
-          <ArrowUpDown className="w-4 h-4" />
+          <ArrowUpDown className="w-3.5 h-3.5" />
           SORT
         </button>
 
         {/* Filter Button */}
         <button
           onClick={onFilterClick}
-          className="relative flex items-center gap-2 px-5 py-2.5 bg-white text-black rounded-full font-semibold text-sm active:scale-95 transition-transform"
+          className="relative flex-1 flex items-center justify-center gap-1.5 py-3 text-white text-xs font-medium tracking-wide active:bg-gray-800 transition-colors"
         >
-          <SlidersHorizontal className="w-4 h-4" />
+          <SlidersHorizontal className="w-3.5 h-3.5" />
           FILTER
           {/* Active Filters Badge */}
           {activeFiltersCount > 0 && (
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#ff6f61] text-white text-xs font-bold rounded-full flex items-center justify-center">
+            <span className="ml-1 px-1.5 py-0.5 bg-white text-black text-[10px] font-bold rounded">
               {activeFiltersCount}
             </span>
           )}

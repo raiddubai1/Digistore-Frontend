@@ -58,10 +58,8 @@ export default function BottomNav() {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 lg:hidden shadow-2xl">
-        {/* Safe area for iOS devices */}
-        <div className="pb-safe">
-          <div className="grid grid-cols-5 h-16">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 lg:hidden shadow-2xl pb-[env(safe-area-inset-bottom)]">
+        <div className="grid grid-cols-5 h-16">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = item.href ? pathname === item.href || pathname?.startsWith(item.href + '/') : false;
@@ -137,7 +135,6 @@ export default function BottomNav() {
               );
             })}
           </div>
-        </div>
       </nav>
 
       <SearchModal isOpen={searchModalOpen} onClose={() => setSearchModalOpen(false)} />
