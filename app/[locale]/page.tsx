@@ -60,20 +60,9 @@ export default async function Home({ params }: HomeProps) {
 
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
               {/* Left Column - Content */}
-              <div className="text-center lg:text-left space-y-6">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-gray-100">
-                <span className="flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-gray-500 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gray-500"></span>
-                </span>
-                <span className="text-sm font-bold bg-gradient-to-r from-gray-500 to-[#ff6f61] bg-clip-text text-transparent">
-                  40,000+ Premium Digital Products
-                </span>
-              </div>
-
+              <div className="text-center lg:text-left space-y-8">
               {/* Main Heading */}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
                   <span className="block text-gray-900">Your Gateway to</span>
                   <span className="block bg-gradient-to-r from-gray-500 via-gray-400 to-[#ff6f61] bg-clip-text text-transparent">
@@ -86,7 +75,7 @@ export default async function Home({ params }: HomeProps) {
               </div>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
                 <Link
                   href={`/${locale}/products`}
                   className="inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 transition-all hover:scale-105"
@@ -130,6 +119,19 @@ export default async function Home({ params }: HomeProps) {
 
             {/* Right Column - Animated Laptop Mockup */}
             <div className="relative hidden lg:block">
+              {/* Badge - Moved from left side */}
+              <div className="flex justify-center mb-6">
+                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-gray-100">
+                  <span className="flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-gray-500 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gray-500"></span>
+                  </span>
+                  <span className="text-sm font-bold bg-gradient-to-r from-gray-500 to-[#ff6f61] bg-clip-text text-transparent">
+                    40,000+ Premium Digital Products
+                  </span>
+                </div>
+              </div>
+
               <div className="relative h-[450px] flex items-center justify-center">
                 {/* Laptop Container */}
                 <div className="relative animate-float">
