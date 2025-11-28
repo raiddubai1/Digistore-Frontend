@@ -31,13 +31,21 @@ export default function ProductCard({ product }: ProductCardProps) {
     <Link href={`/products/${product.slug}`} className="group block h-full">
       <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 hover:shadow-2xl active:scale-[0.98] transition-all duration-300 h-full flex flex-col">
         {/* Image Container - Larger on Mobile */}
-        <div className="relative aspect-square lg:aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden flex-shrink-0">
-          {/* Placeholder Image - Replace with actual image */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-28 h-28 lg:w-24 lg:h-24 rounded-2xl bg-gradient-to-br from-gray-200 via-gray-100 to-gray-50 flex items-center justify-center shadow-lg">
-              <Download className="w-14 h-14 lg:w-12 lg:h-12 text-gray-400" />
+        <div className="relative aspect-square lg:aspect-[4/3] bg-gray-100 overflow-hidden flex-shrink-0">
+          {/* Product Image */}
+          {product.thumbnailUrl ? (
+            <img
+              src={product.thumbnailUrl}
+              alt={product.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-28 h-28 lg:w-24 lg:h-24 rounded-2xl bg-gradient-to-br from-gray-200 via-gray-100 to-gray-50 flex items-center justify-center shadow-lg">
+                <Download className="w-14 h-14 lg:w-12 lg:h-12 text-gray-400" />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Badges - Improved Visibility */}
           <div className="absolute top-2 left-2 lg:top-3 lg:left-3 flex flex-col gap-1.5">
