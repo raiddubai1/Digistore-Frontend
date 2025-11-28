@@ -55,7 +55,7 @@ export default function Header() {
       scrolled ? "bg-white/95 backdrop-blur-lg shadow-lg" : "bg-white shadow-md"
     )}>
       {/* Top Announcement Bar - Modern Gradient */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 text-white py-2.5">
+      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 text-white py-1.5">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
           <div className="flex items-center justify-between text-sm">
             {/* Left - Special Offer Badge */}

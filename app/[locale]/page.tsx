@@ -45,7 +45,7 @@ export default async function Home({ params }: HomeProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section - Clean & Professional Design */}
-      <section className="py-12 md:py-16">
+      <section className="pt-6 pb-12 md:pt-8 md:pb-16">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-cyan-50 rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 lg:p-16">
 
@@ -80,17 +80,14 @@ export default async function Home({ params }: HomeProps) {
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   href={`/${locale}/products`}
-                  className="group inline-flex items-center justify-center gap-3 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-bold text-base hover:shadow-xl hover:shadow-blue-200 transition-all hover:scale-105"
+                  className="inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-bold text-base hover:shadow-xl hover:shadow-blue-200 transition-all hover:scale-105"
                 >
-                  <Rocket className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                   Explore Products
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   href={`/${locale}/categories`}
-                  className="inline-flex items-center justify-center gap-3 px-8 py-3.5 bg-white border-2 border-gray-200 text-gray-900 rounded-xl font-bold text-base hover:border-blue-300 hover:bg-blue-50 transition-all shadow-md hover:shadow-lg"
+                  className="inline-flex items-center justify-center px-8 py-3.5 bg-white border-2 border-gray-200 text-gray-900 rounded-xl font-bold text-base hover:border-blue-300 hover:bg-blue-50 transition-all shadow-md hover:shadow-lg"
                 >
-                  <Sparkles className="w-5 h-5" />
                   Browse Categories
                 </Link>
               </div>
