@@ -38,8 +38,17 @@ export interface Category {
   icon?: string;
   image?: string;
   parentId?: string;
-  productCount: number;
+  parent?: Category;
+  children?: Category[];
   order: number;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+  _count?: {
+    products: number;
+  };
+  // Computed property for backward compatibility
+  productCount?: number;
 }
 
 // User Types
