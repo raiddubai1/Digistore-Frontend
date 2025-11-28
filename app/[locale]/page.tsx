@@ -49,7 +49,7 @@ export default async function Home({ params }: HomeProps) {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50 rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 lg:px-16 lg:py-[50px]">
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
               {/* Left Column - Content */}
               <div className="text-center lg:text-left space-y-6">
               {/* Badge */}
