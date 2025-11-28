@@ -230,3 +230,13 @@ body {
 .animate-fade-in {
   animation: fadeIn 0.8s ease-out;
 }
+
+/* Hide Scrollbar for Horizontal Scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}

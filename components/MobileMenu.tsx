@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { X, ChevronDown, ChevronRight, Briefcase, Sparkles, Code, Heart, Palette, DollarSign, Flame, Zap, Tag, Globe, Check, LucideIcon, Home } from "lucide-react";
+import { X, ChevronDown, ChevronRight, Briefcase, Sparkles, Code, Heart, Palette, DollarSign, Flame, Zap, Tag, Globe, Check, LucideIcon, Home, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCategories } from "@/hooks/useCategories";
 
@@ -147,9 +147,10 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState("EN");
   const [languageExpanded, setLanguageExpanded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch categories from API
-  const { categories: apiCategories, loading } = useCategories();
+  const { categories: apiCategories } = useCategories();
 
   // Use API categories if available, otherwise use demo categories
   const categories = apiCategories.length > 0 ? apiCategories.map(cat => ({
@@ -176,32 +177,81 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
   if (!isOpen) return null;
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/products?search=${encodeURIComponent(searchQuery)}`;
+      onClose();
+    }
+  };
+
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/50 z-50 lg:hidden"
-        onClick={onClose}
-      />
+      {/* Full-Screen Mobile Menu - App Style */}
+      <div className="fixed inset-0 bg-white z-50 lg:hidden overflow-y-auto animate-in slide-in-from-bottom duration-300">
+        {/* Header with Search */}
+        <div className="sticky top-0 bg-white border-b border-gray-200 z-10">
+          {/* Top Bar */}
+          <div className="flex items-center justify-between px-4 py-3">
+            <h2 className="text-xl font-bold text-gray-900">Menu</h2>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors"
+            >
+              <X className="w-6 h-6 text-gray-600" />
+            </button>
+          </div>
 
-      {/* Drawer */}
-      <div className="fixed inset-y-0 left-0 w-[85%] max-w-sm bg-white z-50 lg:hidden overflow-y-auto shadow-2xl animate-in slide-in-from-left duration-300">
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-lg font-bold text-gray-900">Menu</h2>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-          >
-            <X className="w-6 h-6 text-gray-600" />
-          </button>
+          {/* Search Bar */}
+          <div className="px-4 pb-4">
+            <form onSubmit={handleSearch}>
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products, categories..."
+                  className="w-full h-12 pl-12 pr-4 rounded-full border-2 border-gray-200 focus:border-gray-400 focus:ring-4 focus:ring-gray-100 focus:outline-none transition-all text-sm bg-gray-50 focus:bg-white"
+                />
+              </div>
+            </form>
+          </div>
+
+          {/* Quick Action Buttons */}
+          <div className="flex gap-2 px-4 pb-4">
+            <Link
+              href="/products?filter=trending"
+              onClick={onClose}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#ff6f61] to-gray-600 text-white rounded-full font-semibold text-sm shadow-lg active:scale-95 transition-transform"
+            >
+              <Flame className="w-4 h-4" />
+              Trending
+            </Link>
+            <Link
+              href="/products?filter=new"
+              onClick={onClose}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-full font-semibold text-sm shadow-lg active:scale-95 transition-transform"
+            >
+              <Zap className="w-4 h-4" />
+              New
+            </Link>
+            <Link
+              href="/products?filter=deals"
+              onClick={onClose}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full font-semibold text-sm shadow-lg active:scale-95 transition-transform"
+            >
+              <Tag className="w-4 h-4" />
+              Deals
+            </Link>
+          </div>
         </div>
 
         {/* Content */}
         <div className="px-4 py-6">
           {/* Categories */}
-          <div className="space-y-2 mb-8">
-            <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+          <div className="space-y-1 mb-8">
+            <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
               Categories
             </h3>
             {categories.map((category) => {
@@ -210,43 +260,50 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
               return (
                 <div key={category.id}>
-                  {/* Category Button */}
+                  {/* Category Button - Larger Touch Target */}
                   <button
                     onClick={() => toggleCategory(category.id)}
-                    className="w-full flex items-center justify-between px-3 py-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="w-full flex items-center justify-between px-4 py-4 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <IconComponent
-                        className="w-5 h-5 text-[#0A3D62]"
-                        strokeWidth={1.5}
-                        style={{ opacity: 0.8 }}
-                      />
-                      <span className="text-sm font-medium text-gray-900">
+                      <div className={cn(
+                        "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
+                        isExpanded ? "bg-gradient-to-r from-gray-600 to-[#ff6f61]" : "bg-gray-100"
+                      )}>
+                        <IconComponent
+                          className={cn("w-5 h-5 transition-colors", isExpanded ? "text-white" : "text-gray-600")}
+                          strokeWidth={2}
+                        />
+                      </div>
+                      <span className={cn(
+                        "text-base font-medium transition-colors",
+                        isExpanded ? "text-gray-900 font-semibold" : "text-gray-700"
+                      )}>
                         {category.name}
                       </span>
                     </div>
                     <ChevronDown
                       className={cn(
-                        "w-5 h-5 text-gray-400 transition-transform",
+                        "w-5 h-5 text-gray-400 transition-transform duration-200",
                         isExpanded && "rotate-180"
                       )}
                     />
                   </button>
 
-                  {/* Subcategories */}
+                  {/* Subcategories - Improved Touch Targets */}
                   {isExpanded && (
-                    <div className="mt-2 ml-8 space-y-1 animate-in slide-in-from-top-2 duration-200">
+                    <div className="mt-2 ml-14 mr-4 space-y-1 animate-in slide-in-from-top-2 duration-200 bg-gray-50 rounded-xl p-2">
                       {category.subcategories.map((sub: any) => (
                         <Link
                           key={sub.name}
                           href={`/products?category=${sub.slug || sub.name}`}
                           onClick={onClose}
-                          className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors group"
+                          className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-white active:bg-gray-100 transition-colors group"
                         >
-                          <span className="text-sm text-gray-700 group-hover:text-gray-900">
+                          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
                             {sub.name}
                           </span>
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs font-semibold text-gray-400 bg-white px-2 py-1 rounded-full">
                             {sub.count}
                           </span>
                         </Link>
