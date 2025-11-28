@@ -13,6 +13,25 @@ export const metadata: Metadata = {
   description: "Download high-quality digital products instantly. eBooks, templates, tools, and more. Your one-stop shop for digital downloads.",
   keywords: ["digital products", "ebooks", "templates", "downloads", "digital marketplace"],
   authors: [{ name: "Digistore1" }],
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+    viewportFit: "cover", // For iPhone notch support
+  },
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Digistore1",
+  },
+  formatDetection: {
+    telephone: false,
+  },
   openGraph: {
     title: "Digistore1 - Premium Digital Products",
     description: "Download high-quality digital products instantly",
