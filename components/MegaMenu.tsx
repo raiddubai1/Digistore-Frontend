@@ -28,7 +28,7 @@ const demoCategories = [
     id: "business",
     name: "Business & Marketing",
     icon: Briefcase,
-    color: "from-gray-400 to-[#ff6f61]",
+    color: "bg-[#ff6f61]",
     subcategories: [
       { name: "Digital Marketing", count: 234 },
       { name: "Social Media", count: 189 },
@@ -42,7 +42,7 @@ const demoCategories = [
     id: "personal",
     name: "Personal Development",
     icon: Sparkles,
-    color: "from-gray-400 to-pink-500",
+    color: "bg-pink-500",
     subcategories: [
       { name: "Productivity", count: 167 },
       { name: "Time Management", count: 134 },
@@ -56,7 +56,7 @@ const demoCategories = [
     id: "technology",
     name: "Technology",
     icon: Code,
-    color: "from-green-500 to-emerald-500",
+    color: "bg-emerald-500",
     subcategories: [
       { name: "Programming", count: 312 },
       { name: "Web Development", count: 289 },
@@ -70,7 +70,7 @@ const demoCategories = [
     id: "health",
     name: "Health & Fitness",
     icon: Heart,
-    color: "from-red-500 to-orange-500",
+    color: "bg-orange-500",
     subcategories: [
       { name: "Workout Plans", count: 198 },
       { name: "Nutrition Guides", count: 167 },
@@ -84,7 +84,7 @@ const demoCategories = [
     id: "creative",
     name: "Creative Arts",
     icon: Palette,
-    color: "from-pink-500 to-rose-500",
+    color: "bg-rose-500",
     subcategories: [
       { name: "Graphic Design", count: 245 },
       { name: "Photography", count: 198 },
@@ -98,7 +98,7 @@ const demoCategories = [
     id: "finance",
     name: "Finance & Investing",
     icon: DollarSign,
-    color: "from-yellow-500 to-amber-500",
+    color: "bg-amber-500",
     subcategories: [
       { name: "Stock Trading", count: 189 },
       { name: "Cryptocurrency", count: 234 },
@@ -227,7 +227,7 @@ export default function MegaMenu() {
                       onMouseEnter={() => setActiveCategory(category.id)}
                       className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all group ${
                         activeCategory === category.id
-                          ? 'bg-gradient-to-r ' + category.color + ' text-white shadow-lg'
+                          ? category.color + ' text-white shadow-lg'
                           : 'hover:bg-gray-50 text-gray-700'
                       }`}
                     >
@@ -253,7 +253,7 @@ export default function MegaMenu() {
               {activeCategoryData && (
                 <div className="col-span-9">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className={`p-3 rounded-2xl bg-gradient-to-r ${activeCategoryData.color}`}>
+                    <div className={`p-3 rounded-2xl ${activeCategoryData.color}`}>
                       <activeCategoryData.icon className="w-6 h-6 text-white" />
                     </div>
                     <div>
