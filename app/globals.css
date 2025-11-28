@@ -2,20 +2,20 @@
 
 @theme {
   /* Modern Digital Products Color Scheme */
-  /* Primary - Deep Blue (Professional) */
-  --color-primary: #1E40AF;
-  --color-primary-dark: #1E3A8A;
-  --color-primary-light: #3B82F6;
+  /* Primary - Matte Light Grey (Professional) */
+  --color-primary: #6B7280;
+  --color-primary-dark: #4B5563;
+  --color-primary-light: #9CA3AF;
 
-  /* Secondary - Deep Navy/Slate */
-  --color-secondary: #1E293B;
-  --color-secondary-dark: #0F172A;
-  --color-secondary-light: #334155;
+  /* Secondary - Darker Grey */
+  --color-secondary: #374151;
+  --color-secondary-dark: #1F2937;
+  --color-secondary-light: #6B7280;
 
-  /* Accent - Bright Cyan */
-  --color-accent: #06B6D4;
-  --color-accent-dark: #0891B2;
-  --color-accent-light: #22D3EE;
+  /* Accent - Medium Grey */
+  --color-accent: #6B7280;
+  --color-accent-dark: #4B5563;
+  --color-accent-light: #9CA3AF;
 
   /* Success, Warning, Error */
   --color-success: #10B981;
@@ -23,10 +23,10 @@
   --color-error: #EF4444;
 
   /* Gradient Colors */
-  --gradient-primary: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
-  --gradient-secondary: linear-gradient(135deg, #1E293B 0%, #334155 100%);
-  --gradient-accent: linear-gradient(135deg, #06B6D4 0%, #22D3EE 100%);
-  --gradient-vibrant: linear-gradient(135deg, #1E40AF 0%, #06B6D4 50%, #22D3EE 100%);
+  --gradient-primary: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+  --gradient-secondary: linear-gradient(135deg, #374151 0%, #6B7280 100%);
+  --gradient-accent: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+  --gradient-vibrant: linear-gradient(135deg, #6B7280 0%, #9CA3AF 50%, #D1D5DB 100%);
 
   /* Background Colors */
   --color-bg-primary: #FFFFFF;

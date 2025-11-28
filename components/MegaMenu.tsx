@@ -28,7 +28,7 @@ const demoCategories = [
     id: "business",
     name: "Business & Marketing",
     icon: Briefcase,
-    color: "from-blue-500 to-cyan-500",
+    color: "from-gray-400 to-cyan-500",
     subcategories: [
       { name: "Digital Marketing", count: 234 },
       { name: "Social Media", count: 189 },
@@ -42,7 +42,7 @@ const demoCategories = [
     id: "personal",
     name: "Personal Development",
     icon: Sparkles,
-    color: "from-blue-500 to-pink-500",
+    color: "from-gray-400 to-pink-500",
     subcategories: [
       { name: "Productivity", count: 167 },
       { name: "Time Management", count: 134 },
@@ -135,7 +135,7 @@ export default function MegaMenu() {
           <div className="flex items-center gap-1">
             <Link
               href="/"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all"
             >
               <Home className="w-4 h-4" />
               Home
@@ -147,7 +147,7 @@ export default function MegaMenu() {
               onMouseEnter={() => handleMouseEnter(demoCategories[0].id)}
               onMouseLeave={handleMouseLeave}
             >
-              <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all">
+              <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all">
                 <ShoppingBag className="w-4 h-4" />
                 Categories
                 <ChevronDown className="w-3.5 h-3.5" />
@@ -156,7 +156,7 @@ export default function MegaMenu() {
 
             <Link
               href="/products?filter=trending"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all"
             >
               <TrendingUp className="w-4 h-4" />
               Trending
@@ -164,7 +164,7 @@ export default function MegaMenu() {
 
             <Link
               href="/products?filter=new"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all"
             >
               <Sparkles className="w-4 h-4" />
               New Arrivals
@@ -172,7 +172,7 @@ export default function MegaMenu() {
 
             <Link
               href="/products?filter=bestsellers"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all"
             >
               <Flame className="w-4 h-4" />
               Bestsellers
@@ -191,7 +191,7 @@ export default function MegaMenu() {
 
             <Link
               href="/deals"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:shadow-lg hover:shadow-blue-200 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:shadow-lg hover:shadow-gray-200 transition-all"
             >
               <Tag className="w-4 h-4" />
               Hot Deals
@@ -262,13 +262,13 @@ export default function MegaMenu() {
                       <Link
                         key={sub.name}
                         href={`/products?category=${activeCategoryData.id}&subcategory=${sub.name}`}
-                        className="group p-4 rounded-xl border-2 border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all"
+                        className="group p-4 rounded-xl border-2 border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-all"
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600">
+                          <h4 className="text-sm font-semibold text-gray-900 group-hover:text-gray-500">
                             {sub.name}
                           </h4>
-                          <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+                          <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-500 group-hover:translate-x-1 transition-all" />
                         </div>
                         <p className="text-xs text-gray-500">{sub.count} products</p>
                       </Link>
@@ -279,7 +279,7 @@ export default function MegaMenu() {
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <Link
                       href={`/products?category=${activeCategoryData.id}`}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-blue-200 transition-all group"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-gray-200 transition-all group"
                     >
                       View All {activeCategoryData.name}
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

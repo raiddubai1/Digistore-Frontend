@@ -11,7 +11,7 @@ export default function Footer() {
     <footer className="bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 text-white mt-auto relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-600/10 to-transparent rounded-full blur-3xl"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-gray-500/10 to-transparent rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-cyan-600/10 to-transparent rounded-full blur-3xl"></div>
 
       <div className="relative z-10">
@@ -34,9 +34,9 @@ export default function Footer() {
                   <input
                     type="email"
                     placeholder="Enter your email"
-                    className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent backdrop-blur-sm"
+                    className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent backdrop-blur-sm"
                   />
-                  <button className="px-5 py-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl hover:shadow-lg hover:shadow-blue-500/50 transition-all hover:scale-105">
+                  <button className="px-5 py-3 bg-gradient-to-r from-gray-500 to-gray-600 rounded-xl hover:shadow-lg hover:shadow-gray-400/50 transition-all hover:scale-105">
                     <Send className="w-5 h-5" />
                   </button>
                 </div>
@@ -46,25 +46,25 @@ export default function Footer() {
               <div className="flex gap-3">
                 <a
                   href="#"
-                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
+                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-gray-500 hover:to-gray-600 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
                 >
                   <Facebook className="w-5 h-5" />
                 </a>
                 <a
                   href="#"
-                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
+                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-gray-500 hover:to-gray-600 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
                 >
                   <Twitter className="w-5 h-5" />
                 </a>
                 <a
                   href="#"
-                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
+                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-gray-500 hover:to-gray-600 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
                 >
                   <Instagram className="w-5 h-5" />
                 </a>
                 <a
                   href="#"
-                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
+                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-gray-500 hover:to-gray-600 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
                 >
                   <Youtube className="w-5 h-5" />
                 </a>
@@ -77,31 +77,31 @@ export default function Footer() {
               <ul className="space-y-3">
                 <li>
                   <Link href="/products" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     All Products
                   </Link>
                 </li>
                 <li>
                   <Link href="/categories" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Categories
                   </Link>
                 </li>
                 <li>
                   <Link href="/products?filter=new" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     New Arrivals
                   </Link>
                 </li>
                 <li>
                   <Link href="/products?filter=bestsellers" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Best Sellers
                   </Link>
                 </li>
                 <li>
                   <Link href="/products?filter=free" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Free Products
                   </Link>
                 </li>
@@ -114,25 +114,25 @@ export default function Footer() {
               <ul className="space-y-3">
                 <li>
                   <Link href="/help" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Help Center
                   </Link>
                 </li>
                 <li>
                   <Link href="/contact" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Contact Us
                   </Link>
                 </li>
                 <li>
                   <Link href="/faq" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     FAQ
                   </Link>
                 </li>
                 <li>
                   <Link href="/refund-policy" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Refund Policy
                   </Link>
                 </li>
@@ -145,25 +145,25 @@ export default function Footer() {
               <ul className="space-y-3">
                 <li>
                   <Link href="/terms" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Terms of Service
                   </Link>
                 </li>
                 <li>
                   <Link href="/privacy" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
                   <Link href="/licenses" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     License Information
                   </Link>
                 </li>
                 <li>
                   <Link href="/cookies" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Cookie Policy
                   </Link>
                 </li>
@@ -205,7 +205,7 @@ export default function Footer() {
         </div>
 
         {/* Decorative Bottom Gradient */}
-        <div className="h-1 bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600"></div>
+        <div className="h-1 bg-gradient-to-r from-gray-500 via-gray-600 to-cyan-600"></div>
       </div>
     </footer>
   );
