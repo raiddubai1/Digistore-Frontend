@@ -56,7 +56,7 @@ export default async function Home({ params }: HomeProps) {
       {/* Hero Section - Clean & Professional Design */}
       <section className="pt-0 pb-12 md:pt-0 md:pb-16">
         <div className="w-full">
-          <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50 shadow-xl border-b border-gray-100 px-6 sm:px-8 lg:px-16 py-6 md:py-8 lg:py-[40px]">
+          <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-orange-50 shadow-xl border-b border-gray-100 px-6 sm:px-8 lg:px-16 py-6 md:py-8 lg:py-[25px]">
 
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
               {/* Left Column - Content */}
