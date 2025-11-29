@@ -101,7 +101,10 @@ export async function getProductBySlug(slug: string): Promise<Product> {
     }
 
     const data = await response.json();
-    // Handle nested API response format
+    // Handle nested API response format: { success: true, data: { product: {...} } }
+    if (data.success && data.data?.product) {
+      return mapApiProduct(data.data.product);
+    }
     if (data.success && data.data) {
       return mapApiProduct(data.data);
     }
