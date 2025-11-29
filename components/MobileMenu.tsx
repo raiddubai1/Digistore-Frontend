@@ -260,24 +260,24 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
               return (
                 <div key={category.id}>
-                  {/* Category Button - Larger Touch Target */}
+                  {/* Category Button - Larger Touch Target with better spacing */}
                   <button
                     onClick={() => toggleCategory(category.id)}
-                    className="w-full flex items-center justify-between px-4 py-4 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 active:bg-gray-100 dark:active:bg-slate-700 transition-colors"
+                    className="w-full flex items-center justify-between px-4 py-5 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 active:bg-gray-100 dark:active:bg-slate-700 transition-colors"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       <div className={cn(
-                        "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
-                        isExpanded ? "bg-gradient-to-r from-gray-600 to-[#ff6f61]" : "bg-gray-100 dark:bg-slate-700"
+                        "w-12 h-12 rounded-xl flex items-center justify-center transition-colors shadow-sm",
+                        isExpanded ? "bg-gradient-to-r from-[#FF6B35] to-[#ff6f61]" : "bg-gray-100 dark:bg-slate-700"
                       )}>
                         <IconComponent
-                          className={cn("w-5 h-5 transition-colors", isExpanded ? "text-white" : "text-gray-600 dark:text-gray-300")}
+                          className={cn("w-6 h-6 transition-colors", isExpanded ? "text-white" : "text-gray-600 dark:text-gray-300")}
                           strokeWidth={2}
                         />
                       </div>
                       <span className={cn(
                         "text-base font-medium transition-colors",
-                        isExpanded ? "text-gray-900 dark:text-white font-semibold" : "text-gray-700 dark:text-gray-300"
+                        isExpanded ? "text-gray-900 dark:text-white font-bold" : "text-gray-700 dark:text-gray-300"
                       )}>
                         {category.name}
                       </span>

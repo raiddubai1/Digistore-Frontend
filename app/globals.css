@@ -15,10 +15,10 @@
   --color-secondary-dark: #1F2937;
   --color-secondary-light: #6B7280;
 
-  /* Accent - Medium Grey */
-  --color-accent: #6B7280;
-  --color-accent-dark: #4B5563;
-  --color-accent-light: #9CA3AF;
+  /* Accent - Strong Orange (Key accent color for highlights) */
+  --color-accent: #FF6B35;
+  --color-accent-dark: #E55A2B;
+  --color-accent-light: #FF8C5A;
 
   /* Success, Warning, Error */
   --color-success: #10B981;
@@ -28,7 +28,7 @@
   /* Gradient Colors */
   --gradient-primary: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
   --gradient-secondary: linear-gradient(135deg, #374151 0%, #6B7280 100%);
-  --gradient-accent: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+  --gradient-accent: linear-gradient(135deg, #FF6B35 0%, #ff6f61 100%);
   --gradient-vibrant: linear-gradient(135deg, #6B7280 0%, #9CA3AF 50%, #D1D5DB 100%);
 
   /* Background Colors */

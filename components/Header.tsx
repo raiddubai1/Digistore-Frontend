@@ -56,8 +56,8 @@ export default function Header() {
     <header className={cn(
       "sticky top-0 z-50 w-full transition-all duration-300",
       scrolled
-        ? "bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg shadow-lg"
-        : "bg-white dark:bg-slate-900 shadow-md dark:shadow-slate-800/50"
+        ? "bg-gradient-to-r from-white via-gray-50/95 to-white dark:from-slate-900 dark:via-slate-800/95 dark:to-slate-900 backdrop-blur-lg shadow-lg shadow-gray-200/50 dark:shadow-slate-900/50"
+        : "bg-gradient-to-r from-white via-gray-50 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 shadow-md shadow-gray-100 dark:shadow-slate-800/50"
     )}>
       {/* Top Announcement Bar - Hidden on Mobile for App-like Feel */}
       <div className="hidden lg:block bg-gradient-to-r from-gray-500 via-gray-600 to-gray-500 text-white py-1.5">

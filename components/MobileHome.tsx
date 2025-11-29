@@ -76,7 +76,7 @@ export default function MobileHome({
     }
   };
 
-  // Product section component - 2-column grid layout
+  // Product section component - 2-column grid layout with better spacing
   const ProductSection = ({
     title,
     icon: Icon,
@@ -94,18 +94,20 @@ export default function MobileHome({
     badge?: string;
     badgeColor?: string;
   }) => (
-    <section className="mb-6 px-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Icon className={`w-5 h-5 ${iconColor}`} />
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h2>
+    <section className="mb-8 px-4">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2.5">
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${iconColor.replace('text-', 'bg-').replace('-500', '-100')}`}>
+            <Icon className={`w-5 h-5 ${iconColor}`} />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h2>
           {badge && (
-            <span className={`px-2 py-0.5 ${badgeColor} text-[10px] font-bold rounded-full`}>
+            <span className={`px-2.5 py-1 ${badgeColor} text-[10px] font-bold rounded-full`}>
               {badge}
             </span>
           )}
         </div>
-        <Link href={seeAllLink} className="flex items-center text-sm font-medium text-[#ff6f61]">
+        <Link href={seeAllLink} className="flex items-center text-sm font-semibold text-[#FF6B35] hover:text-[#E55A2B]">
           See all
           <ChevronRight className="w-4 h-4" />
         </Link>
@@ -120,17 +122,17 @@ export default function MobileHome({
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-20">
-      {/* Compact Search Bar */}
-      <div className="sticky top-0 z-40 bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700 px-4 py-3">
+      {/* Compact Search Bar - Improved */}
+      <div className="sticky top-0 z-40 bg-gradient-to-r from-white via-gray-50 to-white dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 border-b border-gray-100 dark:border-slate-700 px-4 py-2.5 shadow-sm">
         <form onSubmit={handleSearch}>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
             <input
               type="text"
-              placeholder="Search digital products..."
+              placeholder="Search templates, eBooks, courses..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-11 pl-10 pr-4 rounded-full border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 focus:border-gray-400 dark:focus:border-slate-500 focus:ring-2 focus:ring-gray-100 dark:focus:ring-slate-600 focus:outline-none transition-all text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+              className="w-full h-10 pl-10 pr-4 rounded-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 focus:border-[#FF6B35] dark:focus:border-[#FF6B35] focus:ring-2 focus:ring-[#FF6B35]/20 dark:focus:ring-[#FF6B35]/20 focus:outline-none transition-all text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-sm"
             />
           </div>
         </form>
@@ -157,8 +159,8 @@ export default function MobileHome({
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="pt-4">
+      {/* Main Content - with better section spacing */}
+      <div className="pt-6">
         {/* Trending Now */}
         <ProductSection
           title="Trending Now"
@@ -192,11 +194,11 @@ export default function MobileHome({
           />
         )}
 
-        {/* 2-Column Grid Section - All Products */}
-        <section className="px-4 mt-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900">Explore Products</h2>
-            <Link href={`/${locale}/products`} className="flex items-center text-sm font-medium text-[#ff6f61]">
+        {/* 2-Column Grid Section - All Products with better spacing */}
+        <section className="px-4 mt-8">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Explore Products</h2>
+            <Link href={`/${locale}/products`} className="flex items-center text-sm font-semibold text-[#FF6B35] hover:text-[#E55A2B]">
               View all
               <ChevronRight className="w-4 h-4" />
             </Link>
@@ -212,49 +214,49 @@ export default function MobileHome({
   );
 }
 
-// Compact product card for mobile grid/scroll
+// Compact product card for mobile grid/scroll - with consistent padding
 function MiniProductCard({ product }: { product: Product }) {
   return (
     <Link href={`/products/${product.slug}`} className="block">
-      <div className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm active:scale-[0.98] transition-transform">
-        {/* Product Image */}
-        <div className="relative aspect-square bg-gray-100">
+      <div className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-md active:scale-[0.98] transition-all">
+        {/* Product Image - with consistent padding */}
+        <div className="relative aspect-square bg-gray-50 dark:bg-slate-700 p-2">
           <img
             src={product.thumbnailUrl}
             alt={product.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover rounded-lg"
           />
           {/* Badges */}
           {product.discount && product.discount > 0 && (
-            <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-[#ff6f61] text-white text-[10px] font-bold rounded">
+            <span className="absolute top-3 left-3 px-2 py-0.5 bg-[#FF6B35] text-white text-[10px] font-bold rounded-md shadow-sm">
               -{product.discount}%
             </span>
           )}
           {product.bestseller && !product.discount && (
-            <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded">
+            <span className="absolute top-3 left-3 px-2 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded-md shadow-sm">
               🔥 HOT
             </span>
           )}
           {product.newArrival && !product.discount && !product.bestseller && (
-            <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded">
+            <span className="absolute top-3 left-3 px-2 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded-md shadow-sm">
               ✨ NEW
             </span>
           )}
         </div>
         {/* Content */}
-        <div className="p-2.5">
-          <h3 className="text-xs font-medium text-gray-900 line-clamp-2 leading-tight mb-1.5">
+        <div className="p-3">
+          <h3 className="text-xs font-semibold text-gray-900 dark:text-white line-clamp-2 leading-tight mb-2">
             {product.title}
           </h3>
-          <div className="flex items-center gap-1 mb-1.5">
-            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-            <span className="text-[10px] font-medium text-gray-700">{product.rating}</span>
-            <span className="text-[10px] text-gray-400">({product.reviewCount})</span>
+          <div className="flex items-center gap-1 mb-2">
+            <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+            <span className="text-[11px] font-semibold text-gray-700 dark:text-gray-300">{product.rating}</span>
+            <span className="text-[10px] text-gray-400 dark:text-gray-500">({product.reviewCount})</span>
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-sm font-bold text-gray-900">${product.price}</span>
+            <span className="text-base font-bold text-[#FF6B35]">${product.price}</span>
             {product.originalPrice && (
-              <span className="text-[10px] text-gray-400 line-through">${product.originalPrice}</span>
+              <span className="text-[10px] text-gray-400 dark:text-gray-500 line-through">${product.originalPrice}</span>
             )}
           </div>
         </div>
