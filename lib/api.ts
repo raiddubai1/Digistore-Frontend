@@ -193,5 +193,27 @@ export const reviewsAPI = {
   delete: (id: string) => api.delete(`/reviews/${id}`),
 };
 
+// ============================================
+// ATTRIBUTES API
+// ============================================
+
+export const attributesAPI = {
+  getAll: () => api.get('/attributes'),
+
+  getById: (id: string) => api.get(`/attributes/${id}`),
+
+  create: (data: any) => api.post('/attributes', data),
+
+  update: (id: string, data: any) => api.put(`/attributes/${id}`, data),
+
+  delete: (id: string) => api.delete(`/attributes/${id}`),
+
+  getProductAttributes: (productId: string) =>
+    api.get(`/attributes/product/${productId}`),
+
+  setProductAttributes: (productId: string, attributes: Array<{ attributeId: string; value: string }>) =>
+    api.post(`/attributes/product/${productId}`, { attributes }),
+};
+
 export default api;
 

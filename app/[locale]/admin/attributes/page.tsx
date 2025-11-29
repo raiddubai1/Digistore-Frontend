@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Edit, Trash2, Tag, CheckCircle, XCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Edit, Trash2, Tag, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { attributesAPI } from "@/lib/api";
 
 type AttributeType = "TEXT" | "NUMBER" | "SELECT" | "MULTISELECT" | "COLOR" | "BOOLEAN";
 
@@ -25,70 +26,26 @@ interface Attribute {
 export default function AttributesPage() {
   const pathname = usePathname();
   const locale = pathname.split('/')[1] || 'en';
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data - will be replaced with API calls
-  const [attributes, setAttributes] = useState<Attribute[]>([
-    {
-      id: "1",
-      name: "File Format",
-      slug: "file-format",
-      description: "The format of the digital file",
-      type: "SELECT",
-      options: ["PDF", "DOCX", "XLSX", "MP4", "MP3", "ZIP"],
-      required: true,
-      active: true,
-      order: 1,
-      _count: { productAttributes: 45 },
-    },
-    {
-      id: "2",
-      name: "File Size",
-      slug: "file-size",
-      description: "Size of the file in MB",
-      type: "NUMBER",
-      options: [],
-      required: false,
-      active: true,
-      order: 2,
-      _count: { productAttributes: 38 },
-    },
-    {
-      id: "3",
-      name: "Language",
-      slug: "language",
-      description: "Content language",
-      type: "MULTISELECT",
-      options: ["English", "Arabic", "Spanish", "French", "German"],
-      required: true,
-      active: true,
-      order: 3,
-      _count: { productAttributes: 52 },
-    },
-    {
-      id: "4",
-      name: "License Type",
-      slug: "license-type",
-      description: "Type of usage license",
-      type: "SELECT",
-      options: ["Personal", "Commercial", "Extended"],
-      required: true,
-      active: true,
-      order: 4,
-      _count: { productAttributes: 45 },
-    },
-    {
-      id: "5",
-      name: "Includes Source Files",
-      slug: "includes-source-files",
-      description: "Whether source files are included",
-      type: "BOOLEAN",
-      options: [],
-      required: false,
-      active: true,
-      order: 5,
-      _count: { productAttributes: 28 },
-    },
-  ]);
+  useEffect(() => {
+    fetchAttributes();
+  }, []);
+
+  const fetchAttributes = async () => {
+    try {
+      setLoading(true);
+      const response = await attributesAPI.getAll();
+      if (response.data?.success && response.data?.data) {
+        setAttributes(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch attributes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getTypeColor = (type: AttributeType) => {
     const colors = {
@@ -169,7 +126,20 @@ export default function AttributesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {attributes.map((attribute) => (
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center">
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
+                    <p className="mt-2 text-gray-500">Loading attributes...</p>
+                  </td>
+                </tr>
+              ) : attributes.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                    No attributes found. Create your first attribute to get started.
+                  </td>
+                </tr>
+              ) : attributes.map((attribute) => (
                 <tr key={attribute.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div>
