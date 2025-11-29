@@ -51,7 +51,7 @@
   --border-color: #E2E8F0;
 }
 
-.dark {
+:root.dark {
   --bg-primary: #0F172A;
   --bg-secondary: #1E293B;
   --bg-tertiary: #334155;
@@ -62,19 +62,117 @@
   --border-color: #334155;
 }
 
+/* Dark mode body styles */
+:root.dark body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Dark mode background overrides */
+:root.dark .bg-white {
+  background-color: var(--bg-card);
+}
+
+:root.dark .bg-gray-50 {
+  background-color: var(--bg-secondary);
+}
+
+:root.dark .bg-gray-100 {
+  background-color: var(--bg-tertiary);
+}
+
+/* Dark mode text overrides */
+:root.dark .text-gray-900 {
+  color: var(--text-primary);
+}
+
+:root.dark .text-gray-800 {
+  color: var(--text-primary);
+}
+
+:root.dark .text-gray-700 {
+  color: var(--text-secondary);
+}
+
+:root.dark .text-gray-600 {
+  color: var(--text-secondary);
+}
+
+:root.dark .text-gray-500 {
+  color: var(--text-tertiary);
+}
+
+:root.dark .text-gray-400 {
+  color: var(--text-tertiary);
+}
+
+/* Dark mode border overrides */
+:root.dark .border-gray-200 {
+  border-color: var(--border-color);
+}
+
+:root.dark .border-gray-100 {
+  border-color: var(--border-color);
+}
+
+:root.dark .border-gray-300 {
+  border-color: var(--border-color);
+}
+
+/* Dark mode divide colors */
+:root.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border-color);
+}
+
+/* Dark mode ring colors */
+:root.dark .ring-gray-200 {
+  --tw-ring-color: var(--border-color);
+}
+
 /* Dark mode shadows */
-.dark .shadow-sm,
-.dark .shadow,
-.dark .shadow-md,
-.dark .shadow-lg,
-.dark .shadow-xl {
-  --tw-shadow-color: rgba(0, 0, 0, 0.3);
+:root.dark .shadow-sm,
+:root.dark .shadow,
+:root.dark .shadow-md,
+:root.dark .shadow-lg,
+:root.dark .shadow-xl {
+  --tw-shadow-color: rgba(0, 0, 0, 0.4);
 }
 
 /* Dark mode skeleton */
-.dark .skeleton-pulse {
+:root.dark .skeleton-pulse {
   background: linear-gradient(90deg, #1E293B 25%, #334155 50%, #1E293B 75%);
   background-size: 200% 100%;
+}
+
+/* Dark mode inputs and form elements */
+:root.dark input,
+:root.dark textarea,
+:root.dark select {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+:root.dark input::placeholder,
+:root.dark textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Dark mode focus states */
+:root.dark input:focus,
+:root.dark textarea:focus,
+:root.dark select:focus {
+  border-color: #60A5FA;
+  outline-color: #60A5FA;
+}
+
+/* Dark mode hover states for gray backgrounds */
+:root.dark .hover\:bg-gray-50:hover {
+  background-color: var(--bg-tertiary);
+}
+
+:root.dark .hover\:bg-gray-100:hover {
+  background-color: #475569;
 }
 
 html, body {
