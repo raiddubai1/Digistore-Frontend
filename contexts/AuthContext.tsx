@@ -13,6 +13,7 @@ interface User {
   role: 'CUSTOMER' | 'VENDOR' | 'ADMIN';
   emailVerified: boolean;
   status: string;
+  createdAt?: string;
   vendorProfile?: {
     id: string;
     businessName: string;
