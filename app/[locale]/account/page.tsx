@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, ShoppingBag, User, Settings, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { Download, ShoppingBag, User, Settings, LogOut, ChevronLeft, ChevronRight, Users } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import NotificationSettings from "@/components/NotificationSettings";
@@ -179,6 +179,16 @@ export default function AccountPage() {
               <button className="w-full py-3 bg-gray-900 text-white font-medium rounded-xl">
                 Save Changes
               </button>
+
+              {/* Referral Program Link */}
+              <Link
+                href="/account/referrals"
+                className="w-full py-3 bg-gradient-to-r from-[#ff6f61] to-[#ff8a7a] text-white font-medium rounded-xl flex items-center justify-center gap-2"
+              >
+                <Users className="w-5 h-5" />
+                Referral Program - Earn 10%
+              </Link>
+
               <button className="w-full py-3 bg-red-50 text-red-600 font-medium rounded-xl flex items-center justify-center gap-2">
                 <LogOut className="w-5 h-5" />
                 Logout
@@ -362,9 +372,18 @@ export default function AccountPage() {
                       </div>
                     </div>
                   </div>
-                  <button className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-full font-semibold hover:shadow-lg transition-all">
-                    Save Changes
-                  </button>
+                  <div className="flex gap-4">
+                    <button className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-full font-semibold hover:shadow-lg transition-all">
+                      Save Changes
+                    </button>
+                    <Link
+                      href="/account/referrals"
+                      className="px-6 py-3 bg-gradient-to-r from-[#ff6f61] to-[#ff8a7a] text-white rounded-full font-semibold hover:shadow-lg transition-all flex items-center gap-2"
+                    >
+                      <Users className="w-5 h-5" />
+                      Referral Program
+                    </Link>
+                  </div>
                 </div>
               </div>
             )}
