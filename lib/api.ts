@@ -1,7 +1,8 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 
 // API Configuration
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+// Use environment variable if set, otherwise use production URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://digistore1-backend.onrender.com/api';
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
