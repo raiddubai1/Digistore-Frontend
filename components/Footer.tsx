@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Facebook, Twitter, Instagram, Youtube, Mail, Send, Heart, Sparkles } from "lucide-react";
+import { Facebook, Twitter, Instagram, Youtube, Mail, Send, Heart, Sparkles, Gift, Package, Users } from "lucide-react";
 import Logo from "./Logo";
 
 export default function Footer() {
@@ -76,64 +76,70 @@ export default function Footer() {
               <h3 className="text-lg font-bold mb-6 text-white">Shop</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/products" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  <Link href="/products" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     All Products
                   </Link>
                 </li>
                 <li>
-                  <Link href="/categories" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  <Link href="/categories" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Categories
                   </Link>
                 </li>
                 <li>
-                  <Link href="/products?filter=new" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  <Link href="/bundles" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <Package className="w-3.5 h-3.5 text-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    Product Bundles
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/products?filter=new" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     New Arrivals
                   </Link>
                 </li>
                 <li>
-                  <Link href="/products?filter=bestsellers" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  <Link href="/products?filter=bestsellers" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Best Sellers
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/products?filter=free" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    Free Products
                   </Link>
                 </li>
               </ul>
             </div>
 
-            {/* Support Column */}
+            {/* Features Column */}
             <div>
-              <h3 className="text-lg font-bold mb-6 text-white">Support</h3>
+              <h3 className="text-lg font-bold mb-6 text-white">Features</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/help" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  <Link href="/gift-cards" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <Gift className="w-3.5 h-3.5 text-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    Gift Cards
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/account/referrals" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <Users className="w-3.5 h-3.5 text-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    Referral Program
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/help" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Help Center
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  <Link href="/contact" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Contact Us
                   </Link>
                 </li>
                 <li>
-                  <Link href="/faq" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  <Link href="/faq" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     FAQ
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/refund-policy" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    Refund Policy
                   </Link>
                 </li>
               </ul>
@@ -144,27 +150,33 @@ export default function Footer() {
               <h3 className="text-lg font-bold mb-6 text-white">Legal</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/terms" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  <Link href="/terms" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Terms of Service
                   </Link>
                 </li>
                 <li>
-                  <Link href="/privacy" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  <Link href="/privacy" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link href="/licenses" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  <Link href="/licenses" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     License Information
                   </Link>
                 </li>
                 <li>
-                  <Link href="/cookies" className="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  <Link href="/cookies" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Cookie Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/refund-policy" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    Refund Policy
                   </Link>
                 </li>
               </ul>

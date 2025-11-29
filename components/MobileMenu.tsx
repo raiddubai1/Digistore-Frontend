@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { X, ChevronDown, ChevronRight, Briefcase, Sparkles, Code, Heart, Palette, DollarSign, Flame, Zap, Tag, Globe, Check, LucideIcon, Home, Search } from "lucide-react";
+import { X, ChevronDown, ChevronRight, Briefcase, Sparkles, Code, Heart, Palette, DollarSign, Flame, Zap, Tag, Globe, Check, LucideIcon, Home, Search, Gift, Package, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCategories } from "@/hooks/useCategories";
 
@@ -313,6 +313,52 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 </div>
               );
             })}
+          </div>
+
+          {/* Special Features */}
+          <div className="space-y-2 border-t border-gray-200 pt-6 mb-6">
+            <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
+              Special
+            </h3>
+            <Link
+              href="/bundles"
+              onClick={onClose}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors"
+            >
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#ff6f61] to-[#ff8a7a] flex items-center justify-center">
+                <Package className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <span className="text-base font-medium text-gray-900">Product Bundles</span>
+                <p className="text-xs text-gray-500">Save more when you buy together</p>
+              </div>
+            </Link>
+            <Link
+              href="/gift-cards"
+              onClick={onClose}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors"
+            >
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center">
+                <Gift className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <span className="text-base font-medium text-gray-900">Gift Cards</span>
+                <p className="text-xs text-gray-500">Give the gift of digital products</p>
+              </div>
+            </Link>
+            <Link
+              href="/account/referrals"
+              onClick={onClose}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors"
+            >
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
+                <Users className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <span className="text-base font-medium text-gray-900">Referral Program</span>
+                <p className="text-xs text-gray-500">Earn 10% on every referral</p>
+              </div>
+            </Link>
           </div>
 
           {/* Featured Sections */}

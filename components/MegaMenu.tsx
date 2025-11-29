@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   ChevronDown, TrendingUp, Sparkles, Clock, Tag, Home, Briefcase, Code,
   Heart, Palette, DollarSign, ArrowRight, Flame, Zap, Menu,
-  LucideIcon, Star, Gift, Rocket
+  LucideIcon, Star, Gift, Rocket, Package, Users
 } from "lucide-react";
 import { useCategories } from "@/hooks/useCategories";
 
@@ -189,11 +189,19 @@ export default function MegaMenu() {
           {/* Right Side - Special Links */}
           <div className="flex items-center gap-1">
             <Link
-              href="/products?filter=free"
+              href="/bundles"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all"
+            >
+              <Package className="w-4 h-4" />
+              Bundles
+            </Link>
+
+            <Link
+              href="/gift-cards"
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-[#ff6f61] hover:bg-orange-50 transition-all"
             >
               <Gift className="w-4 h-4" />
-              Free Products
+              Gift Cards
             </Link>
 
             <Link
