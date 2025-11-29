@@ -125,7 +125,7 @@ export default function MobileHome({
         <div className="overflow-x-auto scrollbar-hide">
           <div className="flex gap-2 px-4">
             {categories.slice(0, 6).map((category) => {
-              const config = categoryConfig[category.slug] || { emoji: "📦", bgColor: "bg-gray-100 dark:bg-slate-700" };
+              const config = categoryConfig[category.slug] || { emoji: "📦", bgColor: "bg-gray-100" };
               return (
                 <Link
                   key={category.id}
@@ -133,7 +133,7 @@ export default function MobileHome({
                   className={`flex items-center gap-2 px-4 py-2 ${config.bgColor} rounded-full whitespace-nowrap flex-shrink-0 active:scale-95 transition-transform`}
                 >
                   <span className="text-base">{config.emoji}</span>
-                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{category.name.split(' ')[0]}</span>
+                  <span className="text-sm font-medium text-gray-800">{category.name.split(' ')[0]}</span>
                 </Link>
               );
             })}
