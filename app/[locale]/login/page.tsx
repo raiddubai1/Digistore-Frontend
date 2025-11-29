@@ -89,12 +89,12 @@ export default function LoginPage({ params }: LoginPageProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Back to Home */}
         <Link
           href={`/${locale}`}
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Home
@@ -102,21 +102,21 @@ export default function LoginPage({ params }: LoginPageProps) {
 
         {/* Header */}
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
             Sign in to your account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
-            <Link href={`/${locale}/register`} className="font-medium text-teal-600 hover:text-teal-500">
+            <Link href={`/${locale}/register`} className="font-medium text-teal-600 dark:text-[#FF6B35] hover:text-teal-500 dark:hover:text-orange-400">
               create a new account
             </Link>
           </p>
         </div>
 
         {/* Demo Accounts */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 shadow-sm">
-          <p className="text-sm font-medium text-blue-900 mb-2">🎯 Demo Accounts:</p>
-          <div className="text-xs text-blue-800 space-y-1">
+        <div className="bg-blue-50 dark:bg-slate-700 border border-blue-200 dark:border-slate-600 rounded-xl p-4 shadow-sm">
+          <p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">🎯 Demo Accounts:</p>
+          <div className="text-xs text-blue-800 dark:text-blue-300 space-y-1">
             <p>👤 Customer: customer@example.com / customer123456</p>
             <p>🏪 Vendor: vendor@example.com / vendor123456</p>
             <p>⚙️ Admin: admin@digistore1.com / admin123!</p>
@@ -124,11 +124,11 @@ export default function LoginPage({ params }: LoginPageProps) {
         </div>
 
         {/* Form */}
-        <form className="mt-8 space-y-6 bg-white p-8 rounded-2xl shadow-xl" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6 bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Email address
               </label>
               <div className="relative">
@@ -143,7 +143,7 @@ export default function LoginPage({ params }: LoginPageProps) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none relative block w-full pl-10 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
+                  className="appearance-none relative block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-slate-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-slate-700 rounded-lg focus:outline-none focus:ring-teal-500 dark:focus:ring-[#FF6B35] focus:border-teal-500 dark:focus:border-[#FF6B35] focus:z-10 sm:text-sm"
                   placeholder="Enter your email"
                 />
               </div>
@@ -151,7 +151,7 @@ export default function LoginPage({ params }: LoginPageProps) {
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Password
               </label>
               <div className="relative">
@@ -166,7 +166,7 @@ export default function LoginPage({ params }: LoginPageProps) {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none relative block w-full pl-10 pr-10 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
+                  className="appearance-none relative block w-full pl-10 pr-10 px-3 py-2 border border-gray-300 dark:border-slate-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-slate-700 rounded-lg focus:outline-none focus:ring-teal-500 dark:focus:ring-[#FF6B35] focus:border-teal-500 dark:focus:border-[#FF6B35] focus:z-10 sm:text-sm"
                   placeholder="Enter your password"
                 />
                 <button
@@ -175,9 +175,9 @@ export default function LoginPage({ params }: LoginPageProps) {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
                   )}
                 </button>
               </div>
@@ -191,15 +191,15 @@ export default function LoginPage({ params }: LoginPageProps) {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+                className="h-4 w-4 text-teal-600 dark:text-[#FF6B35] focus:ring-teal-500 dark:focus:ring-[#FF6B35] border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
                 Remember me
               </label>
             </div>
 
             <div className="text-sm">
-              <Link href={`/${locale}/forgot-password`} className="font-medium text-teal-600 hover:text-teal-500">
+              <Link href={`/${locale}/forgot-password`} className="font-medium text-teal-600 dark:text-[#FF6B35] hover:text-teal-500 dark:hover:text-orange-400">
                 Forgot your password?
               </Link>
             </div>
@@ -210,7 +210,7 @@ export default function LoginPage({ params }: LoginPageProps) {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-teal-600 dark:bg-[#FF6B35] hover:bg-teal-700 dark:hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 dark:focus:ring-[#FF6B35] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? (
                 <span className="flex items-center">
@@ -229,10 +229,10 @@ export default function LoginPage({ params }: LoginPageProps) {
           {/* Divider */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
+              <div className="w-full border-t border-gray-300 dark:border-slate-600" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              <span className="px-2 bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-400">Or continue with</span>
             </div>
           </div>
 
@@ -242,7 +242,7 @@ export default function LoginPage({ params }: LoginPageProps) {
               type="button"
               onClick={handleGoogleLogin}
               disabled={!!socialLoading}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 dark:focus:ring-[#FF6B35] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {socialLoading === 'google' ? (
                 <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -263,7 +263,7 @@ export default function LoginPage({ params }: LoginPageProps) {
               type="button"
               onClick={handleGithubLogin}
               disabled={!!socialLoading}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 dark:focus:ring-[#FF6B35] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {socialLoading === 'github' ? (
                 <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
