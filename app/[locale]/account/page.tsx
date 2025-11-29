@@ -3,6 +3,7 @@
 import { Download, ShoppingBag, User, Settings, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
+import NotificationSettings from "@/components/NotificationSettings";
 
 export default function AccountPage() {
   const [activeTab, setActiveTab] = useState("downloads");
@@ -156,6 +157,9 @@ export default function AccountPage() {
 
           {activeTab === "settings" && (
             <div className="space-y-3">
+              {/* Notification Settings */}
+              <NotificationSettings />
+
               <div className="bg-white rounded-xl p-4 shadow-sm">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                 <input
@@ -325,25 +329,38 @@ export default function AccountPage() {
               <div className="bg-white rounded-2xl p-6 shadow-sm">
                 <h2 className="text-2xl font-bold mb-6">Account Settings</h2>
                 <div className="space-y-6">
+                  {/* Notification Settings */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue={user.name}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                    />
+                    <h3 className="text-lg font-semibold mb-3">Notifications</h3>
+                    <NotificationSettings />
                   </div>
+
+                  <hr className="border-gray-200" />
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      defaultValue={user.email}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                    />
+                    <h3 className="text-lg font-semibold mb-3">Profile Information</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Full Name
+                        </label>
+                        <input
+                          type="text"
+                          defaultValue={user.name}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Email Address
+                        </label>
+                        <input
+                          type="email"
+                          defaultValue={user.email}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                        />
+                      </div>
+                    </div>
                   </div>
                   <button className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-full font-semibold hover:shadow-lg transition-all">
                     Save Changes
