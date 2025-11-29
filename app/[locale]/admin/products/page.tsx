@@ -1,11 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { demoProducts } from "@/data/demo-products";
 import { formatPrice } from "@/lib/utils";
-import { Plus, Search, Edit, Trash2, Eye } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { productsAPI } from "@/lib/api";
+
+interface Product {
+  id: string;
+  title: string;
+  slug: string;
+  price: number;
+  originalPrice?: number;
+  fileType: string;
+  downloadCount: number;
+  status: string;
+  category?: { name: string; slug: string } | string;
+  thumbnailUrl?: string;
+}
 
 export default function AdminProductsPage() {
   const router = useRouter();
@@ -17,10 +31,45 @@ export default function AdminProductsPage() {
   const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
 
-  const filteredProducts = demoProducts.filter((product) =>
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await productsAPI.getAll({ limit: 100 });
+      if (response.data?.success && response.data?.data?.products) {
+        setProducts(response.data.data.products);
+        setTotal(response.data.data.pagination?.total || response.data.data.products.length);
+      } else {
+        // Fallback to demo data
+        setProducts(demoProducts as any);
+        setTotal(demoProducts.length);
+      }
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+      setProducts(demoProducts as any);
+      setTotal(demoProducts.length);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredProducts = products.filter((product) =>
     product.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const getCategoryName = (product: Product) => {
+    if (typeof product.category === 'object' && product.category?.name) {
+      return product.category.name.replace(/&amp;/g, '&');
+    }
+    return typeof product.category === 'string' ? product.category : 'Uncategorized';
+  };
 
   const handleDelete = (productId: string, productTitle: string) => {
     if (deleteConfirm === productId) {
@@ -104,21 +153,38 @@ export default function AdminProductsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredProducts.map((product) => (
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
+                    <p className="mt-2 text-gray-500">Loading products...</p>
+                  </td>
+                </tr>
+              ) : filteredProducts.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    No products found
+                  </td>
+                </tr>
+              ) : filteredProducts.map((product) => (
                 <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex-shrink-0" />
+                      {product.thumbnailUrl ? (
+                        <img src={product.thumbnailUrl} alt={product.title} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex-shrink-0" />
+                      )}
                       <div className="min-w-0">
                         <div className="font-semibold text-sm truncate max-w-xs">
                           {product.title}
                         </div>
-                        <div className="text-xs text-gray-500">{product.fileType.toUpperCase()}</div>
+                        <div className="text-xs text-gray-500">{product.fileType?.toUpperCase() || 'N/A'}</div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-700">{product.category}</div>
+                    <div className="text-sm text-gray-700">{getCategoryName(product)}</div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="font-semibold text-sm">{formatPrice(product.price)}</div>
@@ -130,12 +196,16 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-700">
-                      {product.downloadCount.toLocaleString()}
+                      {(product.downloadCount || 0).toLocaleString()}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
-                      Published
+                    <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
+                      product.status === 'APPROVED' ? 'bg-green-100 text-green-700' :
+                      product.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-gray-100 text-gray-700'
+                    }`}>
+                      {product.status === 'APPROVED' ? 'Published' : product.status || 'Published'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -176,7 +246,7 @@ export default function AdminProductsPage() {
         {/* Pagination */}
         <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
           <div className="text-sm text-gray-600">
-            Showing {filteredProducts.length} of {demoProducts.length} products
+            Showing {filteredProducts.length} of {total} products
           </div>
           <div className="flex gap-2">
             <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
