@@ -408,41 +408,53 @@ export default function AccountPage() {
             )}
 
             {activeTab === "orders" && (
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <h2 className="text-2xl font-bold mb-6">Order History</h2>
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm">
+                <h2 className="text-2xl font-bold mb-6 dark:text-white">Order History</h2>
                 <div className="space-y-4">
-                  {purchases.map((purchase) => (
-                    <div
-                      key={purchase.id}
-                      className="border border-gray-200 rounded-xl p-6"
-                    >
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h3 className="font-semibold mb-1">Order #{purchase.orderId}</h3>
-                          <p className="text-sm text-gray-500">
-                            {new Date(purchase.date).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            })}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-lg font-bold">${purchase.total.toFixed(2)}</div>
-                          <span className="inline-block px-3 py-1 bg-success/10 text-success text-xs font-semibold rounded-full">
-                            Completed
-                          </span>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        {purchase.items.map((item, index) => (
-                          <div key={index} className="text-sm text-gray-600">
-                            • {item.title}
-                          </div>
-                        ))}
-                      </div>
+                  {orders.length === 0 ? (
+                    <div className="text-center py-12">
+                      <ShoppingBag className="w-16 h-16 text-gray-300 dark:text-slate-600 mx-auto mb-4" />
+                      <p className="text-gray-500 dark:text-gray-400">No orders yet</p>
+                      <Link href="/products" className="text-[#FF6B35] hover:underline mt-2 inline-block">
+                        Start shopping
+                      </Link>
                     </div>
-                  ))}
+                  ) : (
+                    orders.map((order) => (
+                      <div
+                        key={order.id}
+                        className="border border-gray-200 dark:border-slate-700 rounded-xl p-6"
+                      >
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="font-semibold mb-1 dark:text-white">Order #{order.orderNumber}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              {formatDate(order.createdAt)}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-lg font-bold text-[#FF6B35]">${order.total.toFixed(2)}</div>
+                            <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
+                              order.status === 'COMPLETED'
+                                ? 'bg-green-100 text-green-600'
+                                : order.status === 'PENDING'
+                                ? 'bg-yellow-100 text-yellow-600'
+                                : 'bg-gray-100 text-gray-600'
+                            }`}>
+                              {order.status}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          {order.orderItems.map((item, index) => (
+                            <div key={index} className="text-sm text-gray-600 dark:text-gray-400">
+                              • {item.product.title}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             )}
