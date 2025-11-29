@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "./Logo";
 import MobileMenu from "./MobileMenu";
-import { Search, ShoppingCart, User, Menu, Globe, LogOut, Settings, Heart, Package, Sparkles, TrendingUp, Bell, ChevronDown } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, Globe, LogOut, Settings, Heart, Package, Sparkles, TrendingUp, Bell, ChevronDown, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useAuth } from "@/contexts/AuthContext";
@@ -22,7 +22,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
 
   const { itemCount, openCart } = useCartStore();
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, isAdmin } = useAuth();
   const cartItemsCount = mounted ? itemCount() : 0;
 
   const languages = [
@@ -217,6 +217,19 @@ export default function Header() {
                         <p className="text-sm font-semibold text-gray-900">{user.name}</p>
                         <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
+
+                      {/* Admin Dashboard Link */}
+                      {isAdmin && (
+                        <div className="py-2 border-b border-gray-100">
+                          <Link
+                            href="/admin"
+                            className="flex items-center gap-3 px-4 py-2.5 bg-red-50 hover:bg-red-100 transition-colors group"
+                          >
+                            <LayoutDashboard className="w-4 h-4 text-red-600" />
+                            <span className="text-sm font-medium text-red-600">Admin Dashboard</span>
+                          </Link>
+                        </div>
+                      )}
 
                       {/* Menu Items */}
                       <div className="py-2">
