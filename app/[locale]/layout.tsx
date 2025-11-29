@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import ConditionalLayout from "@/components/ConditionalLayout";
+import PWAProvider from "@/components/PWAProvider";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@/contexts/AuthContext";
 
@@ -67,36 +68,38 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages}>
       <div className="flex flex-col min-h-screen min-h-dvh overflow-x-hidden">
         <AuthProvider>
-          <ConditionalLayout>
-            <main className="page-content">
-              {children}
-            </main>
-          </ConditionalLayout>
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: "#fff",
-                color: "#2D2D2D",
-                border: "1px solid #E5E7EB",
-                borderRadius: "0.75rem",
-                padding: "1rem",
-              },
-              success: {
-                iconTheme: {
-                  primary: "#10B981",
-                  secondary: "#fff",
+          <PWAProvider>
+            <ConditionalLayout>
+              <main className="page-content">
+                {children}
+              </main>
+            </ConditionalLayout>
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 3000,
+                style: {
+                  background: "#fff",
+                  color: "#2D2D2D",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: "0.75rem",
+                  padding: "1rem",
                 },
-              },
-              error: {
-                iconTheme: {
-                  primary: "#EF4444",
-                  secondary: "#fff",
+                success: {
+                  iconTheme: {
+                    primary: "#10B981",
+                    secondary: "#fff",
+                  },
                 },
-              },
-            }}
-          />
+                error: {
+                  iconTheme: {
+                    primary: "#EF4444",
+                    secondary: "#fff",
+                  },
+                },
+              }}
+            />
+          </PWAProvider>
         </AuthProvider>
       </div>
     </NextIntlClientProvider>
