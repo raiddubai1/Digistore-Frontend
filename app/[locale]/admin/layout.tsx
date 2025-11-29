@@ -21,24 +21,24 @@ import {
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
 
-const getNavigation = (locale: string) => [
-  { name: "Dashboard", href: `/${locale}/admin`, icon: LayoutDashboard },
-  { name: "Products", href: `/${locale}/admin/products`, icon: Package },
-  { name: "Categories", href: `/${locale}/admin/categories`, icon: FolderTree },
-  { name: "Attributes", href: `/${locale}/admin/attributes`, icon: Tag },
-  { name: "Orders", href: `/${locale}/admin/orders`, icon: ShoppingCart },
-  { name: "Customers", href: `/${locale}/admin/customers`, icon: Users },
-  { name: "Reviews", href: `/${locale}/admin/reviews`, icon: Star },
-  { name: "Analytics", href: `/${locale}/admin/analytics`, icon: BarChart3 },
-  { name: "Settings", href: `/${locale}/admin/settings`, icon: Settings },
+const getNavigation = (basePath: string) => [
+  { name: "Dashboard", href: `${basePath}/admin`, icon: LayoutDashboard },
+  { name: "Products", href: `${basePath}/admin/products`, icon: Package },
+  { name: "Categories", href: `${basePath}/admin/categories`, icon: FolderTree },
+  { name: "Attributes", href: `${basePath}/admin/attributes`, icon: Tag },
+  { name: "Orders", href: `${basePath}/admin/orders`, icon: ShoppingCart },
+  { name: "Customers", href: `${basePath}/admin/customers`, icon: Users },
+  { name: "Reviews", href: `${basePath}/admin/reviews`, icon: Star },
+  { name: "Analytics", href: `${basePath}/admin/analytics`, icon: BarChart3 },
+  { name: "Settings", href: `${basePath}/admin/settings`, icon: Settings },
 ];
 
 // Mobile bottom nav - show 4 items + more menu
-const getMobileNav = (locale: string) => [
-  { name: "Home", href: `/${locale}/admin`, icon: LayoutDashboard },
-  { name: "Products", href: `/${locale}/admin/products`, icon: Package },
-  { name: "Orders", href: `/${locale}/admin/orders`, icon: ShoppingCart },
-  { name: "Analytics", href: `/${locale}/admin/analytics`, icon: BarChart3 },
+const getMobileNav = (basePath: string) => [
+  { name: "Home", href: `${basePath}/admin`, icon: LayoutDashboard },
+  { name: "Products", href: `${basePath}/admin/products`, icon: Package },
+  { name: "Orders", href: `${basePath}/admin/orders`, icon: ShoppingCart },
+  { name: "Analytics", href: `${basePath}/admin/analytics`, icon: BarChart3 },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -47,16 +47,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, logout } = useAuth();
 
   // Extract locale from pathname (e.g., /en/admin -> en)
-  // Check if first segment is a valid locale, otherwise default to 'en'
+  // Check if first segment is a valid locale, otherwise use empty string (default locale)
   const validLocales = ['en', 'ar', 'es', 'fr', 'de'];
-  const firstSegment = pathname.split('/')[1] || '';
-  const locale = validLocales.includes(firstSegment) ? firstSegment : 'en';
-  const navigation = getNavigation(locale);
-  const mobileNav = getMobileNav(locale);
+  const segments = pathname.split('/').filter(Boolean);
+  const firstSegment = segments[0] || '';
+  // If first segment is a valid locale, use it; otherwise use empty string for default locale
+  const locale = validLocales.includes(firstSegment) ? firstSegment : '';
+  // Build base path: with locale prefix if specified, otherwise just root
+  const basePath = locale ? `/${locale}` : '';
+  const navigation = getNavigation(basePath);
+  const mobileNav = getMobileNav(basePath);
 
   // Check if current path matches or starts with nav item href
   const isActive = (href: string) => {
-    if (href === `/${locale}/admin`) {
+    if (href === `${basePath}/admin`) {
       return pathname === href;
     }
     return pathname.startsWith(href);
@@ -82,7 +86,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <Link href={`/${locale}/admin`} className="flex items-center gap-2">
+            <Link href={`${basePath}/admin`} className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                 <LayoutDashboard className="w-5 h-5 text-white" />
               </div>
@@ -136,7 +140,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <span className="font-medium">Logout</span>
             </button>
             <Link
-              href={`/${locale}`}
+              href={basePath || '/'}
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors mt-2"
             >
               <span className="font-medium">← Back to Store</span>
@@ -163,7 +167,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
             <div className="flex items-center gap-4">
               <Link
-                href={`/${locale}`}
+                href={basePath || '/'}
                 className="text-sm text-gray-600 hover:text-primary transition-colors"
               >
                 View Store →

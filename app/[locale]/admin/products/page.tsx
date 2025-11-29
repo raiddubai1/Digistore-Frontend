@@ -10,7 +10,11 @@ import toast from "react-hot-toast";
 export default function AdminProductsPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'en';
+  // Extract locale/basePath from pathname
+  const validLocales = ['en', 'ar', 'es', 'fr', 'de'];
+  const segments = pathname.split('/').filter(Boolean);
+  const firstSegment = segments[0] || '';
+  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
@@ -38,7 +42,7 @@ export default function AdminProductsPage() {
           <p className="text-gray-600">Manage your digital products</p>
         </div>
         <button
-          onClick={() => router.push(`/${locale}/admin/products/new`)}
+          onClick={() => router.push(`${basePath}/admin/products/new`)}
           className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-full font-semibold hover:shadow-lg transition-all"
         >
           <Plus className="w-5 h-5" />
@@ -137,14 +141,14 @@ export default function AdminProductsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => router.push(`/${locale}/products/${product.slug}`)}
+                        onClick={() => router.push(`${basePath}/products/${product.slug}`)}
                         className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                         title="View"
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </button>
                       <button
-                        onClick={() => router.push(`/${locale}/admin/products/${product.id}/edit`)}
+                        onClick={() => router.push(`${basePath}/admin/products/${product.id}/edit`)}
                         className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                         title="Edit"
                       >
