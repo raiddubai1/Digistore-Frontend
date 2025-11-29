@@ -21,7 +21,7 @@ export default function Footer() {
             {/* Brand Column */}
             <div className="lg:col-span-2 space-y-6">
               <div>
-                <Logo />
+                <Logo variant="dark" />
               </div>
               <p className="text-gray-400 leading-relaxed max-w-md">
                 Your trusted marketplace for high-quality digital products. Download instantly and start creating amazing things today.
