@@ -147,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Redirect based on role
       if (data.role === 'VENDOR') {
-        router.push(`/${currentLocale}/vendor/dashboard`);
+        router.push(`/${currentLocale}/vendor`);
       } else {
         router.push(`/${currentLocale}`);
       }
