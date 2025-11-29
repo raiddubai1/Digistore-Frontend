@@ -71,9 +71,20 @@ export default function ProductsClient() {
         ]);
 
         if (productsRes.data?.success && productsRes.data?.data?.products?.length > 0) {
-          setAllProducts(productsRes.data.data.products);
-          setProducts(productsRes.data.data.products);
-          setTotal(productsRes.data.data.total || productsRes.data.data.products.length);
+          // Map API products to frontend Product type
+          const apiProducts = productsRes.data.data.products.map((p: any) => ({
+            ...p,
+            // Handle category object from API
+            category: typeof p.category === 'object' ? p.category?.slug : p.category,
+            categoryName: typeof p.category === 'object' ? p.category?.name : p.category,
+            // Ensure required fields have defaults
+            license: p.license || 'personal',
+            createdAt: p.createdAt ? new Date(p.createdAt) : new Date(),
+            updatedAt: p.updatedAt ? new Date(p.updatedAt) : new Date(),
+          }));
+          setAllProducts(apiProducts);
+          setProducts(apiProducts);
+          setTotal(productsRes.data.data.pagination?.total || apiProducts.length);
         } else {
           // Fallback to demo data
           setAllProducts(demoProducts);
