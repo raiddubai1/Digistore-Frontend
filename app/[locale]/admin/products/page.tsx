@@ -42,7 +42,7 @@ export default function AdminProductsPage() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await productsAPI.getAll({ limit: 100 });
+      const response = await productsAPI.getAll({ limit: 500 });
       if (response.data?.success && response.data?.data?.products) {
         setProducts(response.data.data.products);
         setTotal(response.data.data.pagination?.total || response.data.data.products.length);
