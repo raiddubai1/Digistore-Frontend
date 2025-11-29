@@ -17,18 +17,27 @@ interface MobileHomeProps {
 
 // Category icon mapping with colors
 const categoryConfig: { [key: string]: { emoji: string; bgColor: string } } = {
-  // Main categories
+  // Legacy demo categories
   "business-and-marketing": { emoji: "💼", bgColor: "bg-blue-100" },
   "personal-development": { emoji: "🧠", bgColor: "bg-purple-100" },
   "animals-and-pets": { emoji: "🐾", bgColor: "bg-orange-100" },
   "home-and-lifestyle": { emoji: "🏠", bgColor: "bg-green-100" },
   "technology": { emoji: "💻", bgColor: "bg-cyan-100" },
   "society-and-politics": { emoji: "🌍", bgColor: "bg-red-100" },
-  // API category slugs
-  "marketing": { emoji: "📣", bgColor: "bg-pink-100" },
-  "business": { emoji: "💼", bgColor: "bg-blue-100" },
+  // Top-level API categories
   "ebooks": { emoji: "📚", bgColor: "bg-indigo-100" },
   "digital-marketing-business": { emoji: "📱", bgColor: "bg-purple-100" },
+  "canva-templates": { emoji: "🎨", bgColor: "bg-cyan-100" },
+  "lightroom-presets": { emoji: "📷", bgColor: "bg-amber-100" },
+  "ebooks-guides": { emoji: "📖", bgColor: "bg-emerald-100" },
+  "stock-media": { emoji: "🎬", bgColor: "bg-red-100" },
+  "planners-printables": { emoji: "📅", bgColor: "bg-pink-100" },
+  "courses-training": { emoji: "🎓", bgColor: "bg-violet-100" },
+  "business-cards-templates": { emoji: "💳", bgColor: "bg-slate-100" },
+  "games-educational": { emoji: "🎮", bgColor: "bg-lime-100" },
+  // Sub-categories
+  "marketing": { emoji: "📣", bgColor: "bg-pink-100" },
+  "business": { emoji: "💼", bgColor: "bg-blue-100" },
   "affiliate-marketing": { emoji: "🤝", bgColor: "bg-green-100" },
   "marketing-templates": { emoji: "📝", bgColor: "bg-yellow-100" },
   "business-resources": { emoji: "📊", bgColor: "bg-teal-100" },
@@ -38,9 +47,16 @@ const categoryConfig: { [key: string]: { emoji: string; bgColor: string } } = {
   "stock-videos": { emoji: "🎬", bgColor: "bg-red-100" },
   "marketing-courses": { emoji: "🎓", bgColor: "bg-violet-100" },
   "pet-animal-guides": { emoji: "🐕", bgColor: "bg-orange-100" },
-  "canva-templates": { emoji: "🎨", bgColor: "bg-cyan-100" },
   "facebook-templates": { emoji: "👍", bgColor: "bg-blue-100" },
   "business-branding": { emoji: "✨", bgColor: "bg-rose-100" },
+  "how-to-guides": { emoji: "📘", bgColor: "bg-sky-100" },
+  "nature-landscape-presets": { emoji: "🏞️", bgColor: "bg-green-100" },
+  "lifestyle-presets": { emoji: "🌟", bgColor: "bg-yellow-100" },
+  "personal-planners": { emoji: "📓", bgColor: "bg-purple-100" },
+  "coloring-books": { emoji: "🖍️", bgColor: "bg-pink-100" },
+  "icons-graphics": { emoji: "🎯", bgColor: "bg-indigo-100" },
+  "mockups": { emoji: "📐", bgColor: "bg-gray-100" },
+  "tech-development": { emoji: "💻", bgColor: "bg-cyan-100" },
 };
 
 export default function MobileHome({
