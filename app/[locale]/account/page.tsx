@@ -363,28 +363,40 @@ export default function AccountPage() {
           {/* Main Content */}
           <div className="lg:col-span-3">
             {activeTab === "downloads" && (
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <h2 className="text-2xl font-bold mb-6">My Downloads</h2>
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm">
+                <h2 className="text-2xl font-bold mb-6 dark:text-white">My Downloads</h2>
                 <div className="space-y-4">
-                  {purchases.flatMap((purchase) =>
-                    purchase.items.map((item, index) => (
+                  {downloads.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Download className="w-16 h-16 text-gray-300 dark:text-slate-600 mx-auto mb-4" />
+                      <p className="text-gray-500 dark:text-gray-400">No downloads yet</p>
+                      <Link href="/products" className="text-[#FF6B35] hover:underline mt-2 inline-block">
+                        Browse products
+                      </Link>
+                    </div>
+                  ) : (
+                    downloads.map((download) => (
                       <div
-                        key={`${purchase.id}-${index}`}
-                        className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-primary transition-colors"
+                        key={download.id}
+                        className="flex items-center gap-4 p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-[#FF6B35] transition-colors"
                       >
-                        <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Download className="w-8 h-8 text-primary" />
+                        <div className="w-16 h-16 bg-gradient-to-br from-[#FF6B35]/10 to-orange-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Download className="w-8 h-8 text-[#FF6B35]" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold mb-1">{item.title}</h3>
-                          <p className="text-sm text-gray-500">
-                            {item.fileType} • {item.fileSize}
+                          <h3 className="font-semibold mb-1 dark:text-white">{download.product.title}</h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {download.downloadCount}/{download.maxDownloads} downloads used
                           </p>
-                          <p className="text-xs text-gray-400">
-                            Purchased on {new Date(purchase.date).toLocaleDateString()}
+                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                            Expires: {isExpired(download.expiresAt) ? 'Expired' : formatDate(download.expiresAt)}
                           </p>
                         </div>
-                        <button className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-full font-semibold hover:shadow-lg transition-all flex items-center gap-2">
+                        <button
+                          onClick={() => handleDownload(download.downloadToken)}
+                          disabled={isExpired(download.expiresAt) || download.downloadCount >= download.maxDownloads}
+                          className="px-6 py-3 bg-gradient-to-r from-[#FF6B35] to-[#ff6f61] text-white rounded-full font-semibold hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
                           <Download className="w-4 h-4" />
                           Download
                         </button>
