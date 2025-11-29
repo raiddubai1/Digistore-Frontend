@@ -45,28 +45,20 @@ export default function Footer() {
               {/* Social Links */}
               <div className="flex gap-3">
                 <a
-                  href="#"
-                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-gray-500 hover:to-gray-600 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
-                >
-                  <Facebook className="w-5 h-5" />
-                </a>
-                <a
-                  href="#"
-                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-gray-500 hover:to-gray-600 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
-                >
-                  <Twitter className="w-5 h-5" />
-                </a>
-                <a
-                  href="#"
-                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-gray-500 hover:to-gray-600 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
-                >
-                  <Instagram className="w-5 h-5" />
-                </a>
-                <a
-                  href="#"
-                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-gray-500 hover:to-gray-600 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
+                  href="https://www.youtube.com/@Digistore1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-red-600 hover:to-red-700 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
                 >
                   <Youtube className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://www.instagram.com/digistore1.dubaii/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-11 h-11 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-pink-500 hover:to-purple-600 flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm border border-white/10"
+                >
+                  <Instagram className="w-5 h-5" />
                 </a>
               </div>
             </div>
