@@ -47,7 +47,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, logout } = useAuth();
 
   // Extract locale from pathname (e.g., /en/admin -> en)
-  const locale = pathname.split('/')[1] || 'en';
+  // Check if first segment is a valid locale, otherwise default to 'en'
+  const validLocales = ['en', 'ar', 'es', 'fr', 'de'];
+  const firstSegment = pathname.split('/')[1] || '';
+  const locale = validLocales.includes(firstSegment) ? firstSegment : 'en';
   const navigation = getNavigation(locale);
   const mobileNav = getMobileNav(locale);
 
