@@ -16,12 +16,30 @@ import { productsAPI, categoriesAPI } from "@/lib/api";
 
 // Category icon mapping
 const categoryConfig: { [key: string]: { emoji: string; bgColor: string } } = {
+  // Main categories
   "business-and-marketing": { emoji: "💼", bgColor: "bg-blue-100" },
   "personal-development": { emoji: "🧠", bgColor: "bg-purple-100" },
   "animals-and-pets": { emoji: "🐾", bgColor: "bg-orange-100" },
   "home-and-lifestyle": { emoji: "🏠", bgColor: "bg-green-100" },
   "technology": { emoji: "💻", bgColor: "bg-cyan-100" },
   "society-and-politics": { emoji: "🌍", bgColor: "bg-red-100" },
+  // API category slugs
+  "marketing": { emoji: "📣", bgColor: "bg-pink-100" },
+  "business": { emoji: "💼", bgColor: "bg-blue-100" },
+  "ebooks": { emoji: "📚", bgColor: "bg-indigo-100" },
+  "digital-marketing-business": { emoji: "📱", bgColor: "bg-purple-100" },
+  "affiliate-marketing": { emoji: "🤝", bgColor: "bg-green-100" },
+  "marketing-templates": { emoji: "📝", bgColor: "bg-yellow-100" },
+  "business-resources": { emoji: "📊", bgColor: "bg-teal-100" },
+  "instagram-templates": { emoji: "📸", bgColor: "bg-pink-100" },
+  "business-planners": { emoji: "📅", bgColor: "bg-blue-100" },
+  "portrait-presets": { emoji: "🖼️", bgColor: "bg-amber-100" },
+  "stock-videos": { emoji: "🎬", bgColor: "bg-red-100" },
+  "marketing-courses": { emoji: "🎓", bgColor: "bg-violet-100" },
+  "pet-animal-guides": { emoji: "🐕", bgColor: "bg-orange-100" },
+  "canva-templates": { emoji: "🎨", bgColor: "bg-cyan-100" },
+  "facebook-templates": { emoji: "👍", bgColor: "bg-blue-100" },
+  "business-branding": { emoji: "✨", bgColor: "bg-rose-100" },
 };
 
 export default function ProductsClient() {
