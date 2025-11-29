@@ -39,7 +39,7 @@
   --color-text-tertiary: #94A3B8;
 }
 
-/* ===== DARK MODE STYLES ===== */
+/* ===== DARK MODE CSS VARIABLES ===== */
 :root {
   --bg-primary: #FFFFFF;
   --bg-secondary: #F8FAFC;
@@ -60,53 +60,6 @@
   --text-secondary: #CBD5E1;
   --text-tertiary: #64748B;
   --border-color: #334155;
-}
-
-/* Apply dark mode background */
-.dark body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-}
-
-/* Dark mode utility classes */
-.dark .bg-white {
-  background-color: var(--bg-card) !important;
-}
-
-.dark .bg-gray-50 {
-  background-color: var(--bg-secondary) !important;
-}
-
-.dark .bg-gray-100 {
-  background-color: var(--bg-tertiary) !important;
-}
-
-.dark .text-gray-900 {
-  color: var(--text-primary) !important;
-}
-
-.dark .text-gray-800 {
-  color: var(--text-primary) !important;
-}
-
-.dark .text-gray-700 {
-  color: var(--text-secondary) !important;
-}
-
-.dark .text-gray-600 {
-  color: var(--text-secondary) !important;
-}
-
-.dark .text-gray-500 {
-  color: var(--text-tertiary) !important;
-}
-
-.dark .border-gray-200 {
-  border-color: var(--border-color) !important;
-}
-
-.dark .border-gray-100 {
-  border-color: var(--border-color) !important;
 }
 
 /* Dark mode shadows */
