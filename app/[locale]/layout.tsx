@@ -68,7 +68,9 @@ export default async function LocaleLayout({
       <div className="flex flex-col min-h-screen min-h-dvh overflow-x-hidden">
         <AuthProvider>
           <ConditionalLayout>
-            {children}
+            <main className="page-content">
+              {children}
+            </main>
           </ConditionalLayout>
           <Toaster
             position="top-right"
