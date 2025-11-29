@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import { Product } from "@/types";
 import SortBottomSheet from "@/components/SortBottomSheet";
 import FilterBottomSheet from "@/components/FilterBottomSheet";
+import { productsAPI, categoriesAPI } from "@/lib/api";
 
 // Category icon mapping
 const categoryConfig: { [key: string]: { emoji: string; bgColor: string } } = {
@@ -25,9 +26,10 @@ const categoryConfig: { [key: string]: { emoji: string; bgColor: string } } = {
 
 export default function ProductsClient() {
   const router = useRouter();
+  const [allProducts, setAllProducts] = useState<Product[]>(demoProducts || []);
   const [products, setProducts] = useState<Product[]>(demoProducts || []);
   const [categories, setCategories] = useState<any[]>(demoCategories || []);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState((demoProducts || []).length);
   const [page, setPage] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -35,6 +37,7 @@ export default function ProductsClient() {
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [selectedFileTypes, setSelectedFileTypes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string>("popular");
+  const hasFetched = useRef(false);
 
   // File type options
   const fileTypeOptions = [
@@ -54,25 +57,66 @@ export default function ProductsClient() {
   // View mode state (grid or list)
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
+  // Fetch products from API on mount
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const [productsRes, categoriesRes] = await Promise.all([
+          productsAPI.getAll({ limit: 100 }),
+          categoriesAPI.getAll(),
+        ]);
+
+        if (productsRes.data?.success && productsRes.data?.data?.products?.length > 0) {
+          setAllProducts(productsRes.data.data.products);
+          setProducts(productsRes.data.data.products);
+          setTotal(productsRes.data.data.total || productsRes.data.data.products.length);
+        } else {
+          // Fallback to demo data
+          setAllProducts(demoProducts);
+          setProducts(demoProducts);
+          setTotal(demoProducts.length);
+        }
+
+        if (categoriesRes.data?.success && categoriesRes.data?.data?.categories?.length > 0) {
+          setCategories(categoriesRes.data.data.categories);
+        }
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+        // Fallback to demo data
+        setAllProducts(demoProducts);
+        setProducts(demoProducts);
+        setTotal(demoProducts.length);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // For now, just filter locally - can be enhanced to use URL params
     if (searchQuery.trim()) {
-      const filtered = demoProducts.filter(p =>
+      const filtered = allProducts.filter(p =>
         p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.description?.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setProducts(filtered);
       setTotal(filtered.length);
     } else {
-      setProducts(demoProducts);
-      setTotal(demoProducts.length);
+      setProducts(allProducts);
+      setTotal(allProducts.length);
     }
   };
 
   // Filter products based on selected filters
   useEffect(() => {
-    let filtered = [...(demoProducts || [])];
+    let filtered = [...(allProducts || [])];
 
     // Filter by category
     if (selectedCategories.length > 0) {
@@ -134,7 +178,7 @@ export default function ProductsClient() {
 
     setProducts(paginatedProducts);
     setTotal(filtered.length);
-  }, [page, selectedCategories, selectedPriceRanges, selectedRatings, selectedFileTypes, sortBy]);
+  }, [page, selectedCategories, selectedPriceRanges, selectedRatings, selectedFileTypes, sortBy, allProducts]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>

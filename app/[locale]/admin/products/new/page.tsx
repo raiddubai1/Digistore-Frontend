@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Save, ArrowLeft, Plus, X, Upload, FileText } from "lucide-react";
+import { Save, ArrowLeft, Plus, X, Upload, FileText, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import ImageUpload from "@/components/ImageUpload";
 import Link from "next/link";
+import { categoriesAPI, productsAPI } from "@/lib/api";
 
 interface Attribute {
   id: string;
@@ -16,16 +17,28 @@ interface Attribute {
   required: boolean;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export default function NewProductPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'en';
+  // Extract locale/basePath from pathname
+  const validLocales = ['en', 'ar', 'es', 'fr', 'de'];
+  const segments = pathname.split('/').filter(Boolean);
+  const firstSegment = segments[0] || '';
+  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
 
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [productFile, setProductFile] = useState<File | null>(null);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -53,18 +66,32 @@ export default function NewProductPage() {
 
   // Load categories and attributes on mount
   useEffect(() => {
-    // TODO: Replace with actual API calls
-    setCategories([
-      { id: "1", name: "Business and Marketing" },
-      { id: "2", name: "Personal Development" },
-      { id: "3", name: "Animals and Pets" },
-      { id: "4", name: "Home and Lifestyle" },
-      { id: "5", name: "Technology" },
-    ]);
+    const fetchCategories = async () => {
+      try {
+        setIsLoadingCategories(true);
+        const response = await categoriesAPI.getAll();
+        if (response.data?.success && response.data?.data?.categories) {
+          setCategories(response.data.data.categories);
+        } else if (response.data?.data) {
+          // Handle different response formats
+          setCategories(Array.isArray(response.data.data) ? response.data.data : []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+        // Fallback to empty - categories should be created via WooCommerce import
+        setCategories([]);
+        toast.error('Failed to load categories. Please try again.');
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
 
+    fetchCategories();
+
+    // Default attributes - could also be fetched from API
     setAttributes([
-      { id: "1", name: "File Format", slug: "file-format", type: "SELECT", options: ["PDF", "DOCX", "XLSX", "MP4"], required: true },
-      { id: "2", name: "Language", slug: "language", type: "MULTISELECT", options: ["English", "Arabic", "Spanish"], required: true },
+      { id: "1", name: "File Format", slug: "file-format", type: "SELECT", options: ["PDF", "DOCX", "XLSX", "MP4", "ZIP"], required: true },
+      { id: "2", name: "Language", slug: "language", type: "MULTISELECT", options: ["English", "Arabic", "Spanish", "French"], required: true },
       { id: "3", name: "License Type", slug: "license-type", type: "SELECT", options: ["Personal", "Commercial"], required: false },
     ]);
   }, []);
@@ -123,7 +150,7 @@ export default function NewProductPage() {
     setFormData({ ...formData, requirements: formData.requirements.filter((_, i) => i !== index) });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validation
@@ -152,14 +179,49 @@ export default function NewProductPage() {
       return;
     }
 
-    // TODO: In a real app, this would upload files and create product in database
-    console.log("Form Data:", formData);
-    console.log("Attributes:", selectedAttributes);
-    console.log("Images:", uploadedImages);
-    console.log("Product File:", productFile);
+    setIsLoading(true);
 
-    toast.success("Product created successfully!");
-    router.push(`/${locale}/admin/products`);
+    try {
+      // For now, use placeholder URLs for files
+      // In production, you would first upload files to cloud storage (S3, Cloudinary, etc.)
+      // and get back the URLs
+      const thumbnailUrl = uploadedImages[0]
+        ? URL.createObjectURL(uploadedImages[0])
+        : 'https://via.placeholder.com/400x300';
+
+      const productData = {
+        title: formData.title,
+        description: formData.description,
+        shortDescription: formData.shortDescription,
+        price: parseFloat(formData.price),
+        originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
+        categoryId: formData.categoryId,
+        subcategory: formData.subcategory || null,
+        tags: formData.tags,
+        fileType: formData.fileType || productFile.name.split('.').pop() || 'pdf',
+        fileName: productFile.name,
+        fileUrl: 'pending-upload', // Placeholder - would be real URL after upload
+        thumbnailUrl: thumbnailUrl,
+        previewImages: [],
+        whatsIncluded: formData.whatsIncluded,
+        requirements: formData.requirements,
+      };
+
+      const response = await productsAPI.create(productData);
+
+      if (response.data?.success) {
+        toast.success("Product created successfully!");
+        router.push(`${basePath}/admin/products`);
+      } else {
+        throw new Error(response.data?.message || 'Failed to create product');
+      }
+    } catch (error: any) {
+      console.error('Failed to create product:', error);
+      const message = error.response?.data?.message || error.message || 'Failed to create product';
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -167,7 +229,7 @@ export default function NewProductPage() {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link
-          href={`/${locale}/admin/products`}
+          href={`${basePath}/admin/products`}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
