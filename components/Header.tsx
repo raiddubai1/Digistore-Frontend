@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "./Logo";
 import MobileMenu from "./MobileMenu";
+import CurrencySelector from "./CurrencySelector";
 import { Search, ShoppingCart, User, Menu, Globe, LogOut, Settings, Heart, Package, Sparkles, TrendingUp, Bell, ChevronDown, LayoutDashboard, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
@@ -182,6 +183,9 @@ export default function Header() {
 
             {/* Desktop Actions */}
             <div className="hidden lg:flex items-center gap-2">
+              {/* Currency Selector */}
+              <CurrencySelector />
+
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}

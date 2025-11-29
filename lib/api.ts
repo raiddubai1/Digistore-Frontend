@@ -215,5 +215,59 @@ export const attributesAPI = {
     api.post(`/attributes/product/${productId}`, { attributes }),
 };
 
+// ============================================
+// PAYMENTS API
+// ============================================
+
+export const paymentsAPI = {
+  // Create PayPal order
+  createPayPalOrder: (data: {
+    items: Array<{
+      name: string;
+      price: number;
+      quantity: number;
+      productId: string;
+      vendorId?: string;
+      license?: string;
+    }>;
+    totalAmount: number;
+    currency?: string;
+    couponCode?: string;
+  }) => api.post('/payments/paypal/create-order', data),
+
+  // Capture PayPal payment
+  capturePayPalOrder: (data: {
+    paypalOrderId: string;
+    items: Array<{
+      productId: string;
+      vendorId?: string;
+      quantity: number;
+      price: number;
+      license?: string;
+    }>;
+    billingInfo: {
+      email: string;
+      firstName: string;
+      lastName: string;
+      country: string;
+    };
+    couponCode?: string;
+  }) => api.post('/payments/paypal/capture-order', data),
+
+  // Get available payment methods
+  getMethods: () => api.get('/payments/methods'),
+};
+
+// ============================================
+// DOWNLOADS API
+// ============================================
+
+export const downloadsAPI = {
+  getMyDownloads: () => api.get('/downloads'),
+
+  generateDownloadLink: (downloadId: string) =>
+    api.get(`/downloads/${downloadId}/link`),
+};
+
 export default api;
 

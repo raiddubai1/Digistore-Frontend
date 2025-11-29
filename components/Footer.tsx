@@ -1,11 +1,43 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Facebook, Twitter, Instagram, Youtube, Mail, Send, Heart, Sparkles, Gift, Package, Users } from "lucide-react";
+import { Facebook, Twitter, Instagram, Youtube, Mail, Send, Heart, Sparkles, Gift, Package, Users, Check, Loader2 } from "lucide-react";
 import Logo from "./Logo";
+import toast from "react-hot-toast";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [email, setEmail] = useState("");
+  const [subscribing, setSubscribing] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setSubscribing(true);
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const res = await fetch(`${API_URL}/newsletter/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        setSubscribed(true);
+        setEmail("");
+        toast.success("Subscribed! Check your email for a welcome message.");
+      } else {
+        throw new Error('Failed to subscribe');
+      }
+    } catch {
+      toast.error("Failed to subscribe. Please try again.");
+    } finally {
+      setSubscribing(false);
+    }
+  };
 
   return (
     <footer className="bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 text-white mt-auto relative overflow-hidden">
@@ -30,16 +62,30 @@ export default function Footer() {
               {/* Newsletter */}
               <div className="space-y-3">
                 <h4 className="text-sm font-bold text-white uppercase tracking-wide">Stay Updated</h4>
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent backdrop-blur-sm"
-                  />
-                  <button className="px-5 py-3 bg-gradient-to-r from-gray-500 to-gray-600 rounded-xl hover:shadow-lg hover:shadow-gray-400/50 transition-all hover:scale-105">
-                    <Send className="w-5 h-5" />
-                  </button>
-                </div>
+                {subscribed ? (
+                  <div className="flex items-center gap-2 text-green-400">
+                    <Check className="w-5 h-5" />
+                    <span>Thanks for subscribing!</span>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubscribe} className="flex gap-2">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      required
+                      className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent backdrop-blur-sm"
+                    />
+                    <button
+                      type="submit"
+                      disabled={subscribing}
+                      className="px-5 py-3 bg-gradient-to-r from-gray-500 to-gray-600 rounded-xl hover:shadow-lg hover:shadow-gray-400/50 transition-all hover:scale-105 disabled:opacity-50"
+                    >
+                      {subscribing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                    </button>
+                  </form>
+                )}
               </div>
 
               {/* Social Links */}

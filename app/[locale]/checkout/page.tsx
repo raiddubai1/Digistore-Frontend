@@ -2,28 +2,51 @@
 
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { CreditCard, Lock, Mail, User, Tag, Check, X, ChevronLeft, ChevronDown, ChevronUp } from "lucide-react";
+import { Lock, Mail, User, Tag, Check, X, ChevronLeft, ChevronDown, ChevronUp } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { paymentsAPI } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
+
+// PayPal icon component
+const PayPalIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
+    <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c1.022-4.588-1.018-6.376-4.826-6.376H8.43c-.524 0-.968.382-1.05.9L4.273 20.1c-.083.518.286.977.805.977h4.606l.738-4.672.023-.15c.082-.518.526-.9 1.05-.9h2.19c4.298 0 7.664-1.747 8.647-6.797.03-.149.054-.294.077-.437.328-1.73.192-3.086-.188-4.204z"/>
+  </svg>
+);
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const { items, total, subtotal, discount, clearCart, coupon, applyCoupon, removeCoupon } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [couponInput, setCouponInput] = useState("");
   const [showCouponInput, setShowCouponInput] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
+  const [paypalLoaded, setPaypalLoaded] = useState(false);
 
   const [formData, setFormData] = useState({
-    email: "",
-    firstName: "",
-    lastName: "",
+    email: user?.email || "",
+    firstName: user?.name?.split(' ')[0] || "",
+    lastName: user?.name?.split(' ').slice(1).join(' ') || "",
     country: "United States",
-    paymentMethod: "stripe",
+    paymentMethod: "paypal",
   });
+
+  // Update form when user loads
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        email: user.email || prev.email,
+        firstName: user.name?.split(' ')[0] || prev.firstName,
+        lastName: user.name?.split(' ').slice(1).join(' ') || prev.lastName,
+      }));
+    }
+  }, [user]);
 
   useEffect(() => {
     setMounted(true);
@@ -35,24 +58,123 @@ export default function CheckoutPage() {
     }
   }, [mounted, items, router]);
 
+  // Load PayPal script
+  useEffect(() => {
+    if (mounted && !paypalLoaded && typeof window !== 'undefined') {
+      const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+      if (!clientId) {
+        console.warn('PayPal client ID not configured');
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD&intent=capture`;
+      script.async = true;
+      script.onload = () => setPaypalLoaded(true);
+      document.body.appendChild(script);
+
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, [mounted, paypalLoaded]);
+
+  // Initialize PayPal buttons
+  const initPayPalButton = useCallback(() => {
+    if (!paypalLoaded || !(window as any).paypal) return;
+
+    const container = document.getElementById('paypal-button-container');
+    if (!container || container.hasChildNodes()) return;
+
+    (window as any).paypal.Buttons({
+      style: {
+        layout: 'vertical',
+        color: 'gold',
+        shape: 'rect',
+        label: 'paypal',
+        height: 50,
+      },
+      createOrder: async () => {
+        try {
+          const orderItems = items.map(item => ({
+            name: item.product.title,
+            price: item.price,
+            quantity: item.quantity,
+            productId: item.product.id,
+            vendorId: (item.product as any).vendorId,
+            license: item.license,
+          }));
+
+          const response = await paymentsAPI.createPayPalOrder({
+            items: orderItems,
+            totalAmount: total(),
+            currency: 'USD',
+            couponCode: coupon?.code,
+          });
+
+          return response.data.data.orderId;
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || 'Failed to create order');
+          throw error;
+        }
+      },
+      onApprove: async (data: any) => {
+        setIsProcessing(true);
+        try {
+          const orderItems = items.map(item => ({
+            productId: item.product.id,
+            vendorId: (item.product as any).vendorId,
+            quantity: item.quantity,
+            price: item.price,
+            license: item.license,
+          }));
+
+          const response = await paymentsAPI.capturePayPalOrder({
+            paypalOrderId: data.orderID,
+            items: orderItems,
+            billingInfo: {
+              email: formData.email,
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              country: formData.country,
+            },
+            couponCode: coupon?.code,
+          });
+
+          clearCart();
+          toast.success('Payment successful!');
+          router.push(`/checkout/success?orderId=${response.data.data.order.id}`);
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || 'Payment failed');
+        } finally {
+          setIsProcessing(false);
+        }
+      },
+      onError: (err: any) => {
+        console.error('PayPal error:', err);
+        toast.error('Payment failed. Please try again.');
+        setIsProcessing(false);
+      },
+      onCancel: () => {
+        toast.error('Payment cancelled');
+        setIsProcessing(false);
+      },
+    }).render('#paypal-button-container');
+  }, [paypalLoaded, items, total, coupon, formData, clearCart, router]);
+
+  useEffect(() => {
+    if (paypalLoaded) {
+      initPayPalButton();
+    }
+  }, [paypalLoaded, initPayPalButton]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsProcessing(true);
-
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    // Generate order ID
-    const orderId = `ORD-${Date.now()}`;
-
-    // Clear cart
-    clearCart();
-
-    // Show success message
-    toast.success("Order placed successfully!");
-
-    // Redirect to confirmation page
-    router.push(`/checkout/success?orderId=${orderId}`);
+    // PayPal handles payment - this is just for form validation
+    if (!formData.email || !formData.firstName || !formData.lastName) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
   };
 
   if (!mounted) {
@@ -253,37 +375,32 @@ export default function CheckoutPage() {
           {/* Payment */}
           <div className="bg-white rounded-xl p-4">
             <label className="block text-sm font-medium text-gray-700 mb-3">Payment Method</label>
-            <div className="flex items-center gap-3 p-3 border-2 border-gray-900 rounded-lg bg-gray-50">
-              <CreditCard className="w-5 h-5" />
+            <div className="flex items-center gap-3 p-3 border-2 border-blue-600 rounded-lg bg-blue-50">
+              <PayPalIcon />
               <div className="flex-1">
-                <p className="font-medium text-sm">Credit / Debit Card</p>
-                <p className="text-xs text-gray-500">Powered by Stripe</p>
+                <p className="font-medium text-sm">PayPal</p>
+                <p className="text-xs text-gray-500">Pay securely with PayPal</p>
               </div>
             </div>
           </div>
         </form>
 
-        {/* Fixed Bottom Button */}
+        {/* Fixed Bottom PayPal Button */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 lg:hidden">
-          <button
-            onClick={handleSubmit}
-            disabled={isProcessing}
-            className="w-full py-4 bg-gray-900 text-white rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            {isProcessing ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                <Lock className="w-5 h-5" />
-                Pay {formatPrice(total())}
-              </>
-            )}
-          </button>
+          {isProcessing ? (
+            <div className="w-full py-4 bg-gray-200 rounded-xl flex items-center justify-center gap-2">
+              <div className="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
+              <span className="text-gray-700 font-semibold">Processing...</span>
+            </div>
+          ) : paypalLoaded ? (
+            <div id="paypal-button-container-mobile" className="w-full"></div>
+          ) : (
+            <div className="w-full py-4 bg-gray-200 rounded-xl flex items-center justify-center">
+              <span className="text-gray-500">Loading payment options...</span>
+            </div>
+          )}
           <p className="text-center text-xs text-gray-500 mt-2">
-            🔒 Secure checkout powered by Stripe
+            🔒 Secure checkout powered by PayPal
           </p>
         </div>
       </div>
@@ -379,53 +496,42 @@ export default function CheckoutPage() {
               {/* Payment Method */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-primary" />
+                  <Lock className="w-5 h-5 text-primary" />
                   Payment Method
                 </h2>
                 <div className="space-y-3">
-                  <label className="flex items-center gap-3 p-4 border-2 border-primary bg-primary/5 rounded-lg cursor-pointer">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="stripe"
-                      checked={formData.paymentMethod === "stripe"}
-                      onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
-                      className="w-4 h-4 text-primary"
-                    />
+                  <div className="flex items-center gap-3 p-4 border-2 border-blue-600 bg-blue-50 rounded-lg">
+                    <PayPalIcon />
                     <div className="flex-1">
-                      <div className="font-semibold">Credit / Debit Card</div>
-                      <div className="text-sm text-gray-500">Powered by Stripe</div>
+                      <div className="font-semibold">PayPal</div>
+                      <div className="text-sm text-gray-500">Pay securely with PayPal</div>
                     </div>
-                    <div className="flex gap-2">
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" className="h-6" />
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6" />
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Secure</span>
                     </div>
-                  </label>
+                  </div>
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isProcessing}
-                className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-full font-semibold text-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
+              {/* PayPal Button */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm">
                 {isProcessing ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Processing...
-                  </>
+                  <div className="w-full py-4 bg-gray-100 rounded-xl flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
+                    <span className="text-gray-700 font-semibold">Processing payment...</span>
+                  </div>
+                ) : paypalLoaded ? (
+                  <div id="paypal-button-container"></div>
                 ) : (
-                  <>
-                    <Lock className="w-5 h-5" />
-                    Complete Order - {formatPrice(total())}
-                  </>
+                  <div className="w-full py-4 bg-gray-100 rounded-xl flex items-center justify-center">
+                    <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2" />
+                    <span className="text-gray-500">Loading PayPal...</span>
+                  </div>
                 )}
-              </button>
-
-              <p className="text-center text-sm text-gray-500">
-                🔒 Secure checkout powered by Stripe. Your payment information is encrypted.
-              </p>
+                <p className="text-center text-sm text-gray-500 mt-4">
+                  🔒 Secure checkout powered by PayPal. Your payment information is encrypted.
+                </p>
+              </div>
             </form>
           </div>
 

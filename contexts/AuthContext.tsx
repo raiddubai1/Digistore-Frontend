@@ -33,6 +33,8 @@ interface AuthContextType {
   register: (data: RegisterData, locale?: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  loginWithGoogle: (token: string, locale?: string) => Promise<void>;
+  loginWithGithub: (code: string, locale?: string) => Promise<void>;
   isAuthenticated: boolean;
   isVendor: boolean;
   isAdmin: boolean;
@@ -169,6 +171,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push(`/${currentLocale}`);
   };
 
+  const loginWithGoogle = async (token: string, locale?: string) => {
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_URL}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Google login failed');
+
+      const { user, accessToken, refreshToken } = data.data;
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      setUser(user);
+
+      toast.success('Logged in with Google!');
+      const currentLocale = locale || getCurrentLocale();
+      router.push(`/${currentLocale}`);
+    } catch (error: any) {
+      toast.error(error.message || 'Google login failed');
+      throw error;
+    }
+  };
+
+  const loginWithGithub = async (code: string, locale?: string) => {
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_URL}/auth/github`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'GitHub login failed');
+
+      const { user, accessToken, refreshToken } = data.data;
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      setUser(user);
+
+      toast.success('Logged in with GitHub!');
+      const currentLocale = locale || getCurrentLocale();
+      router.push(`/${currentLocale}`);
+    } catch (error: any) {
+      toast.error(error.message || 'GitHub login failed');
+      throw error;
+    }
+  };
+
   const value: AuthContextType = {
     user,
     loading,
@@ -176,6 +230,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     register,
     logout,
     refreshUser,
+    loginWithGoogle,
+    loginWithGithub,
     isAuthenticated: !!user,
     isVendor: user?.role === 'VENDOR',
     isAdmin: user?.role === 'ADMIN',

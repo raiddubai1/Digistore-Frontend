@@ -1,51 +1,117 @@
 "use client";
 
-import { Download, ShoppingBag, User, Settings, LogOut, ChevronLeft, ChevronRight, Users } from "lucide-react";
-import { useState } from "react";
+import { Download, ShoppingBag, User, Settings, LogOut, ChevronLeft, ChevronRight, Users, FileDown, Clock, CheckCircle } from "lucide-react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import NotificationSettings from "@/components/NotificationSettings";
+import { useAuth } from "@/contexts/AuthContext";
+
+interface OrderItem {
+  id: string;
+  productId: string;
+  price: number;
+  quantity: number;
+  license: string;
+  product: {
+    id: string;
+    title: string;
+    thumbnail: string;
+    slug: string;
+  };
+}
+
+interface Order {
+  id: string;
+  orderNumber: string;
+  status: string;
+  total: number;
+  currency: string;
+  createdAt: string;
+  orderItems: OrderItem[];
+}
+
+interface DownloadItem {
+  id: string;
+  downloadToken: string;
+  downloadUrl: string;
+  expiresAt: string;
+  downloadCount: number;
+  maxDownloads: number;
+  product: {
+    id: string;
+    title: string;
+    thumbnail: string;
+  };
+}
 
 export default function AccountPage() {
+  const { user: authUser, isAuthenticated, loading: authLoading, logout } = useAuth();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("downloads");
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [downloads, setDownloads] = useState<DownloadItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Mock user data
-  const user = {
-    name: "John Doe",
-    email: "john@example.com",
-    joinedDate: "January 2024",
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+    if (isAuthenticated) {
+      fetchAccountData();
+    }
+  }, [authLoading, isAuthenticated, router]);
+
+  const fetchAccountData = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+      const [ordersRes, downloadsRes] = await Promise.all([
+        fetch(`${API_URL}/orders/my-orders`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch(`${API_URL}/downloads/my-downloads`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+
+      if (ordersRes.ok) {
+        const ordersData = await ordersRes.json();
+        setOrders(ordersData.data?.orders || []);
+      }
+      if (downloadsRes.ok) {
+        const downloadsData = await downloadsRes.json();
+        setDownloads(downloadsData.data?.downloads || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch account data:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Mock purchases
-  const purchases = [
-    {
-      id: "1",
-      orderId: "ORD-1234567890",
-      date: "2024-03-15",
-      total: 29.99,
-      items: [
-        {
-          title: "The Complete Guide to Digital Marketing",
-          downloadUrl: "#",
-          fileType: "PDF",
-          fileSize: "12.5 MB",
-        },
-      ],
-    },
-    {
-      id: "2",
-      orderId: "ORD-1234567891",
-      date: "2024-03-10",
-      total: 19.99,
-      items: [
-        {
-          title: "Social Media Marketing Mastery",
-          downloadUrl: "#",
-          fileType: "PDF",
-          fileSize: "8.2 MB",
-        },
-      ],
-    },
-  ];
+  const handleDownload = async (downloadToken: string) => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    window.open(`${API_URL}/downloads/${downloadToken}`, '_blank');
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const isExpired = (expiresAt: string) => new Date(expiresAt) < new Date();
+
+  const user = {
+    name: authUser?.name || "User",
+    email: authUser?.email || "",
+    joinedDate: authUser?.createdAt ? formatDate(authUser.createdAt) : "Recently",
+  };
 
   const tabs = [
     { id: "downloads", label: "Downloads", icon: Download },
@@ -102,26 +168,46 @@ export default function AccountPage() {
         <div className="p-4">
           {activeTab === "downloads" && (
             <div className="space-y-3">
-              {purchases.flatMap((purchase) =>
-                purchase.items.map((item, index) => (
-                  <div
-                    key={`${purchase.id}-${index}`}
-                    className="bg-white rounded-xl p-4 shadow-sm"
-                  >
+              {isLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin" />
+                </div>
+              ) : downloads.length === 0 ? (
+                <div className="text-center py-12">
+                  <FileDown className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">No downloads yet</p>
+                  <Link href="/products" className="text-red-600 text-sm hover:underline">Browse products</Link>
+                </div>
+              ) : (
+                downloads.map((download) => (
+                  <div key={download.id} className="bg-white rounded-xl p-4 shadow-sm">
                     <div className="flex items-start gap-3">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Download className="w-6 h-6 text-gray-600" />
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                        {download.product.thumbnail ? (
+                          <img src={download.product.thumbnail} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <Download className="w-6 h-6 text-gray-600 m-3" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-sm line-clamp-2">{item.title}</h3>
+                        <h3 className="font-semibold text-sm line-clamp-2">{download.product.title}</h3>
                         <p className="text-xs text-gray-500 mt-1">
-                          {item.fileType} • {item.fileSize}
+                          {download.downloadCount}/{download.maxDownloads} downloads •
+                          {isExpired(download.expiresAt) ? (
+                            <span className="text-red-500"> Expired</span>
+                          ) : (
+                            <span> Expires {formatDate(download.expiresAt)}</span>
+                          )}
                         </p>
                       </div>
                     </div>
-                    <button className="w-full mt-3 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => handleDownload(download.downloadToken)}
+                      disabled={isExpired(download.expiresAt) || download.downloadCount >= download.maxDownloads}
+                      className="w-full mt-3 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                       <Download className="w-4 h-4" />
-                      Download
+                      {isExpired(download.expiresAt) ? 'Expired' : download.downloadCount >= download.maxDownloads ? 'Limit Reached' : 'Download'}
                     </button>
                   </div>
                 ))
@@ -131,27 +217,41 @@ export default function AccountPage() {
 
           {activeTab === "orders" && (
             <div className="space-y-3">
-              {purchases.map((purchase) => (
-                <div key={purchase.id} className="bg-white rounded-xl p-4 shadow-sm">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <p className="text-xs text-gray-500">Order #{purchase.orderId.slice(-6)}</p>
-                      <p className="font-bold">${purchase.total.toFixed(2)}</p>
-                    </div>
-                    <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
-                      Completed
-                    </span>
-                  </div>
-                  {purchase.items.map((item, index) => (
-                    <p key={index} className="text-sm text-gray-600 line-clamp-1">
-                      • {item.title}
-                    </p>
-                  ))}
-                  <p className="text-xs text-gray-400 mt-2">
-                    {new Date(purchase.date).toLocaleDateString()}
-                  </p>
+              {isLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin" />
                 </div>
-              ))}
+              ) : orders.length === 0 ? (
+                <div className="text-center py-12">
+                  <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">No orders yet</p>
+                  <Link href="/products" className="text-red-600 text-sm hover:underline">Start shopping</Link>
+                </div>
+              ) : (
+                orders.map((order) => (
+                  <div key={order.id} className="bg-white rounded-xl p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <p className="text-xs text-gray-500">Order #{order.orderNumber?.slice(-8) || order.id.slice(-8)}</p>
+                        <p className="font-bold">{order.currency} {Number(order.total).toFixed(2)}</p>
+                      </div>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        order.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
+                        order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </div>
+                    {order.orderItems?.map((item) => (
+                      <p key={item.id} className="text-sm text-gray-600 line-clamp-1">
+                        • {item.product?.title || 'Product'}
+                      </p>
+                    ))}
+                    <p className="text-xs text-gray-400 mt-2">{formatDate(order.createdAt)}</p>
+                  </div>
+                ))
+              )}
             </div>
           )}
 
