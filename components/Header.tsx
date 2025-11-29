@@ -5,10 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "./Logo";
 import MobileMenu from "./MobileMenu";
-import { Search, ShoppingCart, User, Menu, Globe, LogOut, Settings, Heart, Package, Sparkles, TrendingUp, Bell, ChevronDown, LayoutDashboard } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, Globe, LogOut, Settings, Heart, Package, Sparkles, TrendingUp, Bell, ChevronDown, LayoutDashboard, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Header() {
   const pathname = usePathname();
@@ -23,6 +24,7 @@ export default function Header() {
 
   const { itemCount, openCart } = useCartStore();
   const { user, logout, isAuthenticated, isAdmin } = useAuth();
+  const { resolvedTheme, toggleTheme } = useTheme();
   const cartItemsCount = mounted ? itemCount() : 0;
 
   const languages = [
@@ -52,7 +54,9 @@ export default function Header() {
   return (
     <header className={cn(
       "sticky top-0 z-50 w-full transition-all duration-300",
-      scrolled ? "bg-white/95 backdrop-blur-lg shadow-lg" : "bg-white shadow-md"
+      scrolled
+        ? "bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg shadow-lg"
+        : "bg-white dark:bg-slate-900 shadow-md dark:shadow-slate-800/50"
     )}>
       {/* Top Announcement Bar - Hidden on Mobile for App-like Feel */}
       <div className="hidden lg:block bg-gradient-to-r from-gray-500 via-gray-600 to-gray-500 text-white py-1.5">
@@ -126,9 +130,9 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileDrawerOpen(true)}
-            className="lg:hidden p-2 hover:bg-gray-100 rounded-xl transition-colors"
+            className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-colors"
           >
-            <Menu className="w-6 h-6 text-gray-700" />
+            <Menu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
           </button>
 
           {/* Logo */}
@@ -139,23 +143,36 @@ export default function Header() {
           {/* Search Bar - Desktop */}
           <div className="hidden lg:flex flex-1 max-w-2xl mx-8">
             <div className="relative w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
                 placeholder="Search for digital products, templates, eBooks..."
-                className="w-full h-12 pl-12 pr-4 rounded-full border-2 border-gray-200 focus:border-gray-400 focus:ring-4 focus:ring-gray-100 focus:outline-none transition-all text-sm bg-gray-50 focus:bg-white"
+                className="w-full h-12 pl-12 pr-4 rounded-full border-2 border-gray-200 dark:border-slate-600 focus:border-gray-400 dark:focus:border-slate-500 focus:ring-4 focus:ring-gray-100 dark:focus:ring-slate-700 focus:outline-none transition-all text-sm bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
             </div>
           </div>
 
           {/* Right Actions */}
           <div className="flex items-center gap-2">
+            {/* Theme Toggle - Mobile */}
+            <button
+              onClick={toggleTheme}
+              className="lg:hidden relative p-2.5 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-colors group"
+              aria-label="Toggle theme"
+            >
+              {resolvedTheme === "dark" ? (
+                <Sun className="w-5 h-5 text-yellow-500" />
+              ) : (
+                <Moon className="w-5 h-5 text-gray-700" />
+              )}
+            </button>
+
             {/* Cart - Mobile Only (Bottom nav handles other actions) */}
             <button
               onClick={openCart}
-              className="lg:hidden relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors group"
+              className="lg:hidden relative p-2.5 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-colors group"
             >
-              <ShoppingCart className="w-5 h-5 text-gray-700 group-hover:text-gray-500 transition-colors" />
+              <ShoppingCart className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-gray-500 transition-colors" />
               {cartItemsCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-[#ff6f61] to-gray-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
                   {cartItemsCount > 9 ? "9+" : cartItemsCount}
@@ -165,20 +182,33 @@ export default function Header() {
 
             {/* Desktop Actions */}
             <div className="hidden lg:flex items-center gap-2">
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="relative p-2.5 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-colors group"
+                aria-label="Toggle theme"
+              >
+                {resolvedTheme === "dark" ? (
+                  <Sun className="w-5 h-5 text-yellow-500 group-hover:text-yellow-400 transition-colors" />
+                ) : (
+                  <Moon className="w-5 h-5 text-gray-700 group-hover:text-gray-500 transition-colors" />
+                )}
+              </button>
+
               {/* Wishlist */}
               <Link
                 href="/wishlist"
-                className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors group"
+                className="relative p-2.5 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-colors group"
               >
-                <Heart className="w-5 h-5 text-gray-700 group-hover:text-gray-500 transition-colors" />
+                <Heart className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-gray-500 transition-colors" />
               </Link>
 
               {/* Cart */}
               <button
                 onClick={openCart}
-                className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors group"
+                className="relative p-2.5 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-colors group"
               >
-                <ShoppingCart className="w-5 h-5 text-gray-700 group-hover:text-gray-500 transition-colors" />
+                <ShoppingCart className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-gray-500 transition-colors" />
                 {cartItemsCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
                     {cartItemsCount}

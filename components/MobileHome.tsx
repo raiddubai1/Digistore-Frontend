@@ -64,7 +64,7 @@ export default function MobileHome({
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Icon className={`w-5 h-5 ${iconColor}`} />
-          <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h2>
           {badge && (
             <span className={`px-2 py-0.5 ${badgeColor} text-[10px] font-bold rounded-full`}>
               {badge}
@@ -85,29 +85,29 @@ export default function MobileHome({
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-20">
       {/* Compact Search Bar */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-4 py-3">
+      <div className="sticky top-0 z-40 bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700 px-4 py-3">
         <form onSubmit={handleSearch}>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
             <input
               type="text"
               placeholder="Search digital products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-11 pl-10 pr-4 rounded-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-gray-400 focus:ring-2 focus:ring-gray-100 focus:outline-none transition-all text-sm"
+              className="w-full h-11 pl-10 pr-4 rounded-full border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 focus:border-gray-400 dark:focus:border-slate-500 focus:ring-2 focus:ring-gray-100 dark:focus:ring-slate-600 focus:outline-none transition-all text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
             />
           </div>
         </form>
       </div>
 
       {/* Categories - Horizontal Scroll Pills */}
-      <div className="bg-white py-3 border-b border-gray-100">
+      <div className="bg-white dark:bg-slate-800 py-3 border-b border-gray-100 dark:border-slate-700">
         <div className="overflow-x-auto scrollbar-hide">
           <div className="flex gap-2 px-4">
             {categories.slice(0, 6).map((category) => {
-              const config = categoryConfig[category.slug] || { emoji: "📦", bgColor: "bg-gray-100" };
+              const config = categoryConfig[category.slug] || { emoji: "📦", bgColor: "bg-gray-100 dark:bg-slate-700" };
               return (
                 <Link
                   key={category.id}
@@ -115,7 +115,7 @@ export default function MobileHome({
                   className={`flex items-center gap-2 px-4 py-2 ${config.bgColor} rounded-full whitespace-nowrap flex-shrink-0 active:scale-95 transition-transform`}
                 >
                   <span className="text-base">{config.emoji}</span>
-                  <span className="text-sm font-medium text-gray-800">{category.name.split(' ')[0]}</span>
+                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{category.name.split(' ')[0]}</span>
                 </Link>
               );
             })}

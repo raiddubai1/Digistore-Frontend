@@ -188,17 +188,17 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   return (
     <>
       {/* Full-Screen Mobile Menu - App Style */}
-      <div className="fixed inset-0 bg-white z-50 lg:hidden overflow-y-auto animate-in slide-in-from-bottom duration-300">
+      <div className="fixed inset-0 bg-white dark:bg-slate-900 z-50 lg:hidden overflow-y-auto animate-in slide-in-from-bottom duration-300">
         {/* Header with Search */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 z-10">
+        <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 z-10">
           {/* Top Bar */}
           <div className="flex items-center justify-between px-4 py-3">
-            <h2 className="text-xl font-bold text-gray-900">Menu</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Menu</h2>
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors"
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 active:bg-gray-200 dark:active:bg-slate-600 transition-colors"
             >
-              <X className="w-6 h-6 text-gray-600" />
+              <X className="w-6 h-6 text-gray-600 dark:text-gray-300" />
             </button>
           </div>
 
@@ -206,13 +206,13 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           <div className="px-4 pb-4">
             <form onSubmit={handleSearch}>
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search products, categories..."
-                  className="w-full h-12 pl-12 pr-4 rounded-full border-2 border-gray-200 focus:border-gray-400 focus:ring-4 focus:ring-gray-100 focus:outline-none transition-all text-sm bg-gray-50 focus:bg-white"
+                  className="w-full h-12 pl-12 pr-4 rounded-full border-2 border-gray-200 dark:border-slate-600 focus:border-gray-400 dark:focus:border-slate-500 focus:ring-4 focus:ring-gray-100 dark:focus:ring-slate-700 focus:outline-none transition-all text-sm bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
             </form>
@@ -251,7 +251,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <div className="px-4 py-6">
           {/* Categories */}
           <div className="space-y-1 mb-8">
-            <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
+            <h3 className="px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
               Categories
             </h3>
             {categories.map((category) => {
@@ -263,21 +263,21 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   {/* Category Button - Larger Touch Target */}
                   <button
                     onClick={() => toggleCategory(category.id)}
-                    className="w-full flex items-center justify-between px-4 py-4 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                    className="w-full flex items-center justify-between px-4 py-4 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 active:bg-gray-100 dark:active:bg-slate-700 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <div className={cn(
                         "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
-                        isExpanded ? "bg-gradient-to-r from-gray-600 to-[#ff6f61]" : "bg-gray-100"
+                        isExpanded ? "bg-gradient-to-r from-gray-600 to-[#ff6f61]" : "bg-gray-100 dark:bg-slate-700"
                       )}>
                         <IconComponent
-                          className={cn("w-5 h-5 transition-colors", isExpanded ? "text-white" : "text-gray-600")}
+                          className={cn("w-5 h-5 transition-colors", isExpanded ? "text-white" : "text-gray-600 dark:text-gray-300")}
                           strokeWidth={2}
                         />
                       </div>
                       <span className={cn(
                         "text-base font-medium transition-colors",
-                        isExpanded ? "text-gray-900 font-semibold" : "text-gray-700"
+                        isExpanded ? "text-gray-900 dark:text-white font-semibold" : "text-gray-700 dark:text-gray-300"
                       )}>
                         {category.name}
                       </span>
@@ -292,18 +292,18 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
                   {/* Subcategories - Improved Touch Targets */}
                   {isExpanded && (
-                    <div className="mt-2 ml-14 mr-4 space-y-1 animate-in slide-in-from-top-2 duration-200 bg-gray-50 rounded-xl p-2">
+                    <div className="mt-2 ml-14 mr-4 space-y-1 animate-in slide-in-from-top-2 duration-200 bg-gray-50 dark:bg-slate-800 rounded-xl p-2">
                       {category.subcategories.map((sub: any) => (
                         <Link
                           key={sub.name}
                           href={`/products?category=${sub.slug || sub.name}`}
                           onClick={onClose}
-                          className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-white active:bg-gray-100 transition-colors group"
+                          className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-white dark:hover:bg-slate-700 active:bg-gray-100 dark:active:bg-slate-600 transition-colors group"
                         >
-                          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
                             {sub.name}
                           </span>
-                          <span className="text-xs font-semibold text-gray-400 bg-white px-2 py-1 rounded-full">
+                          <span className="text-xs font-semibold text-gray-400 bg-white dark:bg-slate-600 dark:text-gray-300 px-2 py-1 rounded-full">
                             {sub.count}
                           </span>
                         </Link>

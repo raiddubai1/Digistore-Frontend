@@ -60,11 +60,11 @@ export default async function Home({ params }: HomeProps) {
       </div>
 
       {/* Desktop Home - Full featured layout */}
-      <div className="hidden lg:block min-h-screen bg-gray-50">
+      <div className="hidden lg:block min-h-screen bg-gray-50 dark:bg-slate-900">
       {/* Hero Section - Desktop Only */}
       <section className="pt-0 pb-16">
         <div className="w-full">
-          <div className="relative overflow-hidden bg-gradient-to-br from-[#F8FAFF] via-white to-[#FFF8F6] shadow-xl border-b border-gray-100 px-4 sm:px-8 lg:px-16 py-8 lg:py-[25px]">
+          <div className="relative overflow-hidden bg-gradient-to-br from-[#F8FAFF] via-white to-[#FFF8F6] dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 shadow-xl border-b border-gray-100 dark:border-slate-700 px-4 sm:px-8 lg:px-16 py-8 lg:py-[25px]">
 
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
               {/* Left Column - Content */}
@@ -72,12 +72,12 @@ export default async function Home({ params }: HomeProps) {
               {/* Main Heading */}
               <div className="space-y-3 lg:space-y-4">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
-                  <span className="block text-gray-900">Your Gateway to</span>
+                  <span className="block text-gray-900 dark:text-white">Your Gateway to</span>
                   <span className="block bg-gradient-to-r from-gray-600 via-[#ff8a7a] to-[#ff6f61] bg-clip-text text-transparent">
                     Digital Excellence
                   </span>
                 </h1>
-                <p className="text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-xl mx-auto lg:mx-0">
                   Discover, download, and deploy premium digital products instantly. 🚀
                 </p>
               </div>
@@ -86,13 +86,13 @@ export default async function Home({ params }: HomeProps) {
               <div className="flex flex-col gap-3 lg:flex-row lg:gap-4 lg:justify-start">
                 <Link
                   href={`/${locale}/products`}
-                  className="w-full lg:w-auto inline-flex items-center justify-center px-8 py-4 lg:py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 transition-all active:scale-95 lg:hover:scale-105"
+                  className="w-full lg:w-auto inline-flex items-center justify-center px-8 py-4 lg:py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 dark:hover:shadow-slate-900 transition-all active:scale-95 lg:hover:scale-105"
                 >
                   Explore Products
                 </Link>
                 <Link
                   href={`/${locale}/categories`}
-                  className="w-full lg:w-auto inline-flex items-center justify-center px-8 py-4 lg:py-3.5 bg-white border-2 border-gray-200 text-gray-900 rounded-full font-bold text-base hover:border-gray-300 hover:bg-gray-50 transition-all shadow-md hover:shadow-lg active:scale-95"
+                  className="w-full lg:w-auto inline-flex items-center justify-center px-8 py-4 lg:py-3.5 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-full font-bold text-base hover:border-gray-300 dark:hover:border-slate-500 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all shadow-md hover:shadow-lg active:scale-95"
                 >
                   Browse Categories
                 </Link>
@@ -102,13 +102,13 @@ export default async function Home({ params }: HomeProps) {
               <div className="flex flex-wrap gap-6 lg:gap-8 justify-center lg:justify-start items-center">
                 <div className="flex items-center gap-2">
                   <div className="flex -space-x-2">
-                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-gradient-to-r from-gray-400 to-gray-500 border-2 border-white"></div>
-                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-gradient-to-r from-[#ff6f61] to-gray-400 border-2 border-white"></div>
-                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 border-2 border-white"></div>
+                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-gradient-to-r from-gray-400 to-gray-500 border-2 border-white dark:border-slate-800"></div>
+                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-gradient-to-r from-[#ff6f61] to-gray-400 border-2 border-white dark:border-slate-800"></div>
+                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 border-2 border-white dark:border-slate-800"></div>
                   </div>
                   <div className="text-left">
-                    <div className="text-sm font-bold text-gray-900">50,000+</div>
-                    <div className="text-xs text-gray-500">Customers</div>
+                    <div className="text-sm font-bold text-gray-900 dark:text-white">50,000+</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">Customers</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -118,8 +118,8 @@ export default async function Home({ params }: HomeProps) {
                     ))}
                   </div>
                   <div className="text-left">
-                    <div className="text-sm font-bold text-gray-900">4.9/5</div>
-                    <div className="text-xs text-gray-500">Rating</div>
+                    <div className="text-sm font-bold text-gray-900 dark:text-white">4.9/5</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">Rating</div>
                   </div>
                 </div>
               </div>
@@ -246,46 +246,46 @@ export default async function Home({ params }: HomeProps) {
       </section>
 
       {/* Features Section - Modern Cards */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="group relative p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-white border-2 border-gray-100 hover:border-gray-300 transition-all hover:shadow-xl hover:shadow-gray-100 hover:-translate-y-1">
+            <div className="group relative p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-white dark:from-slate-800 dark:to-slate-800 border-2 border-gray-100 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-600 transition-all hover:shadow-xl hover:shadow-gray-100 dark:hover:shadow-slate-900/50 hover:-translate-y-1">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-2xl"></div>
               <div className="relative">
                 <div className="w-14 h-14 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg">
                   <Download className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">Instant Download</h3>
-                <p className="text-gray-600 leading-relaxed text-sm">
+                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Instant Download</h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">
                   Get your digital products immediately after purchase. No waiting, no hassle. Start using right away.
                 </p>
               </div>
             </div>
 
             {/* Feature 2 */}
-            <div className="group relative p-8 rounded-2xl bg-gradient-to-br from-orange-50 to-white border-2 border-orange-100 hover:border-orange-300 transition-all hover:shadow-xl hover:shadow-orange-100 hover:-translate-y-1">
+            <div className="group relative p-8 rounded-2xl bg-gradient-to-br from-orange-50 to-white dark:from-slate-800 dark:to-slate-800 border-2 border-orange-100 dark:border-slate-700 hover:border-orange-300 dark:hover:border-slate-600 transition-all hover:shadow-xl hover:shadow-orange-100 dark:hover:shadow-slate-900/50 hover:-translate-y-1">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-400/20 to-transparent rounded-full blur-2xl"></div>
               <div className="relative">
                 <div className="w-14 h-14 bg-gradient-to-br from-[#ff6f61] to-[#ff6f61] rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg">
                   <Shield className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">Secure Payment</h3>
-                <p className="text-gray-600 leading-relaxed text-sm">
+                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Secure Payment</h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">
                   Your transactions are protected with industry-standard encryption. Shop with confidence.
                 </p>
               </div>
             </div>
 
             {/* Feature 3 */}
-            <div className="group relative p-8 rounded-2xl bg-gradient-to-br from-green-50 to-white border-2 border-green-100 hover:border-green-300 transition-all hover:shadow-xl hover:shadow-green-100 hover:-translate-y-1">
+            <div className="group relative p-8 rounded-2xl bg-gradient-to-br from-green-50 to-white dark:from-slate-800 dark:to-slate-800 border-2 border-green-100 dark:border-slate-700 hover:border-green-300 dark:hover:border-slate-600 transition-all hover:shadow-xl hover:shadow-green-100 dark:hover:shadow-slate-900/50 hover:-translate-y-1">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-transparent rounded-full blur-2xl"></div>
               <div className="relative">
                 <div className="w-14 h-14 bg-gradient-to-br from-green-600 to-green-700 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg">
                   <Award className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">Premium Quality</h3>
-                <p className="text-gray-600 leading-relaxed text-sm">
+                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Premium Quality</h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">
                   All products are carefully curated to ensure the highest quality standards. Excellence guaranteed.
                 </p>
               </div>
@@ -323,19 +323,19 @@ export default async function Home({ params }: HomeProps) {
       </section>
 
       {/* Featured Products Section */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-12">
           {/* Section Header */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-800 rounded-full mb-4">
               <Sparkles className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-bold text-gray-500">FEATURED COLLECTION</span>
+              <span className="text-sm font-bold text-gray-500 dark:text-gray-400">FEATURED COLLECTION</span>
             </div>
             <h2 className="text-4xl font-black mb-3">
-              <span className="text-gray-900">Discover Our </span>
+              <span className="text-gray-900 dark:text-white">Discover Our </span>
               <span className="bg-gradient-to-r from-gray-500 to-[#ff6f61] bg-clip-text text-transparent">Best Products</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Hand-picked premium digital products
             </p>
           </div>
@@ -364,20 +364,20 @@ export default async function Home({ params }: HomeProps) {
       <OfferOfTheDay />
 
       {/* Bestsellers Section */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white dark:from-slate-800 dark:to-slate-900">
         <div className="max-w-7xl mx-auto px-12">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 rounded-full mb-4">
-                <TrendingUp className="w-4 h-4 text-orange-600" />
-                <span className="text-sm font-bold text-orange-600">TRENDING NOW</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 dark:bg-orange-900/30 rounded-full mb-4">
+                <TrendingUp className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                <span className="text-sm font-bold text-orange-600 dark:text-orange-400">TRENDING NOW</span>
               </div>
-              <h2 className="text-5xl font-black text-gray-900">Bestsellers</h2>
-              <p className="text-lg text-gray-600 mt-2">Most popular this month</p>
+              <h2 className="text-5xl font-black text-gray-900 dark:text-white">Bestsellers</h2>
+              <p className="text-lg text-gray-600 dark:text-gray-300 mt-2">Most popular this month</p>
             </div>
             <Link
               href={`/${locale}/products?filter=bestsellers`}
-              className="inline-flex items-center gap-2 text-gray-500 font-bold hover:gap-3 transition-all"
+              className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 font-bold hover:gap-3 transition-all"
             >
               View All
               <ArrowRight className="w-5 h-5" />
@@ -398,20 +398,20 @@ export default async function Home({ params }: HomeProps) {
 
       {/* New Arrivals */}
       {newProducts.length > 0 && (
-        <section className="py-24 bg-white">
+        <section className="py-24 bg-white dark:bg-slate-900">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="flex items-center justify-between mb-12">
               <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 rounded-full mb-4">
-                  <Sparkles className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-bold text-green-600">JUST ADDED</span>
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
+                  <Sparkles className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  <span className="text-sm font-bold text-green-600 dark:text-green-400">JUST ADDED</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-black text-gray-900">New Arrivals</h2>
-                <p className="text-lg text-gray-600 mt-2">Latest additions to our collection</p>
+                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">New Arrivals</h2>
+                <p className="text-lg text-gray-600 dark:text-gray-300 mt-2">Latest additions to our collection</p>
               </div>
               <Link
                 href={`/${locale}/products?filter=new`}
-                className="hidden md:inline-flex items-center gap-2 text-gray-500 font-bold hover:gap-3 transition-all"
+                className="hidden md:inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 font-bold hover:gap-3 transition-all"
               >
                 View All
                 <ArrowRight className="w-5 h-5" />
@@ -431,7 +431,7 @@ export default async function Home({ params }: HomeProps) {
       <BlogSection />
 
       {/* CTA Section - Modern Design */}
-      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-20 bg-gradient-to-b from-white to-gray-50 dark:from-slate-900 dark:to-slate-800">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-500 via-gray-600 to-gray-700 p-12 md:p-16 text-center">
             {/* Background Pattern */}

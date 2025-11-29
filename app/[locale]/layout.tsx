@@ -6,6 +6,7 @@ import ConditionalLayout from "@/components/ConditionalLayout";
 import PWAProvider from "@/components/PWAProvider";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const locales = ['en', 'ar', 'es', 'fr', 'de'];
 
@@ -66,42 +67,44 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <div className="flex flex-col min-h-screen min-h-dvh overflow-x-hidden">
-        <AuthProvider>
-          <PWAProvider>
-            <ConditionalLayout>
-              <main className="page-content">
-                {children}
-              </main>
-            </ConditionalLayout>
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 3000,
-                style: {
-                  background: "#fff",
-                  color: "#2D2D2D",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: "0.75rem",
-                  padding: "1rem",
-                },
-                success: {
-                  iconTheme: {
-                    primary: "#10B981",
-                    secondary: "#fff",
+      <ThemeProvider>
+        <div className="flex flex-col min-h-screen min-h-dvh overflow-x-hidden bg-white dark:bg-slate-900 transition-colors duration-300">
+          <AuthProvider>
+            <PWAProvider>
+              <ConditionalLayout>
+                <main className="page-content">
+                  {children}
+                </main>
+              </ConditionalLayout>
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 3000,
+                  style: {
+                    background: "var(--bg-card)",
+                    color: "var(--text-primary)",
+                    border: "1px solid var(--border-color)",
+                    borderRadius: "0.75rem",
+                    padding: "1rem",
                   },
-                },
-                error: {
-                  iconTheme: {
-                    primary: "#EF4444",
-                    secondary: "#fff",
+                  success: {
+                    iconTheme: {
+                      primary: "#10B981",
+                      secondary: "#fff",
+                    },
                   },
-                },
-              }}
-            />
-          </PWAProvider>
-        </AuthProvider>
-      </div>
+                  error: {
+                    iconTheme: {
+                      primary: "#EF4444",
+                      secondary: "#fff",
+                    },
+                  },
+                }}
+              />
+            </PWAProvider>
+          </AuthProvider>
+        </div>
+      </ThemeProvider>
     </NextIntlClientProvider>
   );
 }

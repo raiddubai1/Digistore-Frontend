@@ -61,9 +61,9 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/products/${product.slug}`} className="group block h-full">
-      <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 hover:shadow-2xl active:scale-[0.98] transition-all duration-300 h-full flex flex-col">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-600 hover:shadow-2xl dark:hover:shadow-slate-900/50 active:scale-[0.98] transition-all duration-300 h-full flex flex-col">
         {/* Image Container - Larger on Mobile */}
-        <div className="relative aspect-square lg:aspect-[4/3] bg-gray-100 overflow-hidden flex-shrink-0">
+        <div className="relative aspect-square lg:aspect-[4/3] bg-gray-100 dark:bg-slate-700 overflow-hidden flex-shrink-0">
           {/* Product Image */}
           {product.thumbnailUrl ? (
             <img
@@ -73,8 +73,8 @@ export default function ProductCard({ product }: ProductCardProps) {
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-28 h-28 lg:w-24 lg:h-24 rounded-2xl bg-gradient-to-br from-gray-200 via-gray-100 to-gray-50 flex items-center justify-center shadow-lg">
-                <Download className="w-14 h-14 lg:w-12 lg:h-12 text-gray-400" />
+              <div className="w-28 h-28 lg:w-24 lg:h-24 rounded-2xl bg-gradient-to-br from-gray-200 via-gray-100 to-gray-50 dark:from-slate-600 dark:via-slate-700 dark:to-slate-800 flex items-center justify-center shadow-lg">
+                <Download className="w-14 h-14 lg:w-12 lg:h-12 text-gray-400 dark:text-slate-400" />
               </div>
             </div>
           )}
@@ -102,18 +102,18 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="absolute top-2 right-2 lg:top-3 lg:right-3 flex flex-col gap-2">
             <button
               onClick={handleToggleWishlist}
-              className="w-10 h-10 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-transform"
+              className="w-10 h-10 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-transform"
             >
               <Heart
                 className={`w-5 h-5 transition-colors ${
-                  isWishlisted ? "fill-[#ff6f61] text-[#ff6f61]" : "text-gray-400"
+                  isWishlisted ? "fill-[#ff6f61] text-[#ff6f61]" : "text-gray-400 dark:text-slate-400"
                 }`}
               />
             </button>
             <button
               onClick={handleToggleCompare}
               className={`w-10 h-10 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-transform ${
-                isComparing ? "bg-gray-900 text-white" : "bg-white/95 text-gray-400"
+                isComparing ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900" : "bg-white/95 dark:bg-slate-800/95 text-gray-400 dark:text-slate-400"
               }`}
             >
               <GitCompare className="w-4 h-4" />
@@ -121,18 +121,18 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {/* Hover Overlay */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 dark:group-hover:bg-white/5 transition-colors" />
         </div>
 
         {/* Content - Improved Mobile Spacing */}
         <div className="p-4 lg:p-5 flex flex-col flex-1">
           {/* Category */}
-          <div className="text-[10px] lg:text-xs text-gray-600 font-bold mb-2 uppercase tracking-wider">
+          <div className="text-[10px] lg:text-xs text-gray-600 dark:text-gray-400 font-bold mb-2 uppercase tracking-wider">
             {product.category}
           </div>
 
           {/* Title - Larger on Mobile */}
-          <h3 className="font-bold text-gray-900 mb-2 lg:mb-3 line-clamp-2 group-hover:text-gray-700 transition-colors text-base lg:text-base leading-tight">
+          <h3 className="font-bold text-gray-900 dark:text-white mb-2 lg:mb-3 line-clamp-2 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors text-base lg:text-base leading-tight">
             {product.title}
           </h3>
 
@@ -140,30 +140,30 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="flex items-center gap-2 mb-3">
             <div className="flex items-center gap-1">
               <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm font-bold text-gray-900">
+              <span className="text-sm font-bold text-gray-900 dark:text-white">
                 {product.rating}
               </span>
             </div>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
               ({product.reviewCount})
             </span>
           </div>
 
           {/* Price & Add to Cart - Bolder on Mobile */}
-          <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+          <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100 dark:border-slate-700">
             <div className="flex flex-col gap-1">
               <div className="flex items-baseline gap-2">
-                <span className="text-xl lg:text-2xl font-black text-gray-900">
+                <span className="text-xl lg:text-2xl font-black text-gray-900 dark:text-white">
                   {formatPrice(product.price)}
                 </span>
                 {product.originalPrice && (
-                  <span className="text-xs text-gray-400 line-through font-medium">
+                  <span className="text-xs text-gray-400 dark:text-gray-500 line-through font-medium">
                     {formatPrice(product.originalPrice)}
                   </span>
                 )}
               </div>
               {/* Downloads Count */}
-              <div className="flex items-center gap-1 text-[10px] lg:text-xs text-gray-500">
+              <div className="flex items-center gap-1 text-[10px] lg:text-xs text-gray-500 dark:text-gray-400">
                 <Download className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
                 <span className="font-medium">{product.downloadCount.toLocaleString()} downloads</span>
               </div>
