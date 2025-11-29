@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { 
-  Star, Download, ShoppingCart, Heart, Share2, Check, 
-  ChevronLeft, ChevronRight, Minus, Plus, X
+import { useState, useEffect } from "react";
+import {
+  Star, Download, ShoppingCart, Heart, Share2, Check,
+  ChevronLeft, ChevronRight, Minus, Plus, X, Copy, Facebook, Twitter
 } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
+import { useWishlistStore } from "@/store/wishlistStore";
+import { useRecentlyViewedStore } from "@/store/recentlyViewedStore";
 import { Product, Review } from "@/types";
 import toast from "react-hot-toast";
 
@@ -26,9 +28,30 @@ export default function ProductDetailClient({
   locale,
 }: ProductDetailClientProps) {
   const { addItem } = useCartStore();
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
+  const { addItem: addToRecentlyViewed } = useRecentlyViewedStore();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  const isWishlisted = mounted ? isInWishlist(product.id) : false;
+
+  // Track recently viewed products
+  useEffect(() => {
+    setMounted(true);
+    addToRecentlyViewed(product);
+  }, [product]);
+
+  const handleToggleWishlist = () => {
+    if (isWishlisted) {
+      removeFromWishlist(product.id);
+      toast.success("Removed from wishlist");
+    } else {
+      addToWishlist(product);
+      toast.success("Added to wishlist!");
+    }
+  };
 
   const images = product.previewImages?.length > 0 
     ? product.previewImages 
@@ -48,12 +71,39 @@ export default function ProductDetailClient({
           url: window.location.href,
         });
       } catch (err) {
-        // User cancelled
+        // User cancelled or not supported, show modal
+        setShowShareModal(true);
       }
     } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success("Link copied!");
+      setShowShareModal(true);
     }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast.success("Link copied!");
+    setShowShareModal(false);
+  };
+
+  const shareToSocial = (platform: string) => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(product.title);
+    let shareUrl = '';
+
+    switch (platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+        break;
+      case 'whatsapp':
+        shareUrl = `https://wa.me/?text=${text}%20${url}`;
+        break;
+    }
+
+    window.open(shareUrl, '_blank', 'width=600,height=400');
+    setShowShareModal(false);
   };
 
   return (
@@ -87,7 +137,7 @@ export default function ProductDetailClient({
               <Share2 className="w-5 h-5 text-gray-800" />
             </button>
             <button
-              onClick={() => setIsWishlisted(!isWishlisted)}
+              onClick={handleToggleWishlist}
               className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md"
             >
               <Heart
@@ -474,7 +524,7 @@ export default function ProductDetailClient({
                     Add to Cart
                   </button>
                   <button
-                    onClick={() => setIsWishlisted(!isWishlisted)}
+                    onClick={handleToggleWishlist}
                     className={`w-14 h-14 flex items-center justify-center border-2 rounded-full transition-colors ${
                       isWishlisted
                         ? 'border-red-500 bg-red-50'
@@ -569,6 +619,59 @@ export default function ProductDetailClient({
           )}
         </div>
       </div>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end lg:items-center justify-center" onClick={() => setShowShareModal(false)}>
+          <div className="bg-white w-full lg:w-96 rounded-t-2xl lg:rounded-2xl p-6 animate-slide-up" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold">Share this product</h3>
+              <button onClick={() => setShowShareModal(false)} className="p-2 hover:bg-gray-100 rounded-full">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex justify-center gap-4 mb-6">
+              <button onClick={() => shareToSocial('facebook')} className="flex flex-col items-center gap-2">
+                <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center">
+                  <Facebook className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-xs text-gray-600">Facebook</span>
+              </button>
+              <button onClick={() => shareToSocial('twitter')} className="flex flex-col items-center gap-2">
+                <div className="w-14 h-14 bg-sky-500 rounded-full flex items-center justify-center">
+                  <Twitter className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-xs text-gray-600">Twitter</span>
+              </button>
+              <button onClick={() => shareToSocial('whatsapp')} className="flex flex-col items-center gap-2">
+                <div className="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                </div>
+                <span className="text-xs text-gray-600">WhatsApp</span>
+              </button>
+            </div>
+
+            <div className="relative">
+              <input
+                type="text"
+                value={typeof window !== 'undefined' ? window.location.href : ''}
+                readOnly
+                className="w-full px-4 py-3 pr-24 bg-gray-100 rounded-xl text-sm text-gray-600"
+              />
+              <button
+                onClick={copyToClipboard}
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-gray-900 text-white text-sm font-medium rounded-lg flex items-center gap-1"
+              >
+                <Copy className="w-4 h-4" />
+                Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

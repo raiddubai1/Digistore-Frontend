@@ -2,17 +2,26 @@
 
 import { useState } from "react";
 import { Review } from "@/types";
-import { Star, ThumbsUp, CheckCircle } from "lucide-react";
+import { Star, ThumbsUp, CheckCircle, X, Loader2, Camera } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import toast from "react-hot-toast";
 
 interface ProductReviewsProps {
   reviews: Review[];
   averageRating: number;
   totalReviews: number;
+  productId?: string;
+  onReviewSubmit?: (review: { rating: number; title: string; comment: string }) => void;
 }
 
-export default function ProductReviews({ reviews, averageRating, totalReviews }: ProductReviewsProps) {
+export default function ProductReviews({ reviews, averageRating, totalReviews, productId, onReviewSubmit }: ProductReviewsProps) {
   const [sortBy, setSortBy] = useState<"recent" | "helpful">("recent");
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewTitle, setReviewTitle] = useState("");
+  const [reviewComment, setReviewComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const sortedReviews = [...reviews].sort((a, b) => {
     if (sortBy === "helpful") {
@@ -142,16 +151,127 @@ export default function ProductReviews({ reviews, averageRating, totalReviews }:
         </div>
       </div>
 
-      {/* Write Review Button */}
-      <div className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl p-8 text-center border border-gray-200">
-        <h3 className="text-xl font-bold mb-2">Share Your Experience</h3>
-        <p className="text-gray-600 mb-4">
-          Help others make informed decisions by writing a review
-        </p>
-        <button className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-full font-semibold hover:shadow-lg transition-all">
-          Write a Review
-        </button>
-      </div>
+      {/* Write Review Section */}
+      {showReviewForm ? (
+        <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-200">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold">Write a Review</h3>
+            <button onClick={() => setShowReviewForm(false)} className="p-2 hover:bg-gray-100 rounded-full">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <form onSubmit={async (e) => {
+            e.preventDefault();
+            if (reviewRating === 0) {
+              toast.error('Please select a rating');
+              return;
+            }
+            if (!reviewComment.trim()) {
+              toast.error('Please write a review');
+              return;
+            }
+            setSubmitting(true);
+            try {
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              if (onReviewSubmit) {
+                onReviewSubmit({ rating: reviewRating, title: reviewTitle, comment: reviewComment });
+              }
+              toast.success('Review submitted successfully!');
+              setShowReviewForm(false);
+              setReviewRating(0);
+              setReviewTitle("");
+              setReviewComment("");
+            } catch (error) {
+              toast.error('Failed to submit review');
+            } finally {
+              setSubmitting(false);
+            }
+          }}>
+            {/* Star Rating */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-3">Your Rating *</label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setReviewRating(star)}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    className="focus:outline-none transition-transform hover:scale-110"
+                  >
+                    <Star
+                      className={`w-8 h-8 ${
+                        star <= (hoverRating || reviewRating)
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  </button>
+                ))}
+                <span className="ml-2 text-sm text-gray-500 self-center">
+                  {reviewRating > 0 && ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][reviewRating]}
+                </span>
+              </div>
+            </div>
+
+            {/* Review Title */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Review Title</label>
+              <input
+                type="text"
+                value={reviewTitle}
+                onChange={(e) => setReviewTitle(e.target.value)}
+                placeholder="Sum up your experience"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#ff6f61] focus:border-transparent"
+              />
+            </div>
+
+            {/* Review Content */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Your Review *</label>
+              <textarea
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                placeholder="Tell others about your experience with this product..."
+                rows={5}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#ff6f61] focus:border-transparent resize-none"
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowReviewForm(false)}
+                className="flex-1 py-3 border border-gray-300 rounded-xl font-semibold hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="flex-1 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {submitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</> : 'Submit Review'}
+              </button>
+            </div>
+          </form>
+        </div>
+      ) : (
+        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 text-center border border-gray-200">
+          <h3 className="text-xl font-bold mb-2">Share Your Experience</h3>
+          <p className="text-gray-600 mb-4">
+            Help others make informed decisions by writing a review
+          </p>
+          <button
+            onClick={() => setShowReviewForm(true)}
+            className="px-6 py-3 bg-gray-900 text-white rounded-full font-semibold hover:bg-gray-800 transition-all"
+          >
+            Write a Review
+          </button>
+        </div>
+      )}
     </div>
   );
 }

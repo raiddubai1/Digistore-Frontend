@@ -1,33 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Heart, ShoppingCart, Trash2, ChevronLeft } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
-import { demoProducts } from "@/data/demo-products";
+import { useWishlistStore } from "@/store/wishlistStore";
 import toast from "react-hot-toast";
 
-// For now, we'll use a simple state. In production, this would be a store like cartStore
 export default function WishlistPage() {
-  // Demo: show first 3 products as wishlist items (in production, use a wishlist store)
-  const [wishlistItems, setWishlistItems] = useState(demoProducts.slice(0, 3));
+  const [mounted, setMounted] = useState(false);
+  const { items: wishlistItems, removeItem, moveToCart: moveToCartStore } = useWishlistStore();
   const { addItem } = useCartStore();
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const removeFromWishlist = (productId: string) => {
-    setWishlistItems(items => items.filter(item => item.id !== productId));
+    removeItem(productId);
     toast.success("Removed from wishlist");
   };
 
-  const addToCart = (product: any) => {
-    addItem(product);
-    toast.success("Added to cart!");
-  };
-
-  const moveToCart = (product: any) => {
-    addItem(product);
-    removeFromWishlist(product.id);
+  const moveToCart = (productId: string) => {
+    moveToCartStore(productId, addItem);
     toast.success("Moved to cart!");
   };
+
+  // Prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-pulse text-gray-400">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -60,36 +66,36 @@ export default function WishlistPage() {
           </div>
         ) : (
           <div className="p-4 space-y-3">
-            {wishlistItems.map((item) => (
-              <div key={item.id} className="bg-white rounded-xl p-3 flex gap-3">
-                <Link href={`/products/${item.slug}`} className="flex-shrink-0">
+            {wishlistItems.map((wishlistItem) => (
+              <div key={wishlistItem.product.id} className="bg-white rounded-xl p-3 flex gap-3">
+                <Link href={`/products/${wishlistItem.product.slug}`} className="flex-shrink-0">
                   <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
-                    {item.thumbnailUrl ? (
-                      <img src={item.thumbnailUrl} alt={item.title} className="w-full h-full object-cover" />
+                    {wishlistItem.product.thumbnailUrl ? (
+                      <img src={wishlistItem.product.thumbnailUrl} alt={wishlistItem.product.title} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-2xl">📦</div>
                     )}
                   </div>
                 </Link>
                 <div className="flex-1 min-w-0">
-                  <Link href={`/products/${item.slug}`}>
-                    <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-1">{item.title}</h3>
+                  <Link href={`/products/${wishlistItem.product.slug}`}>
+                    <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-1">{wishlistItem.product.title}</h3>
                   </Link>
                   <div className="flex items-baseline gap-2 mb-2">
-                    <span className="font-bold text-gray-900">${item.price}</span>
-                    {item.originalPrice && (
-                      <span className="text-xs text-gray-400 line-through">${item.originalPrice}</span>
+                    <span className="font-bold text-gray-900">${wishlistItem.product.price}</span>
+                    {wishlistItem.product.originalPrice && (
+                      <span className="text-xs text-gray-400 line-through">${wishlistItem.product.originalPrice}</span>
                     )}
                   </div>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => moveToCart(item)}
+                      onClick={() => moveToCart(wishlistItem.product.id)}
                       className="flex-1 py-2 bg-gray-900 text-white text-xs font-semibold rounded-full"
                     >
                       Move to Cart
                     </button>
                     <button
-                      onClick={() => removeFromWishlist(item.id)}
+                      onClick={() => removeFromWishlist(wishlistItem.product.id)}
                       className="w-9 h-9 flex items-center justify-center border border-gray-200 rounded-full"
                     >
                       <Trash2 className="w-4 h-4 text-gray-500" />
@@ -118,30 +124,30 @@ export default function WishlistPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {wishlistItems.map((item) => (
-                <div key={item.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden group">
-                  <Link href={`/products/${item.slug}`}>
+              {wishlistItems.map((wishlistItem) => (
+                <div key={wishlistItem.product.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden group">
+                  <Link href={`/products/${wishlistItem.product.slug}`}>
                     <div className="aspect-[4/3] bg-gray-100 overflow-hidden">
-                      {item.thumbnailUrl ? (
-                        <img src={item.thumbnailUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                      {wishlistItem.product.thumbnailUrl ? (
+                        <img src={wishlistItem.product.thumbnailUrl} alt={wishlistItem.product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-4xl">📦</div>
                       )}
                     </div>
                   </Link>
                   <div className="p-4">
-                    <Link href={`/products/${item.slug}`}>
-                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#ff6f61]">{item.title}</h3>
+                    <Link href={`/products/${wishlistItem.product.slug}`}>
+                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#ff6f61]">{wishlistItem.product.title}</h3>
                     </Link>
                     <div className="flex items-baseline gap-2 mb-4">
-                      <span className="text-xl font-bold text-gray-900">${item.price}</span>
-                      {item.originalPrice && <span className="text-gray-400 line-through">${item.originalPrice}</span>}
+                      <span className="text-xl font-bold text-gray-900">${wishlistItem.product.price}</span>
+                      {wishlistItem.product.originalPrice && <span className="text-gray-400 line-through">${wishlistItem.product.originalPrice}</span>}
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => moveToCart(item)} className="flex-1 py-2.5 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 flex items-center justify-center gap-2">
+                      <button onClick={() => moveToCart(wishlistItem.product.id)} className="flex-1 py-2.5 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 flex items-center justify-center gap-2">
                         <ShoppingCart className="w-4 h-4" /> Move to Cart
                       </button>
-                      <button onClick={() => removeFromWishlist(item.id)} className="w-10 h-10 border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50">
+                      <button onClick={() => removeFromWishlist(wishlistItem.product.id)} className="w-10 h-10 border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50">
                         <Trash2 className="w-4 h-4 text-gray-500" />
                       </button>
                     </div>

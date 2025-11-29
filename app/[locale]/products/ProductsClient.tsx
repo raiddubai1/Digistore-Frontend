@@ -33,7 +33,17 @@ export default function ProductsClient() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
+  const [selectedFileTypes, setSelectedFileTypes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string>("popular");
+
+  // File type options
+  const fileTypeOptions = [
+    { value: "pdf", label: "PDF", icon: "📄" },
+    { value: "zip", label: "ZIP", icon: "📦" },
+    { value: "mp4", label: "Video", icon: "🎬" },
+    { value: "mp3", label: "Audio", icon: "🎵" },
+    { value: "psd", label: "PSD", icon: "🎨" },
+  ];
   const [showFilters, setShowFilters] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -96,6 +106,14 @@ export default function ProductsClient() {
       });
     }
 
+    // Filter by file type
+    if (selectedFileTypes.length > 0) {
+      filtered = filtered.filter(product => {
+        const fileType = product.fileType?.toLowerCase() || '';
+        return selectedFileTypes.some(type => fileType.includes(type));
+      });
+    }
+
     // Sort products
     if (sortBy === "price-low") {
       filtered.sort((a, b) => a.price - b.price);
@@ -105,6 +123,8 @@ export default function ProductsClient() {
       filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     } else if (sortBy === "newest") {
       filtered.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+    } else if (sortBy === "downloads") {
+      filtered.sort((a, b) => (b.downloadCount || 0) - (a.downloadCount || 0));
     }
 
     // Pagination
@@ -114,7 +134,7 @@ export default function ProductsClient() {
 
     setProducts(paginatedProducts);
     setTotal(filtered.length);
-  }, [page, selectedCategories, selectedPriceRanges, selectedRatings, sortBy]);
+  }, [page, selectedCategories, selectedPriceRanges, selectedRatings, selectedFileTypes, sortBy]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
@@ -134,14 +154,21 @@ export default function ProductsClient() {
     );
   };
 
+  const toggleFileType = (fileType: string) => {
+    setSelectedFileTypes((prev) =>
+      prev.includes(fileType) ? prev.filter((f) => f !== fileType) : [...prev, fileType]
+    );
+  };
+
   const clearAllFilters = () => {
     setSelectedCategories([]);
     setSelectedPriceRanges([]);
     setSelectedRatings([]);
+    setSelectedFileTypes([]);
   };
 
   const hasActiveFilters =
-    selectedCategories.length > 0 || selectedPriceRanges.length > 0 || selectedRatings.length > 0;
+    selectedCategories.length > 0 || selectedPriceRanges.length > 0 || selectedRatings.length > 0 || selectedFileTypes.length > 0;
 
   // Mini product card for mobile
   const MiniProductCard = ({ product }: { product: Product }) => (
@@ -650,9 +677,11 @@ export default function ProductsClient() {
         selectedCategories={selectedCategories}
         selectedPriceRanges={selectedPriceRanges}
         selectedRatings={selectedRatings}
+        selectedFileTypes={selectedFileTypes}
         onToggleCategory={toggleCategory}
         onTogglePriceRange={togglePriceRange}
         onToggleRating={toggleRating}
+        onToggleFileType={toggleFileType}
         onClearAll={clearAllFilters}
       />
     </>

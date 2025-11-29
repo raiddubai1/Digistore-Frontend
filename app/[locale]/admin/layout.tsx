@@ -16,6 +16,7 @@ import {
   FolderTree,
   Star,
   Tag,
+  MoreHorizontal,
 } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,6 +33,14 @@ const getNavigation = (locale: string) => [
   { name: "Settings", href: `/${locale}/admin/settings`, icon: Settings },
 ];
 
+// Mobile bottom nav - show 4 items + more menu
+const getMobileNav = (locale: string) => [
+  { name: "Home", href: `/${locale}/admin`, icon: LayoutDashboard },
+  { name: "Products", href: `/${locale}/admin/products`, icon: Package },
+  { name: "Orders", href: `/${locale}/admin/orders`, icon: ShoppingCart },
+  { name: "Analytics", href: `/${locale}/admin/analytics`, icon: BarChart3 },
+];
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
@@ -40,6 +49,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // Extract locale from pathname (e.g., /en/admin -> en)
   const locale = pathname.split('/')[1] || 'en';
   const navigation = getNavigation(locale);
+  const mobileNav = getMobileNav(locale);
+
+  // Check if current path matches or starts with nav item href
+  const isActive = (href: string) => {
+    if (href === `/${locale}/admin`) {
+      return pathname === href;
+    }
+    return pathname.startsWith(href);
+  };
 
   return (
     <ProtectedRoute allowedRoles={['ADMIN']}>
@@ -152,7 +170,35 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-8">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 lg:p-8 pb-20 lg:pb-8">{children}</main>
+
+        {/* Mobile Bottom Navigation */}
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 safe-area-pb">
+          <div className="flex items-center justify-around h-16">
+            {mobileNav.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`flex flex-col items-center justify-center flex-1 h-full gap-0.5 ${
+                    active ? "text-gray-900" : "text-gray-400"
+                  }`}
+                >
+                  <item.icon className={`w-5 h-5 ${active ? "stroke-[2.5]" : ""}`} />
+                  <span className="text-[10px] font-medium">{item.name}</span>
+                </Link>
+              );
+            })}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 text-gray-400"
+            >
+              <MoreHorizontal className="w-5 h-5" />
+              <span className="text-[10px] font-medium">More</span>
+            </button>
+          </div>
+        </nav>
       </div>
     </div>
     </ProtectedRoute>

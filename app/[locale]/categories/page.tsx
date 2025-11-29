@@ -2,7 +2,7 @@ import Link from "next/link";
 import { demoCategories } from "@/data/demo-products";
 import { getCategories } from "@/lib/api/categories";
 import type { Category } from "@/types";
-import { ArrowRight, Briefcase, User, Home, Code, Globe, Heart, Package } from "lucide-react";
+import { ArrowRight, Briefcase, User, Home, Code, Globe, Heart, Package, ChevronRight } from "lucide-react";
 
 const categoryIcons: Record<string, any> = {
   briefcase: Briefcase,
@@ -12,6 +12,15 @@ const categoryIcons: Record<string, any> = {
   code: Code,
   globe: Globe,
   package: Package,
+};
+
+const categoryEmojis: Record<string, string> = {
+  "business-and-marketing": "💼",
+  "personal-development": "🧠",
+  "animals-and-pets": "🐾",
+  "home-and-lifestyle": "🏠",
+  "technology": "💻",
+  "society-and-politics": "🌍",
 };
 
 interface CategoriesPageProps {
@@ -44,17 +53,62 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Page Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Browse by Category
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Explore our diverse collection of digital products organized by category
-          </p>
+    <>
+      {/* ===== MOBILE LAYOUT ===== */}
+      <div className="lg:hidden min-h-screen bg-white pb-24">
+        {/* Header */}
+        <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-4 py-4">
+          <h1 className="text-xl font-bold text-center">Categories</h1>
         </div>
+
+        {/* Category List */}
+        <div className="divide-y divide-gray-100">
+          {categories.map((category: any) => {
+            const emoji = categoryEmojis[category.slug] || "📦";
+            return (
+              <Link
+                key={category.id}
+                href={`/${locale}/products?category=${category.slug}`}
+                className="flex items-center gap-4 px-4 py-4 active:bg-gray-50"
+              >
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-2xl">
+                  {emoji}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900">{category.name}</h3>
+                  <p className="text-sm text-gray-500">
+                    {category._count?.products || category.productCount || 0} products
+                  </p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-gray-400" />
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Browse All */}
+        <div className="p-4 mt-4">
+          <Link
+            href={`/${locale}/products`}
+            className="block w-full py-4 bg-gray-900 text-white text-center rounded-xl font-semibold"
+          >
+            Browse All Products
+          </Link>
+        </div>
+      </div>
+
+      {/* ===== DESKTOP LAYOUT ===== */}
+      <div className="hidden lg:block min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Page Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Browse by Category
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Explore our diverse collection of digital products organized by category
+            </p>
+          </div>
 
         {/* Categories Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -154,6 +208,7 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

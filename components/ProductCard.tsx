@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { Product } from "@/types";
-import { Heart, ShoppingCart, Star, Download } from "lucide-react";
+import { Heart, ShoppingCart, Star, Download, GitCompare } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
+import { useWishlistStore } from "@/store/wishlistStore";
+import { useCompareStore } from "@/store/compareStore";
 import toast from "react-hot-toast";
 
 interface ProductCardProps {
@@ -13,8 +15,17 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const { addItem } = useCartStore();
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
+  const { addItem: addToCompare, removeItem: removeFromCompare, isInCompare, items: compareItems } = useCompareStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isWishlisted = mounted ? isInWishlist(product.id) : false;
+  const isComparing = mounted ? isInCompare(product.id) : false;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -24,7 +35,28 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsWishlisted(!isWishlisted);
+    if (isWishlisted) {
+      removeFromWishlist(product.id);
+      toast.success("Removed from wishlist");
+    } else {
+      addToWishlist(product);
+      toast.success("Added to wishlist!");
+    }
+  };
+
+  const handleToggleCompare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isComparing) {
+      removeFromCompare(product.id);
+      toast.success("Removed from compare");
+    } else {
+      if (compareItems.length >= 4) {
+        toast.error("Maximum 4 products can be compared");
+        return;
+      }
+      addToCompare(product);
+      toast.success("Added to compare!");
+    }
   };
 
   return (
@@ -66,17 +98,27 @@ export default function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
 
-          {/* Wishlist Button - Larger Touch Target */}
-          <button
-            onClick={handleToggleWishlist}
-            className="absolute top-2 right-2 lg:top-3 lg:right-3 w-11 h-11 lg:w-10 lg:h-10 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-transform"
-          >
-            <Heart
-              className={`w-5 h-5 lg:w-5 lg:h-5 transition-colors ${
-                isWishlisted ? "fill-[#ff6f61] text-[#ff6f61]" : "text-gray-400"
+          {/* Action Buttons */}
+          <div className="absolute top-2 right-2 lg:top-3 lg:right-3 flex flex-col gap-2">
+            <button
+              onClick={handleToggleWishlist}
+              className="w-10 h-10 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-transform"
+            >
+              <Heart
+                className={`w-5 h-5 transition-colors ${
+                  isWishlisted ? "fill-[#ff6f61] text-[#ff6f61]" : "text-gray-400"
+                }`}
+              />
+            </button>
+            <button
+              onClick={handleToggleCompare}
+              className={`w-10 h-10 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-transform ${
+                isComparing ? "bg-gray-900 text-white" : "bg-white/95 text-gray-400"
               }`}
-            />
-          </button>
+            >
+              <GitCompare className="w-4 h-4" />
+            </button>
+          </div>
 
           {/* Hover Overlay */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />

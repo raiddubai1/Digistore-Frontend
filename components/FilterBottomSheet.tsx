@@ -11,9 +11,11 @@ interface FilterBottomSheetProps {
   selectedCategories: string[];
   selectedPriceRanges: string[];
   selectedRatings: string[];
+  selectedFileTypes?: string[];
   onToggleCategory: (category: string) => void;
   onTogglePriceRange: (range: string) => void;
   onToggleRating: (rating: string) => void;
+  onToggleFileType?: (fileType: string) => void;
   onClearAll: () => void;
 }
 
@@ -28,6 +30,14 @@ const ratings = [
   { value: "4", label: "★★★★☆ 4.0+" },
 ];
 
+const fileTypes = [
+  { value: "pdf", label: "📄 PDF" },
+  { value: "zip", label: "📦 ZIP" },
+  { value: "mp4", label: "🎬 Video" },
+  { value: "mp3", label: "🎵 Audio" },
+  { value: "psd", label: "🎨 PSD" },
+];
+
 export default function FilterBottomSheet({
   isOpen,
   onClose,
@@ -35,12 +45,14 @@ export default function FilterBottomSheet({
   selectedCategories,
   selectedPriceRanges,
   selectedRatings,
+  selectedFileTypes = [],
   onToggleCategory,
   onTogglePriceRange,
   onToggleRating,
+  onToggleFileType,
   onClearAll,
 }: FilterBottomSheetProps) {
-  const totalFilters = selectedCategories.length + selectedPriceRanges.length + selectedRatings.length;
+  const totalFilters = selectedCategories.length + selectedPriceRanges.length + selectedRatings.length + selectedFileTypes.length;
 
   // Lock body scroll when open
   useEffect(() => {
@@ -177,6 +189,29 @@ export default function FilterBottomSheet({
               ))}
             </div>
           </div>
+
+          {/* File Type Section */}
+          {onToggleFileType && (
+            <div className="mb-6">
+              <h3 className="font-bold text-gray-900 mb-3">File Type</h3>
+              <div className="flex flex-wrap gap-2">
+                {fileTypes.map((type) => (
+                  <button
+                    key={type.value}
+                    onClick={() => onToggleFileType(type.value)}
+                    className={cn(
+                      "px-4 py-2 rounded-full text-sm font-medium transition-colors",
+                      selectedFileTypes.includes(type.value)
+                        ? "bg-gray-900 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    )}
+                  >
+                    {type.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Footer - Apply Button */}

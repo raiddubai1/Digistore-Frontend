@@ -1,7 +1,8 @@
 "use client";
 
-import { Download, ShoppingBag, User, Settings, LogOut } from "lucide-react";
+import { Download, ShoppingBag, User, Settings, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function AccountPage() {
   const [activeTab, setActiveTab] = useState("downloads");
@@ -45,38 +46,176 @@ export default function AccountPage() {
     },
   ];
 
+  const tabs = [
+    { id: "downloads", label: "Downloads", icon: Download },
+    { id: "orders", label: "Orders", icon: ShoppingBag },
+    { id: "settings", label: "Settings", icon: Settings },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold mb-8">My Account</h1>
+    <>
+      {/* ===== MOBILE LAYOUT ===== */}
+      <div className="lg:hidden min-h-screen bg-gray-50 pb-24">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-100">
+          <div className="px-4 py-4 flex items-center gap-3">
+            <Link href="/" className="p-1">
+              <ChevronLeft className="w-6 h-6" />
+            </Link>
+            <h1 className="text-lg font-bold">My Account</h1>
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              {/* User Info */}
-              <div className="text-center mb-6 pb-6 border-b border-gray-200">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-3">
-                  <User className="w-10 h-10 text-white" />
-                </div>
-                <h2 className="font-bold text-lg">{user.name}</h2>
-                <p className="text-sm text-gray-500">{user.email}</p>
-                <p className="text-xs text-gray-400 mt-1">Member since {user.joinedDate}</p>
+          {/* User Profile Card */}
+          <div className="px-4 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 bg-gradient-to-br from-gray-800 to-gray-900 rounded-full flex items-center justify-center">
+                <User className="w-7 h-7 text-white" />
               </div>
+              <div>
+                <h2 className="font-bold">{user.name}</h2>
+                <p className="text-sm text-gray-500">{user.email}</p>
+              </div>
+            </div>
+          </div>
 
-              {/* Navigation */}
-              <nav className="space-y-2">
-                <button
-                  onClick={() => setActiveTab("downloads")}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    activeTab === "downloads"
-                      ? "bg-primary text-white"
-                      : "hover:bg-gray-100 text-gray-700"
-                  }`}
-                >
-                  <Download className="w-5 h-5" />
-                  <span className="font-medium">My Downloads</span>
-                </button>
+          {/* Tab Pills */}
+          <div className="px-4 pb-3 flex gap-2 overflow-x-auto">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                  activeTab === tab.id
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-600"
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          {activeTab === "downloads" && (
+            <div className="space-y-3">
+              {purchases.flatMap((purchase) =>
+                purchase.items.map((item, index) => (
+                  <div
+                    key={`${purchase.id}-${index}`}
+                    className="bg-white rounded-xl p-4 shadow-sm"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Download className="w-6 h-6 text-gray-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm line-clamp-2">{item.title}</h3>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {item.fileType} • {item.fileSize}
+                        </p>
+                      </div>
+                    </div>
+                    <button className="w-full mt-3 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2">
+                      <Download className="w-4 h-4" />
+                      Download
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+
+          {activeTab === "orders" && (
+            <div className="space-y-3">
+              {purchases.map((purchase) => (
+                <div key={purchase.id} className="bg-white rounded-xl p-4 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="text-xs text-gray-500">Order #{purchase.orderId.slice(-6)}</p>
+                      <p className="font-bold">${purchase.total.toFixed(2)}</p>
+                    </div>
+                    <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                      Completed
+                    </span>
+                  </div>
+                  {purchase.items.map((item, index) => (
+                    <p key={index} className="text-sm text-gray-600 line-clamp-1">
+                      • {item.title}
+                    </p>
+                  ))}
+                  <p className="text-xs text-gray-400 mt-2">
+                    {new Date(purchase.date).toLocaleDateString()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === "settings" && (
+            <div className="space-y-3">
+              <div className="bg-white rounded-xl p-4 shadow-sm">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                <input
+                  type="text"
+                  defaultValue={user.name}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                />
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input
+                  type="email"
+                  defaultValue={user.email}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                />
+              </div>
+              <button className="w-full py-3 bg-gray-900 text-white font-medium rounded-xl">
+                Save Changes
+              </button>
+              <button className="w-full py-3 bg-red-50 text-red-600 font-medium rounded-xl flex items-center justify-center gap-2">
+                <LogOut className="w-5 h-5" />
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ===== DESKTOP LAYOUT ===== */}
+      <div className="hidden lg:block min-h-screen bg-gray-50 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold mb-8">My Account</h1>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-2xl p-6 shadow-sm">
+                {/* User Info */}
+                <div className="text-center mb-6 pb-6 border-b border-gray-200">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-3">
+                    <User className="w-10 h-10 text-white" />
+                  </div>
+                  <h2 className="font-bold text-lg">{user.name}</h2>
+                  <p className="text-sm text-gray-500">{user.email}</p>
+                  <p className="text-xs text-gray-400 mt-1">Member since {user.joinedDate}</p>
+                </div>
+
+                {/* Navigation */}
+                <nav className="space-y-2">
+                  <button
+                    onClick={() => setActiveTab("downloads")}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      activeTab === "downloads"
+                        ? "bg-primary text-white"
+                        : "hover:bg-gray-100 text-gray-700"
+                    }`}
+                  >
+                    <Download className="w-5 h-5" />
+                    <span className="font-medium">My Downloads</span>
+                  </button>
                 <button
                   onClick={() => setActiveTab("orders")}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
@@ -216,6 +355,7 @@ export default function AccountPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

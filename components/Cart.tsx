@@ -1,15 +1,18 @@
 "use client";
 
 import { useCartStore } from "@/store/cartStore";
-import { X, ShoppingBag, Trash2, Plus, Minus } from "lucide-react";
+import { X, ShoppingBag, Trash2, Plus, Minus, Tag, Check } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function Cart() {
-  const { items, isOpen, closeCart, removeItem, updateQuantity, itemCount, subtotal, total } =
+  const { items, isOpen, closeCart, removeItem, updateQuantity, itemCount, subtotal, discount, total, coupon, applyCoupon, removeCoupon } =
     useCartStore();
   const [mounted, setMounted] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [showCouponInput, setShowCouponInput] = useState(false);
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -135,23 +138,79 @@ export default function Cart() {
           {/* Footer */}
           {items.length > 0 && (
             <div className="border-t border-gray-200 p-6 space-y-4">
+              {/* Coupon Section */}
+              {coupon ? (
+                <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-medium text-green-700">
+                      {coupon.code} ({coupon.type === 'percentage' ? `${coupon.discount}% off` : `$${coupon.discount} off`})
+                    </span>
+                  </div>
+                  <button onClick={removeCoupon} className="text-sm text-red-500 hover:text-red-700">
+                    Remove
+                  </button>
+                </div>
+              ) : showCouponInput ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={couponInput}
+                    onChange={(e) => setCouponInput(e.target.value)}
+                    placeholder="Enter coupon code"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                  />
+                  <button
+                    onClick={() => {
+                      const result = applyCoupon(couponInput);
+                      if (result.success) {
+                        toast.success(result.message);
+                        setCouponInput("");
+                        setShowCouponInput(false);
+                      } else {
+                        toast.error(result.message);
+                      }
+                    }}
+                    className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800"
+                  >
+                    Apply
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowCouponInput(true)}
+                  className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                >
+                  <Tag className="w-4 h-4" />
+                  Have a coupon code?
+                </button>
+              )}
+
               {/* Subtotal */}
-              <div className="flex justify-between text-lg">
-                <span className="font-semibold">Subtotal:</span>
-                <span className="font-bold">{formatPrice(subtotal())}</span>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Subtotal:</span>
+                <span className="font-medium">{formatPrice(subtotal())}</span>
               </div>
+
+              {/* Discount */}
+              {discount() > 0 && (
+                <div className="flex justify-between text-sm text-green-600">
+                  <span>Discount:</span>
+                  <span>-{formatPrice(discount())}</span>
+                </div>
+              )}
 
               {/* Total */}
               <div className="flex justify-between text-xl border-t border-gray-200 pt-4">
                 <span className="font-bold">Total:</span>
-                <span className="font-bold text-primary">{formatPrice(total())}</span>
+                <span className="font-bold text-gray-900">{formatPrice(total())}</span>
               </div>
 
               {/* Checkout Button */}
               <Link
                 href="/checkout"
                 onClick={closeCart}
-                className="block w-full py-4 bg-gradient-to-r from-primary to-secondary text-white text-center rounded-full font-semibold hover:shadow-lg transition-all"
+                className="block w-full py-4 bg-gray-900 text-white text-center rounded-full font-semibold hover:bg-gray-800 transition-all"
               >
                 Proceed to Checkout
               </Link>
