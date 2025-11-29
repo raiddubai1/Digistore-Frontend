@@ -328,7 +328,7 @@ export default function ProductsClient() {
         </div>
 
         {/* Category Grid - 2 rows */}
-        <div className="bg-white py-4 px-4 border-b border-gray-100">
+        <div className="bg-white dark:bg-slate-800 py-4 px-4 border-b border-gray-100 dark:border-slate-700">
           <div className="grid grid-cols-3 gap-2">
             {categories.slice(0, 6).map((category) => {
               const config = categoryConfig[category.slug] || { emoji: "📦", bgColor: "bg-gray-100" };
@@ -339,8 +339,8 @@ export default function ProductsClient() {
                   onClick={() => toggleCategory(category.slug)}
                   className={`flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-xl active:scale-95 transition-all ${
                     isSelected
-                      ? "bg-gray-900 text-white"
-                      : `${config.bgColor} text-gray-800`
+                      ? "bg-gray-900 text-white dark:bg-[#FF6B35]"
+                      : `${config.bgColor} dark:bg-slate-700 text-gray-800 dark:text-white`
                   }`}
                 >
                   <span className="text-2xl">{config.emoji}</span>

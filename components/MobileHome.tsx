@@ -148,10 +148,10 @@ export default function MobileHome({
                 <Link
                   key={category.id}
                   href={`/${locale}/products?category=${category.slug}`}
-                  className={`flex items-center gap-2 px-4 py-2 ${config.bgColor} rounded-full whitespace-nowrap flex-shrink-0 active:scale-95 transition-transform`}
+                  className={`flex items-center gap-2 px-4 py-2 ${config.bgColor} dark:bg-slate-700 rounded-full whitespace-nowrap flex-shrink-0 active:scale-95 transition-transform`}
                 >
                   <span className="text-base">{config.emoji}</span>
-                  <span className="text-sm font-medium text-gray-800">{category.name.split(' ')[0]}</span>
+                  <span className="text-sm font-medium text-gray-800 dark:text-white">{category.name.split(' ')[0]}</span>
                 </Link>
               );
             })}
