@@ -167,28 +167,28 @@ export default function AdminCustomersPage() {
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[800px]">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
                       Customer
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Joined Date
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                      Joined
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
                       Orders
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Total Spent
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                      Spent
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Last Purchase
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                      Last Order
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
                       Status
                     </th>
-                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
                       Actions
                     </th>
                   </tr>
@@ -196,33 +196,33 @@ export default function AdminCustomersPage() {
                 <tbody className="divide-y divide-gray-200">
                   {customers.map((customer) => (
                     <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-semibold">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                             {(customer.name || customer.email).charAt(0).toUpperCase()}
                           </div>
-                          <div>
-                            <div className="font-semibold text-sm">{customer.name || "No name"}</div>
-                            <div className="text-xs text-gray-500">{customer.email}</div>
+                          <div className="min-w-0">
+                            <div className="font-semibold text-sm truncate">{customer.name || "No name"}</div>
+                            <div className="text-xs text-gray-500 truncate">{customer.email}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <div className="text-sm text-gray-700">
                           {new Date(customer.createdAt).toLocaleDateString("en-US", {
-                            year: "numeric",
+                            year: "2-digit",
                             month: "short",
                             day: "numeric",
                           })}
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <div className="text-sm font-semibold">{customer.totalOrders}</div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <div className="text-sm font-semibold">{formatPrice(customer.totalSpent)}</div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <div className="text-sm text-gray-700">
                           {customer.lastPurchase
                             ? new Date(customer.lastPurchase).toLocaleDateString("en-US", {
@@ -232,9 +232,9 @@ export default function AdminCustomersPage() {
                             : "-"}
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full ${
+                          className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full ${
                             customer.status === "ACTIVE"
                               ? "bg-green-100 text-green-700"
                               : customer.status === "SUSPENDED"
@@ -246,12 +246,12 @@ export default function AdminCustomersPage() {
                           {customer.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="View Details">
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1">
+                          <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" title="View Details">
                             <Eye className="w-4 h-4 text-gray-600" />
                           </button>
-                          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Send Email">
+                          <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" title="Send Email">
                             <Mail className="w-4 h-4 text-gray-600" />
                           </button>
                         </div>

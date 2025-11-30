@@ -177,7 +177,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-8 pb-20 lg:pb-8">{children}</main>
+        <main className="flex-1 overflow-auto p-4 lg:p-8 pb-20 lg:pb-8">
+          <div className="min-w-0 w-full">{children}</div>
+        </main>
 
         {/* Mobile Bottom Navigation */}
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 safe-area-pb">
