@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { formatPrice } from "@/lib/utils";
 import { Search, Mail, Eye, Download, UserCheck, UserX, Loader2 } from "lucide-react";
 
@@ -35,9 +35,9 @@ export default function AdminCustomersPage() {
   const [stats, setStats] = useState<CustomerStats>({ total: 0, active: 0, newThisMonth: 0 });
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, pages: 0 });
   const [isLoading, setIsLoading] = useState(true);
-  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  const isInitialMount = useRef(true);
 
-  const fetchCustomers = useCallback(async (page = 1, search = "", status = "") => {
+  const fetchCustomers = async (page = 1, search = "", status = "") => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem("accessToken");
@@ -53,28 +53,34 @@ export default function AdminCustomersPage() {
 
       if (res.ok) {
         const data = await res.json();
-        setCustomers(data.data.customers);
-        setStats(data.data.stats);
-        setPagination(data.data.pagination);
+        setCustomers(data.data?.customers || []);
+        setStats(data.data?.stats || { total: 0, active: 0, newThisMonth: 0 });
+        setPagination(data.data?.pagination || { page: 1, limit: 20, total: 0, pages: 0 });
       }
     } catch (error) {
       console.error("Failed to fetch customers:", error);
+      setCustomers([]);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
+  // Initial load
   useEffect(() => {
     fetchCustomers();
-  }, [fetchCustomers]);
+  }, []);
 
-  // Debounced search
+  // Debounced search - only after initial mount
   useEffect(() => {
-    if (searchTimeout) clearTimeout(searchTimeout);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
     const timeout = setTimeout(() => {
       fetchCustomers(1, searchQuery, statusFilter);
     }, 300);
-    setSearchTimeout(timeout);
+
     return () => clearTimeout(timeout);
   }, [searchQuery, statusFilter]);
 
