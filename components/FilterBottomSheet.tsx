@@ -43,19 +43,21 @@ const fileTypes = [
   { value: "xls", label: "Spreadsheets", icon: "📊" },
 ];
 
-// Collapsible section component
+// Collapsible section component with internal scrolling
 function FilterSection({
   title,
   icon: Icon,
   count,
   children,
-  defaultOpen = false
+  defaultOpen = false,
+  maxHeight = "200px"
 }: {
   title: string;
   icon: React.ElementType;
   count: number;
   children: React.ReactNode;
   defaultOpen?: boolean;
+  maxHeight?: string;
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -89,13 +91,21 @@ function FilterSection({
           )}
         </div>
       </button>
+      {/* Expanded content with its own scroll container */}
       <div
         className={cn(
-          "overflow-hidden transition-all duration-300 ease-out",
-          isOpen ? "max-h-[500px] opacity-100 pb-4" : "max-h-0 opacity-0"
+          "transition-all duration-300 ease-out",
+          isOpen ? "opacity-100 pb-4" : "max-h-0 opacity-0 overflow-hidden"
         )}
       >
-        <div className="px-1">
+        <div
+          className="px-1 overflow-y-auto overscroll-contain"
+          style={{
+            maxHeight: isOpen ? maxHeight : '0px',
+            WebkitOverflowScrolling: 'touch'
+          }}
+          onTouchMove={(e) => e.stopPropagation()}
+        >
           {children}
         </div>
       </div>
@@ -178,12 +188,13 @@ export default function FilterBottomSheet({
           className="flex-1 overflow-y-auto overscroll-contain touch-pan-y px-4"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          {/* Categories Section */}
+          {/* Categories Section - taller to show more categories */}
           <FilterSection
             title="Categories"
             icon={Tag}
             count={selectedCategories.length}
             defaultOpen={true}
+            maxHeight="250px"
           >
             <div className="grid grid-cols-2 gap-2">
               {categories.map((category) => (
@@ -211,6 +222,7 @@ export default function FilterBottomSheet({
             title="Price Range"
             icon={DollarSign}
             count={selectedPriceRanges.length}
+            maxHeight="280px"
           >
             <div className="space-y-2">
               {priceRanges.map((range) => (
@@ -241,6 +253,7 @@ export default function FilterBottomSheet({
             title="Customer Rating"
             icon={Star}
             count={selectedRatings.length}
+            maxHeight="180px"
           >
             <div className="space-y-2">
               {ratings.map((rating) => (
@@ -286,6 +299,7 @@ export default function FilterBottomSheet({
               title="File Type"
               icon={FileType}
               count={selectedFileTypes.length}
+              maxHeight="220px"
             >
               <div className="grid grid-cols-2 gap-2">
                 {fileTypes.map((type) => (
