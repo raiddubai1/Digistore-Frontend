@@ -328,7 +328,7 @@ export default function CheckoutPage() {
   return (
     <>
       {/* ===== MOBILE LAYOUT ===== */}
-      <div className="lg:hidden min-h-screen bg-gray-50 pb-32">
+      <div className="lg:hidden min-h-screen bg-gray-50 pb-48">
         {/* Header */}
         <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-4 py-3">
           <div className="flex items-center gap-3">
@@ -436,8 +436,11 @@ export default function CheckoutPage() {
           )}
         </form>
 
-        {/* Fixed Bottom Button (PayPal or Free Order) */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 lg:hidden">
+        {/* Fixed Bottom Button (PayPal or Free Order) - positioned above bottom nav */}
+        <div
+          className="fixed left-0 right-0 bg-white border-t border-gray-100 p-4 lg:hidden z-40"
+          style={{ bottom: 'calc(64px + env(safe-area-inset-bottom, 0px))' }}
+        >
           {isProcessing ? (
             <div className="w-full py-4 bg-gray-200 rounded-xl flex items-center justify-center gap-2">
               <div className="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />

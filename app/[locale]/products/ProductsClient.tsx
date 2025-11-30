@@ -66,6 +66,7 @@ export default function ProductsClient() {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState((demoProducts || []).length);
   const [page, setPage] = useState(1);
+  const [isLoadMore, setIsLoadMore] = useState(false); // Track if "Load More" was clicked
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
@@ -216,37 +217,54 @@ export default function ProductsClient() {
       filtered.sort((a, b) => (b.downloadCount || 0) - (a.downloadCount || 0));
     }
 
-    // Pagination
-    const startIndex = (page - 1) * 12;
-    const endIndex = startIndex + 12;
-    const paginatedProducts = filtered.slice(startIndex, endIndex);
+    // Pagination - for "Load More" on mobile, show all products up to current page
+    // For desktop pagination, show only the current page
+    const endIndex = page * 12;
 
-    setProducts(paginatedProducts);
+    if (isLoadMore) {
+      // Mobile "Load More" - show all products from page 1 to current page
+      const accumulatedProducts = filtered.slice(0, endIndex);
+      setProducts(accumulatedProducts);
+    } else {
+      // Desktop pagination - show only current page
+      const startIndex = (page - 1) * 12;
+      const paginatedProducts = filtered.slice(startIndex, endIndex);
+      setProducts(paginatedProducts);
+    }
+
     setTotal(filtered.length);
-  }, [page, selectedCategories, selectedPriceRanges, selectedRatings, selectedFileTypes, sortBy, allProducts]);
+  }, [page, isLoadMore, selectedCategories, selectedPriceRanges, selectedRatings, selectedFileTypes, sortBy, allProducts]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
       prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
     );
+    setPage(1);
+    setIsLoadMore(false);
   };
 
   const togglePriceRange = (range: string) => {
     setSelectedPriceRanges((prev) =>
       prev.includes(range) ? prev.filter((r) => r !== range) : [...prev, range]
     );
+    setPage(1);
+    setIsLoadMore(false);
   };
 
   const toggleRating = (rating: string) => {
     setSelectedRatings((prev) =>
       prev.includes(rating) ? prev.filter((r) => r !== rating) : [...prev, rating]
     );
+    setPage(1);
+    setIsLoadMore(false);
   };
 
   const toggleFileType = (fileType: string) => {
     setSelectedFileTypes((prev) =>
       prev.includes(fileType) ? prev.filter((f) => f !== fileType) : [...prev, fileType]
     );
+    setPage(1);
+    setIsLoadMore(false);
   };
 
   const clearAllFilters = () => {
@@ -254,6 +272,8 @@ export default function ProductsClient() {
     setSelectedPriceRanges([]);
     setSelectedRatings([]);
     setSelectedFileTypes([]);
+    setPage(1);
+    setIsLoadMore(false);
   };
 
   const hasActiveFilters =
@@ -459,7 +479,10 @@ export default function ProductsClient() {
         {!loading && products.length > 0 && products.length < total && (
           <div className="px-4 py-6">
             <button
-              onClick={() => setPage(page + 1)}
+              onClick={() => {
+                setIsLoadMore(true);
+                setPage(page + 1);
+              }}
               className="w-full py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 active:bg-gray-50"
             >
               Load more products
@@ -716,7 +739,7 @@ export default function ProductsClient() {
               <div className="mt-12 flex justify-center">
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setPage(Math.max(1, page - 1))}
+                    onClick={() => { setIsLoadMore(false); setPage(Math.max(1, page - 1)); }}
                     disabled={page === 1}
                     className="px-4 py-2 border border-gray-200 rounded-lg hover:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -725,7 +748,7 @@ export default function ProductsClient() {
                   {total > 0 && [...Array(Math.ceil(total / 12))].map((_, i) => (
                     <button
                       key={i}
-                      onClick={() => setPage(i + 1)}
+                      onClick={() => { setIsLoadMore(false); setPage(i + 1); }}
                       className={`px-4 py-2 rounded-lg transition-colors ${
                         page === i + 1
                           ? 'bg-primary text-white'
@@ -736,7 +759,7 @@ export default function ProductsClient() {
                     </button>
                   )).slice(0, 5)}
                   <button
-                    onClick={() => setPage(Math.min(Math.ceil(total / 12), page + 1))}
+                    onClick={() => { setIsLoadMore(false); setPage(Math.min(Math.ceil(total / 12), page + 1)); }}
                     disabled={page === Math.ceil(total / 12)}
                     className="px-4 py-2 border border-gray-200 rounded-lg hover:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
