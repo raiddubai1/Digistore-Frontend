@@ -79,19 +79,19 @@ export default function CheckoutPage() {
     }
   }, [mounted, paypalLoaded]);
 
-  // Initialize PayPal buttons
+  // Check if order is free
+  const isFreeOrder = total() === 0;
+
+  // Initialize PayPal buttons for both desktop and mobile
   const initPayPalButton = useCallback(() => {
-    if (!paypalLoaded || !(window as any).paypal) return;
+    if (!paypalLoaded || !(window as any).paypal || isFreeOrder) return;
 
-    const container = document.getElementById('paypal-button-container');
-    if (!container || container.hasChildNodes()) return;
-
-    (window as any).paypal.Buttons({
+    const buttonConfig = {
       style: {
-        layout: 'vertical',
-        color: 'gold',
-        shape: 'rect',
-        label: 'paypal',
+        layout: 'vertical' as const,
+        color: 'gold' as const,
+        shape: 'rect' as const,
+        label: 'paypal' as const,
         height: 50,
       },
       createOrder: async () => {
@@ -159,14 +159,63 @@ export default function CheckoutPage() {
         toast.error('Payment cancelled');
         setIsProcessing(false);
       },
-    }).render('#paypal-button-container');
-  }, [paypalLoaded, items, total, coupon, formData, clearCart, router]);
+    };
+
+    // Render for desktop
+    const desktopContainer = document.getElementById('paypal-button-container');
+    if (desktopContainer && !desktopContainer.hasChildNodes()) {
+      (window as any).paypal.Buttons(buttonConfig).render('#paypal-button-container');
+    }
+
+    // Render for mobile
+    const mobileContainer = document.getElementById('paypal-button-container-mobile');
+    if (mobileContainer && !mobileContainer.hasChildNodes()) {
+      (window as any).paypal.Buttons(buttonConfig).render('#paypal-button-container-mobile');
+    }
+  }, [paypalLoaded, items, total, coupon, formData, clearCart, router, isFreeOrder]);
 
   useEffect(() => {
-    if (paypalLoaded) {
+    if (paypalLoaded && !isFreeOrder) {
       initPayPalButton();
     }
-  }, [paypalLoaded, initPayPalButton]);
+  }, [paypalLoaded, initPayPalButton, isFreeOrder]);
+
+  // Handle free order
+  const handleFreeOrder = async () => {
+    if (!formData.email || !formData.firstName || !formData.lastName) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const orderItems = items.map(item => ({
+        productId: item.product.id,
+        vendorId: (item.product as any).vendorId,
+        quantity: item.quantity,
+        price: item.price,
+        license: item.license,
+      }));
+
+      const response = await paymentsAPI.createFreeOrder({
+        items: orderItems,
+        billingInfo: {
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          country: formData.country,
+        },
+      });
+
+      clearCart();
+      toast.success('Order completed successfully!');
+      router.push(`/checkout/success?orderId=${response.data.data.order.id}`);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to complete order');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -373,25 +422,34 @@ export default function CheckoutPage() {
           </div>
 
           {/* Payment */}
-          <div className="bg-white rounded-xl p-4">
-            <label className="block text-sm font-medium text-gray-700 mb-3">Payment Method</label>
-            <div className="flex items-center gap-3 p-3 border-2 border-blue-600 rounded-lg bg-blue-50">
-              <PayPalIcon />
-              <div className="flex-1">
-                <p className="font-medium text-sm">PayPal</p>
-                <p className="text-xs text-gray-500">Pay securely with PayPal</p>
+          {!isFreeOrder && (
+            <div className="bg-white rounded-xl p-4">
+              <label className="block text-sm font-medium text-gray-700 mb-3">Payment Method</label>
+              <div className="flex items-center gap-3 p-3 border-2 border-blue-600 rounded-lg bg-blue-50">
+                <PayPalIcon />
+                <div className="flex-1">
+                  <p className="font-medium text-sm">PayPal</p>
+                  <p className="text-xs text-gray-500">Pay securely with PayPal</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </form>
 
-        {/* Fixed Bottom PayPal Button */}
+        {/* Fixed Bottom Button (PayPal or Free Order) */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 lg:hidden">
           {isProcessing ? (
             <div className="w-full py-4 bg-gray-200 rounded-xl flex items-center justify-center gap-2">
               <div className="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
               <span className="text-gray-700 font-semibold">Processing...</span>
             </div>
+          ) : isFreeOrder ? (
+            <button
+              onClick={handleFreeOrder}
+              className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-colors"
+            >
+              Complete Free Order
+            </button>
           ) : paypalLoaded ? (
             <div id="paypal-button-container-mobile" className="w-full"></div>
           ) : (
@@ -400,7 +458,7 @@ export default function CheckoutPage() {
             </div>
           )}
           <p className="text-center text-xs text-gray-500 mt-2">
-            🔒 Secure checkout powered by PayPal
+            🔒 Secure checkout
           </p>
         </div>
       </div>
@@ -493,33 +551,42 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Payment Method */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                  <Lock className="w-5 h-5 text-primary" />
-                  Payment Method
-                </h2>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-4 border-2 border-blue-600 bg-blue-50 rounded-lg">
-                    <PayPalIcon />
-                    <div className="flex-1">
-                      <div className="font-semibold">PayPal</div>
-                      <div className="text-sm text-gray-500">Pay securely with PayPal</div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Secure</span>
+              {/* Payment Method - Only show for paid orders */}
+              {!isFreeOrder && (
+                <div className="bg-white rounded-2xl p-6 shadow-sm">
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Lock className="w-5 h-5 text-primary" />
+                    Payment Method
+                  </h2>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-4 border-2 border-blue-600 bg-blue-50 rounded-lg">
+                      <PayPalIcon />
+                      <div className="flex-1">
+                        <div className="font-semibold">PayPal</div>
+                        <div className="text-sm text-gray-500">Pay securely with PayPal</div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Secure</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
 
-              {/* PayPal Button */}
+              {/* Payment/Complete Button */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
                 {isProcessing ? (
                   <div className="w-full py-4 bg-gray-100 rounded-xl flex items-center justify-center gap-2">
                     <div className="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
-                    <span className="text-gray-700 font-semibold">Processing payment...</span>
+                    <span className="text-gray-700 font-semibold">Processing...</span>
                   </div>
+                ) : isFreeOrder ? (
+                  <button
+                    onClick={handleFreeOrder}
+                    className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-colors text-lg"
+                  >
+                    🎉 Complete Free Order
+                  </button>
                 ) : paypalLoaded ? (
                   <div id="paypal-button-container"></div>
                 ) : (
@@ -529,7 +596,7 @@ export default function CheckoutPage() {
                   </div>
                 )}
                 <p className="text-center text-sm text-gray-500 mt-4">
-                  🔒 Secure checkout powered by PayPal. Your payment information is encrypted.
+                  🔒 Secure checkout. Your information is protected.
                 </p>
               </div>
             </form>

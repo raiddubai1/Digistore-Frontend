@@ -254,6 +254,23 @@ export const paymentsAPI = {
     couponCode?: string;
   }) => api.post('/payments/paypal/capture-order', data),
 
+  // Create free order (for $0 products)
+  createFreeOrder: (data: {
+    items: Array<{
+      productId: string;
+      vendorId?: string;
+      quantity: number;
+      price: number;
+      license?: string;
+    }>;
+    billingInfo: {
+      email: string;
+      firstName: string;
+      lastName: string;
+      country: string;
+    };
+  }) => api.post('/payments/free-order', data),
+
   // Get available payment methods
   getMethods: () => api.get('/payments/methods'),
 };
