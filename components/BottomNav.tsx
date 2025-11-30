@@ -2,9 +2,10 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Home, ShoppingBag, ShoppingCart, User, Heart, Loader2 } from "lucide-react";
+import { Home, ShoppingBag, ShoppingCart, User, Heart, Loader2, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
+import { useFilterStore } from "@/store/filterStore";
 import { useState, useEffect, useCallback, useRef } from "react";
 
 interface NavItem {
@@ -13,12 +14,14 @@ interface NavItem {
   icon: typeof Home;
   badge?: boolean;
   action?: () => void;
+  isFilterFab?: boolean;
 }
 
 export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { itemCount, openCart } = useCartStore();
+  const { openFilter, filterCount } = useFilterStore();
   const [mounted, setMounted] = useState(false);
   const [loadingTab, setLoadingTab] = useState<string | null>(null);
   const [pressedTab, setPressedTab] = useState<string | null>(null);
@@ -47,6 +50,12 @@ export default function BottomNav() {
     return match ? match[1] : 'en';
   };
 
+  // Check if on shop/products page
+  const isOnShopPage = () => {
+    const pathWithoutLocale = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+    return pathWithoutLocale === '/products' || pathWithoutLocale.startsWith('/products?');
+  };
+
   // Check if a nav item is active
   const isNavActive = (href?: string) => {
     if (!href) return false;
@@ -59,13 +68,27 @@ export default function BottomNav() {
     return normalizedPath === href || normalizedPath.startsWith(href + '/');
   };
 
-  const navItems: NavItem[] = [
+  const showFilterFab = isOnShopPage();
+
+  // Base nav items
+  const baseNavItems: NavItem[] = [
     { name: "Home", href: "/", icon: Home },
     { name: "Shop", href: "/products", icon: ShoppingBag },
     { name: "Cart", icon: ShoppingCart, badge: true, action: () => openCart() },
     { name: "Wishlist", href: "/wishlist", icon: Heart },
     { name: "Account", href: "/account", icon: User },
   ];
+
+  // Insert Filter FAB in the middle when on shop page (replace Cart position temporarily)
+  const navItems: NavItem[] = showFilterFab
+    ? [
+        { name: "Home", href: "/", icon: Home },
+        { name: "Shop", href: "/products", icon: ShoppingBag },
+        { name: "Filter", icon: SlidersHorizontal, action: () => openFilter(), isFilterFab: true },
+        { name: "Cart", icon: ShoppingCart, badge: true, action: () => openCart() },
+        { name: "Account", href: "/account", icon: User },
+      ]
+    : baseNavItems;
 
   // Handle navigation with loading state
   const handleNavClick = useCallback((item: NavItem, e: React.MouseEvent) => {
@@ -114,6 +137,43 @@ export default function BottomNav() {
           const isActive = isNavActive(item.href);
           const isLoading = loadingTab === item.name;
           const isPressed = pressedTab === item.name;
+
+          // Special FAB style for Filter button
+          if (item.isFilterFab) {
+            return (
+              <button
+                key={item.name}
+                onClick={() => item.action?.()}
+                className="flex items-center justify-center select-none touch-manipulation relative"
+                onTouchStart={() => handlePressStart(item.name)}
+                onTouchEnd={handlePressEnd}
+                onTouchCancel={handlePressEnd}
+                onMouseDown={() => handlePressStart(item.name)}
+                onMouseUp={handlePressEnd}
+                onMouseLeave={handlePressEnd}
+              >
+                {/* Floating circle that pops out */}
+                <div
+                  className={cn(
+                    "absolute -top-6 w-14 h-14 rounded-full bg-[#ff6f61] shadow-lg flex items-center justify-center transition-all duration-200",
+                    isPressed && "scale-90 bg-[#e55a4f]"
+                  )}
+                >
+                  <Icon className="w-6 h-6 text-white" strokeWidth={2} />
+                  {/* Filter count badge */}
+                  {filterCount > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 bg-gray-900 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md">
+                      {filterCount > 9 ? "9+" : filterCount}
+                    </span>
+                  )}
+                </div>
+                {/* Label below */}
+                <span className="text-[10px] font-semibold text-[#ff6f61] mt-8">
+                  {item.name}
+                </span>
+              </button>
+            );
+          }
 
           const content = (
             <div

@@ -40,7 +40,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 text-white mt-auto relative overflow-hidden">
+    <footer className="hidden lg:block bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 text-white mt-auto relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-gray-500/10 to-transparent rounded-full blur-3xl"></div>

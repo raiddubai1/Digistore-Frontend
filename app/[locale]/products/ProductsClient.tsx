@@ -8,6 +8,7 @@ import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { demoProducts, demoCategories } from "@/data/demo-products";
 import { Filter, Grid, List, X, Search, Star, Heart, ShoppingCart, Download } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
+import { useFilterStore } from "@/store/filterStore";
 import toast from "react-hot-toast";
 import { Product } from "@/types";
 import SortBottomSheet from "@/components/SortBottomSheet";
@@ -87,7 +88,7 @@ export default function ProductsClient() {
 
   // Mobile bottom sheet states
   const [isSortOpen, setIsSortOpen] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const { isFilterOpen, openFilter, closeFilter, setFilterCount } = useFilterStore();
 
   // View mode state (grid or list)
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -279,6 +280,12 @@ export default function ProductsClient() {
   const hasActiveFilters =
     selectedCategories.length > 0 || selectedPriceRanges.length > 0 || selectedRatings.length > 0 || selectedFileTypes.length > 0;
 
+  // Update filter count in store for bottom nav badge
+  useEffect(() => {
+    const count = selectedCategories.length + selectedPriceRanges.length + selectedRatings.length + selectedFileTypes.length;
+    setFilterCount(count);
+  }, [selectedCategories, selectedPriceRanges, selectedRatings, selectedFileTypes, setFilterCount]);
+
   // Mini product card for mobile
   const MiniProductCard = ({ product }: { product: Product }) => (
     <Link href={`/products/${product.slug}`} className="block">
@@ -399,7 +406,7 @@ export default function ProductsClient() {
               </svg>
             </button>
             <button
-              onClick={() => setIsFilterOpen(true)}
+              onClick={openFilter}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium active:bg-gray-50 ${
                 hasActiveFilters
                   ? "border-gray-900 bg-gray-900 text-white"
@@ -784,7 +791,7 @@ export default function ProductsClient() {
       {/* Filter Bottom Sheet */}
       <FilterBottomSheet
         isOpen={isFilterOpen}
-        onClose={() => setIsFilterOpen(false)}
+        onClose={closeFilter}
         categories={categories.map(cat => ({ id: cat.id, name: cat.name, slug: cat.slug || cat.name }))}
         selectedCategories={selectedCategories}
         selectedPriceRanges={selectedPriceRanges}
