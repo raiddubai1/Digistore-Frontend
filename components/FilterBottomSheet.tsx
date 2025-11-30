@@ -1,21 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Check, RotateCcw, ChevronDown, ChevronUp, Tag, DollarSign, Star, FileType } from "lucide-react";
+import { X, Check, RotateCcw, ChevronDown, ChevronUp, Tag, DollarSign, Star, FileType, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+interface CategoryWithChildren {
+  id: string;
+  name: string;
+  slug: string;
+  parentId?: string | null;
+  children?: CategoryWithChildren[];
+  productCount?: number;
+}
 
 interface FilterBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  categories: { id: string; name: string; slug: string }[];
+  categories: CategoryWithChildren[];
   selectedCategories: string[];
+  selectedSubcategories?: string[];
   selectedPriceRanges: string[];
   selectedRatings: string[];
   selectedFileTypes?: string[];
+  availableTags?: { tag: string; count: number }[];
+  selectedTags?: string[];
   onToggleCategory: (category: string) => void;
+  onToggleSubcategory?: (subcategory: string) => void;
   onTogglePriceRange: (range: string) => void;
   onToggleRating: (rating: string) => void;
   onToggleFileType?: (fileType: string) => void;
+  onToggleTag?: (tag: string) => void;
   onClearAll: () => void;
 }
 
@@ -118,16 +132,32 @@ export default function FilterBottomSheet({
   onClose,
   categories,
   selectedCategories,
+  selectedSubcategories = [],
   selectedPriceRanges,
   selectedRatings,
   selectedFileTypes = [],
+  availableTags = [],
+  selectedTags = [],
   onToggleCategory,
+  onToggleSubcategory,
   onTogglePriceRange,
   onToggleRating,
   onToggleFileType,
+  onToggleTag,
   onClearAll,
 }: FilterBottomSheetProps) {
-  const totalFilters = selectedCategories.length + selectedPriceRanges.length + selectedRatings.length + selectedFileTypes.length;
+  const totalFilters = selectedCategories.length + selectedSubcategories.length + selectedPriceRanges.length + selectedRatings.length + selectedFileTypes.length + selectedTags.length;
+
+  // Filter to only parent categories with products
+  const parentCategories = categories.filter(cat => !cat.parentId && (cat.productCount || 0) > 0);
+
+  // Get subcategories for selected parent categories
+  const availableSubcategories = categories.filter(cat => {
+    if (!cat.parentId) return false;
+    // Find if parent is in selectedCategories by slug
+    const parentSlug = categories.find(p => p.id === cat.parentId)?.slug;
+    return parentSlug && selectedCategories.includes(parentSlug) && (cat.productCount || 0) > 0;
+  });
 
   // Lock body scroll when open
   useEffect(() => {
@@ -188,34 +218,122 @@ export default function FilterBottomSheet({
           className="flex-1 overflow-y-auto overscroll-contain touch-pan-y px-4"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          {/* Categories Section - taller to show more categories */}
-          <FilterSection
-            title="Categories"
-            icon={Tag}
-            count={selectedCategories.length}
-            defaultOpen={true}
-            maxHeight="250px"
-          >
-            <div className="grid grid-cols-2 gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => onToggleCategory(category.name)}
-                  className={cn(
-                    "flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
-                    selectedCategories.includes(category.name)
-                      ? "bg-[#ff6f61] text-white shadow-sm"
-                      : "bg-gray-50 text-gray-700 active:bg-gray-100"
-                  )}
-                >
-                  {selectedCategories.includes(category.name) && (
-                    <Check className="w-4 h-4 flex-shrink-0" />
-                  )}
-                  <span className="truncate">{category.name}</span>
-                </button>
-              ))}
-            </div>
-          </FilterSection>
+          {/* Categories Section - Only parent categories with products */}
+          {parentCategories.length > 0 && (
+            <FilterSection
+              title="Categories"
+              icon={Tag}
+              count={selectedCategories.length}
+              defaultOpen={true}
+              maxHeight="280px"
+            >
+              <div className="space-y-2">
+                {parentCategories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => onToggleCategory(category.slug)}
+                    className={cn(
+                      "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                      selectedCategories.includes(category.slug)
+                        ? "bg-[#ff6f61] text-white shadow-sm"
+                        : "bg-gray-50 text-gray-700 active:bg-gray-100"
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      {selectedCategories.includes(category.slug) && (
+                        <Check className="w-4 h-4 flex-shrink-0" />
+                      )}
+                      <span className="truncate">{category.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={cn(
+                        "text-xs px-2 py-0.5 rounded-full",
+                        selectedCategories.includes(category.slug) ? "bg-white/20" : "bg-gray-200 text-gray-600"
+                      )}>
+                        {category.productCount || 0}
+                      </span>
+                      {category.children && category.children.length > 0 && (
+                        <ChevronRight className={cn(
+                          "w-4 h-4 transition-transform",
+                          selectedCategories.includes(category.slug) && "rotate-90"
+                        )} />
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </FilterSection>
+          )}
+
+          {/* Subcategories Section - Only show when parent category is selected */}
+          {availableSubcategories.length > 0 && onToggleSubcategory && (
+            <FilterSection
+              title="Subcategories"
+              icon={Tag}
+              count={selectedSubcategories.length}
+              defaultOpen={true}
+              maxHeight="220px"
+            >
+              <div className="grid grid-cols-2 gap-2">
+                {availableSubcategories.map((subcategory) => (
+                  <button
+                    key={subcategory.id}
+                    onClick={() => onToggleSubcategory(subcategory.slug)}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
+                      selectedSubcategories.includes(subcategory.slug)
+                        ? "bg-[#ff6f61] text-white shadow-sm"
+                        : "bg-gray-50 text-gray-700 active:bg-gray-100"
+                    )}
+                  >
+                    {selectedSubcategories.includes(subcategory.slug) && (
+                      <Check className="w-4 h-4 flex-shrink-0" />
+                    )}
+                    <span className="truncate text-left">{subcategory.name}</span>
+                    <span className={cn(
+                      "text-xs px-1.5 py-0.5 rounded-full ml-auto",
+                      selectedSubcategories.includes(subcategory.slug) ? "bg-white/20" : "bg-gray-200 text-gray-600"
+                    )}>
+                      {subcategory.productCount || 0}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </FilterSection>
+          )}
+
+          {/* Tags Section - Only show when we have tags available for the selected category */}
+          {availableTags.length > 0 && onToggleTag && (
+            <FilterSection
+              title="Tags"
+              icon={Tag}
+              count={selectedTags.length}
+              maxHeight="200px"
+            >
+              <div className="flex flex-wrap gap-2">
+                {availableTags.map((tagItem) => (
+                  <button
+                    key={tagItem.tag}
+                    onClick={() => onToggleTag(tagItem.tag)}
+                    className={cn(
+                      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all",
+                      selectedTags.includes(tagItem.tag)
+                        ? "bg-[#ff6f61] text-white shadow-sm"
+                        : "bg-gray-100 text-gray-700 active:bg-gray-200"
+                    )}
+                  >
+                    <span>{tagItem.tag}</span>
+                    <span className={cn(
+                      "text-xs",
+                      selectedTags.includes(tagItem.tag) ? "text-white/70" : "text-gray-500"
+                    )}>
+                      ({tagItem.count})
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </FilterSection>
+          )}
 
           {/* Price Range Section */}
           <FilterSection

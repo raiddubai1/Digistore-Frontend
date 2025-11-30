@@ -69,9 +69,11 @@ export default function ProductsClient() {
   const [page, setPage] = useState(1);
   const [isLoadMore, setIsLoadMore] = useState(false); // Track if "Load More" was clicked
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [selectedFileTypes, setSelectedFileTypes] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string>("popular");
   const hasFetched = useRef(false);
 
@@ -165,11 +167,36 @@ export default function ProductsClient() {
   useEffect(() => {
     let filtered = [...(allProducts || [])];
 
-    // Filter by category
+    // Filter by parent category (using slug)
     if (selectedCategories.length > 0) {
+      filtered = filtered.filter(product => {
+        const productCatSlug = product.category;
+        // Check if product is in selected category or its subcategory
+        const productCategory = categories.find(c => c.slug === productCatSlug);
+        if (!productCategory) return selectedCategories.includes(productCatSlug);
+
+        // Check if parent category is selected
+        if (productCategory.parentId) {
+          const parentCategory = categories.find(c => c.id === productCategory.parentId);
+          return parentCategory && selectedCategories.includes(parentCategory.slug);
+        }
+        return selectedCategories.includes(productCatSlug);
+      });
+    }
+
+    // Filter by subcategory (if any selected)
+    if (selectedSubcategories.length > 0) {
       filtered = filtered.filter(product =>
-        selectedCategories.includes(product.category)
+        selectedSubcategories.includes(product.category)
       );
+    }
+
+    // Filter by tags
+    if (selectedTags.length > 0) {
+      filtered = filtered.filter(product => {
+        const productTags = product.tags || [];
+        return selectedTags.some(tag => productTags.includes(tag));
+      });
     }
 
     // Filter by price range
@@ -177,8 +204,10 @@ export default function ProductsClient() {
       filtered = filtered.filter(product => {
         const price = product.price;
         return selectedPriceRanges.some(range => {
-          if (range === "under-20") return price < 20;
-          if (range === "20-50") return price >= 20 && price <= 50;
+          if (range === "free") return price === 0;
+          if (range === "under-10") return price > 0 && price < 10;
+          if (range === "10-25") return price >= 10 && price <= 25;
+          if (range === "25-50") return price > 25 && price <= 50;
           if (range === "over-50") return price > 50;
           return false;
         });
@@ -192,6 +221,7 @@ export default function ProductsClient() {
         return selectedRatings.some(r => {
           if (r === "5") return rating >= 4.5;
           if (r === "4") return rating >= 4 && rating < 4.5;
+          if (r === "3") return rating >= 3 && rating < 4;
           return false;
         });
       });
@@ -234,11 +264,41 @@ export default function ProductsClient() {
     }
 
     setTotal(filtered.length);
-  }, [page, isLoadMore, selectedCategories, selectedPriceRanges, selectedRatings, selectedFileTypes, sortBy, allProducts]);
+  }, [page, isLoadMore, selectedCategories, selectedSubcategories, selectedTags, selectedPriceRanges, selectedRatings, selectedFileTypes, sortBy, allProducts, categories]);
 
-  const toggleCategory = (category: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
+  const toggleCategory = (categorySlug: string) => {
+    setSelectedCategories((prev) => {
+      const isSelected = prev.includes(categorySlug);
+      if (isSelected) {
+        // When deselecting a category, also clear its subcategories
+        const category = categories.find(c => c.slug === categorySlug);
+        if (category) {
+          const subcategorySlugs = categories
+            .filter(c => c.parentId === category.id)
+            .map(c => c.slug);
+          setSelectedSubcategories(prevSub =>
+            prevSub.filter(s => !subcategorySlugs.includes(s))
+          );
+        }
+        return prev.filter((c) => c !== categorySlug);
+      }
+      return [...prev, categorySlug];
+    });
+    setPage(1);
+    setIsLoadMore(false);
+  };
+
+  const toggleSubcategory = (subcategorySlug: string) => {
+    setSelectedSubcategories((prev) =>
+      prev.includes(subcategorySlug) ? prev.filter((c) => c !== subcategorySlug) : [...prev, subcategorySlug]
+    );
+    setPage(1);
+    setIsLoadMore(false);
+  };
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
     setPage(1);
     setIsLoadMore(false);
@@ -270,6 +330,8 @@ export default function ProductsClient() {
 
   const clearAllFilters = () => {
     setSelectedCategories([]);
+    setSelectedSubcategories([]);
+    setSelectedTags([]);
     setSelectedPriceRanges([]);
     setSelectedRatings([]);
     setSelectedFileTypes([]);
@@ -278,13 +340,69 @@ export default function ProductsClient() {
   };
 
   const hasActiveFilters =
-    selectedCategories.length > 0 || selectedPriceRanges.length > 0 || selectedRatings.length > 0 || selectedFileTypes.length > 0;
+    selectedCategories.length > 0 || selectedSubcategories.length > 0 || selectedTags.length > 0 || selectedPriceRanges.length > 0 || selectedRatings.length > 0 || selectedFileTypes.length > 0;
 
   // Update filter count in store for bottom nav badge
   useEffect(() => {
-    const count = selectedCategories.length + selectedPriceRanges.length + selectedRatings.length + selectedFileTypes.length;
+    const count = selectedCategories.length + selectedSubcategories.length + selectedTags.length + selectedPriceRanges.length + selectedRatings.length + selectedFileTypes.length;
     setFilterCount(count);
-  }, [selectedCategories, selectedPriceRanges, selectedRatings, selectedFileTypes, setFilterCount]);
+  }, [selectedCategories, selectedSubcategories, selectedTags, selectedPriceRanges, selectedRatings, selectedFileTypes, setFilterCount]);
+
+  // Compute categories with product counts (only categories that have products)
+  const categoriesWithCounts = categories.map(cat => {
+    // Count products in this category
+    const count = allProducts.filter(p => {
+      if (cat.parentId) {
+        // This is a subcategory - direct match
+        return p.category === cat.slug;
+      } else {
+        // This is a parent category - count products in this category or its subcategories
+        const subcategorySlugs = categories
+          .filter(c => c.parentId === cat.id)
+          .map(c => c.slug);
+        return p.category === cat.slug || subcategorySlugs.includes(p.category);
+      }
+    }).length;
+    return { ...cat, productCount: count };
+  });
+
+  // Get available tags based on selected categories (only tags from products in those categories)
+  const availableTags = (() => {
+    let relevantProducts = allProducts;
+
+    // Filter by selected categories if any
+    if (selectedCategories.length > 0) {
+      relevantProducts = allProducts.filter(p => {
+        const productCategory = categories.find(c => c.slug === p.category);
+        if (!productCategory) return selectedCategories.includes(p.category);
+        if (productCategory.parentId) {
+          const parentCategory = categories.find(c => c.id === productCategory.parentId);
+          return parentCategory && selectedCategories.includes(parentCategory.slug);
+        }
+        return selectedCategories.includes(p.category);
+      });
+    }
+
+    // Further filter by subcategories if any
+    if (selectedSubcategories.length > 0) {
+      relevantProducts = relevantProducts.filter(p =>
+        selectedSubcategories.includes(p.category)
+      );
+    }
+
+    // Collect all tags from relevant products
+    const tagCounts: { [key: string]: number } = {};
+    relevantProducts.forEach(p => {
+      (p.tags || []).forEach((tag: string) => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
+    });
+
+    return Object.entries(tagCounts)
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 20); // Limit to top 20 tags
+  })();
 
   // Mini product card for mobile
   const MiniProductCard = ({ product }: { product: Product }) => (
@@ -526,15 +644,14 @@ export default function ProductsClient() {
                   )}
               </div>
 
-              {/* Categories */}
+              {/* Categories - Only parent categories with products */}
               <div className="mb-6">
                 <h3 className="font-semibold text-sm text-gray-700 mb-3">Categories</h3>
-                <div className="space-y-2">
-                  {categories && categories.length > 0 ? (
-                    categories.map((category) => {
-                      // Handle both API format (_count.products) and demo format (productCount)
-                      const productCount = (category as any)._count?.products || (category as any).productCount || 0;
-                      return (
+                <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                  {categoriesWithCounts.filter(c => !c.parentId && c.productCount > 0).length > 0 ? (
+                    categoriesWithCounts
+                      .filter(c => !c.parentId && c.productCount > 0)
+                      .map((category) => (
                         <label
                           key={category.id}
                           className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
@@ -547,16 +664,67 @@ export default function ProductsClient() {
                           />
                           <span className="text-sm flex-1">{category.name || 'Unknown'}</span>
                           <span className="text-xs text-gray-400">
-                            {productCount}
+                            {category.productCount}
                           </span>
                         </label>
-                      );
-                    })
+                      ))
                   ) : (
                     <p className="text-sm text-gray-500">No categories available</p>
                   )}
                 </div>
               </div>
+
+              {/* Subcategories - Only show when parent category is selected */}
+              {selectedCategories.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="font-semibold text-sm text-gray-700 mb-3">Subcategories</h3>
+                  <div className="space-y-2 max-h-[150px] overflow-y-auto">
+                    {categoriesWithCounts
+                      .filter(c => {
+                        if (!c.parentId) return false;
+                        const parent = categories.find(p => p.id === c.parentId);
+                        return parent && selectedCategories.includes(parent.slug) && c.productCount > 0;
+                      })
+                      .map((subcategory) => (
+                        <label
+                          key={subcategory.id}
+                          className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedSubcategories.includes(subcategory.slug || '')}
+                            onChange={() => toggleSubcategory(subcategory.slug || '')}
+                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                          />
+                          <span className="text-sm flex-1">{subcategory.name}</span>
+                          <span className="text-xs text-gray-400">{subcategory.productCount}</span>
+                        </label>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Tags - Only show when we have available tags */}
+              {availableTags.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="font-semibold text-sm text-gray-700 mb-3">Tags</h3>
+                  <div className="flex flex-wrap gap-2 max-h-[120px] overflow-y-auto">
+                    {availableTags.slice(0, 10).map((tagItem) => (
+                      <button
+                        key={tagItem.tag}
+                        onClick={() => toggleTag(tagItem.tag)}
+                        className={`px-2 py-1 text-xs rounded-full transition-colors ${
+                          selectedTags.includes(tagItem.tag)
+                            ? 'bg-primary text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {tagItem.tag} ({tagItem.count})
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Price Range */}
               <div className="mb-6">
@@ -565,20 +733,38 @@ export default function ProductsClient() {
                   <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
                     <input
                       type="checkbox"
-                      checked={selectedPriceRanges.includes("under-20")}
-                      onChange={() => togglePriceRange("under-20")}
+                      checked={selectedPriceRanges.includes("free")}
+                      onChange={() => togglePriceRange("free")}
                       className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
-                    <span className="text-sm">Under $20</span>
+                    <span className="text-sm">Free</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
                     <input
                       type="checkbox"
-                      checked={selectedPriceRanges.includes("20-50")}
-                      onChange={() => togglePriceRange("20-50")}
+                      checked={selectedPriceRanges.includes("under-10")}
+                      onChange={() => togglePriceRange("under-10")}
                       className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
-                    <span className="text-sm">$20 - $50</span>
+                    <span className="text-sm">Under $10</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={selectedPriceRanges.includes("10-25")}
+                      onChange={() => togglePriceRange("10-25")}
+                      className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <span className="text-sm">$10 - $25</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={selectedPriceRanges.includes("25-50")}
+                      onChange={() => togglePriceRange("25-50")}
+                      className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <span className="text-sm">$25 - $50</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
                     <input
@@ -790,15 +976,20 @@ export default function ProductsClient() {
       <FilterBottomSheet
         isOpen={isFilterOpen}
         onClose={closeFilter}
-        categories={categories.map(cat => ({ id: cat.id, name: cat.name, slug: cat.slug || cat.name }))}
+        categories={categoriesWithCounts}
         selectedCategories={selectedCategories}
+        selectedSubcategories={selectedSubcategories}
         selectedPriceRanges={selectedPriceRanges}
         selectedRatings={selectedRatings}
         selectedFileTypes={selectedFileTypes}
+        availableTags={availableTags}
+        selectedTags={selectedTags}
         onToggleCategory={toggleCategory}
+        onToggleSubcategory={toggleSubcategory}
         onTogglePriceRange={togglePriceRange}
         onToggleRating={toggleRating}
         onToggleFileType={toggleFileType}
+        onToggleTag={toggleTag}
         onClearAll={clearAllFilters}
       />
     </>
