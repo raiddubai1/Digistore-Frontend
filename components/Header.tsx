@@ -52,14 +52,9 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Check if we're on the home page (to hide header on mobile)
-  const isHomePage = pathname === '/' || pathname.match(/^\/[a-z]{2}$/) || pathname.match(/^\/[a-z]{2}\/$/);
-
   return (
     <header className={cn(
       "sticky top-0 z-50 w-full transition-all duration-300",
-      // Hide header on mobile for home page (MobileHome has its own search bar)
-      isHomePage && "hidden lg:block",
       scrolled
         ? "bg-gradient-to-r from-white via-gray-50/95 to-white dark:from-slate-900 dark:via-slate-800/95 dark:to-slate-900 backdrop-blur-lg shadow-lg shadow-gray-200/50 dark:shadow-slate-900/50"
         : "bg-gradient-to-r from-white via-gray-50 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 shadow-md shadow-gray-100 dark:shadow-slate-800/50"
