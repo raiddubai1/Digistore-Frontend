@@ -1,71 +1,90 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { formatPrice } from "@/lib/utils";
-import { Search, Mail, Eye, Download, UserCheck } from "lucide-react";
+import { Search, Mail, Eye, Download, UserCheck, UserX, Loader2 } from "lucide-react";
+
+interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  status: string;
+  createdAt: string;
+  totalOrders: number;
+  totalSpent: number;
+  lastPurchase: string | null;
+}
+
+interface CustomerStats {
+  total: number;
+  active: number;
+  newThisMonth: number;
+}
+
+interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
+}
 
 export default function AdminCustomersPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [stats, setStats] = useState<CustomerStats>({ total: 0, active: 0, newThisMonth: 0 });
+  const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, pages: 0 });
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  // Mock customers data
-  const customers = [
-    {
-      id: "1",
-      name: "John Doe",
-      email: "john@example.com",
-      joinedDate: "2024-01-15",
-      totalOrders: 5,
-      totalSpent: 149.95,
-      lastPurchase: "2024-03-15",
-      status: "active",
-    },
-    {
-      id: "2",
-      name: "Jane Smith",
-      email: "jane@example.com",
-      joinedDate: "2024-02-01",
-      totalOrders: 3,
-      totalSpent: 89.97,
-      lastPurchase: "2024-03-14",
-      status: "active",
-    },
-    {
-      id: "3",
-      name: "Bob Johnson",
-      email: "bob@example.com",
-      joinedDate: "2024-02-10",
-      totalOrders: 7,
-      totalSpent: 234.93,
-      lastPurchase: "2024-03-14",
-      status: "active",
-    },
-    {
-      id: "4",
-      name: "Alice Brown",
-      email: "alice@example.com",
-      joinedDate: "2024-01-20",
-      totalOrders: 2,
-      totalSpent: 44.98,
-      lastPurchase: "2024-03-13",
-      status: "active",
-    },
-    {
-      id: "5",
-      name: "Charlie Wilson",
-      email: "charlie@example.com",
-      joinedDate: "2024-03-01",
-      totalOrders: 1,
-      totalSpent: 19.99,
-      lastPurchase: "2024-03-13",
-      status: "active",
-    },
-  ];
+  const fetchCustomers = useCallback(async (page = 1, search = "", status = "") => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem("accessToken");
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-  const filteredCustomers = customers.filter(
-    (customer) =>
-      customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      const params = new URLSearchParams({ page: String(page), limit: "20" });
+      if (search) params.append("search", search);
+      if (status) params.append("status", status);
+
+      const res = await fetch(`${API_URL}/admin/customers?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setCustomers(data.data.customers);
+        setStats(data.data.stats);
+        setPagination(data.data.pagination);
+      }
+    } catch (error) {
+      console.error("Failed to fetch customers:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCustomers();
+  }, [fetchCustomers]);
+
+  // Debounced search
+  useEffect(() => {
+    if (searchTimeout) clearTimeout(searchTimeout);
+    const timeout = setTimeout(() => {
+      fetchCustomers(1, searchQuery, statusFilter);
+    }, 300);
+    setSearchTimeout(timeout);
+    return () => clearTimeout(timeout);
+  }, [searchQuery, statusFilter]);
+
+  const handlePageChange = (newPage: number) => {
+    fetchCustomers(newPage, searchQuery, statusFilter);
+  };
+
+  const avgOrderValue = stats.total > 0
+    ? customers.reduce((sum, c) => sum + c.totalSpent, 0) / Math.max(customers.reduce((sum, c) => sum + c.totalOrders, 0), 1)
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -85,19 +104,19 @@ export default function AdminCustomersPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl p-4 border border-gray-200">
           <div className="text-sm text-gray-600 mb-1">Total Customers</div>
-          <div className="text-2xl font-bold">892</div>
+          <div className="text-2xl font-bold">{stats.total.toLocaleString()}</div>
         </div>
         <div className="bg-white rounded-xl p-4 border border-gray-200">
           <div className="text-sm text-gray-600 mb-1">Active</div>
-          <div className="text-2xl font-bold text-green-600">856</div>
+          <div className="text-2xl font-bold text-green-600">{stats.active.toLocaleString()}</div>
         </div>
         <div className="bg-white rounded-xl p-4 border border-gray-200">
           <div className="text-sm text-gray-600 mb-1">New This Month</div>
-          <div className="text-2xl font-bold text-blue-600">73</div>
+          <div className="text-2xl font-bold text-blue-600">{stats.newThisMonth}</div>
         </div>
         <div className="bg-white rounded-xl p-4 border border-gray-200">
           <div className="text-sm text-gray-600 mb-1">Avg. Order Value</div>
-          <div className="text-2xl font-bold">$42.50</div>
+          <div className="text-2xl font-bold">{formatPrice(avgOrderValue)}</div>
         </div>
       </div>
 
@@ -114,122 +133,156 @@ export default function AdminCustomersPage() {
               className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
             />
           </div>
-          <select className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-            <option>All Customers</option>
-            <option>Active</option>
-            <option>Inactive</option>
-          </select>
-          <select className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-            <option>Sort by: Recent</option>
-            <option>Sort by: Name</option>
-            <option>Sort by: Spending</option>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+          >
+            <option value="">All Customers</option>
+            <option value="ACTIVE">Active</option>
+            <option value="SUSPENDED">Suspended</option>
+            <option value="PENDING">Pending</option>
           </select>
         </div>
       </div>
 
       {/* Customers Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Customer
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Joined Date
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Orders
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Total Spent
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Last Purchase
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredCustomers.map((customer) => (
-                <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-semibold">
-                        {customer.name.charAt(0)}
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">{customer.name}</div>
-                        <div className="text-xs text-gray-500">{customer.email}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-700">
-                      {new Date(customer.joinedDate).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-semibold">{customer.totalOrders}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-semibold">{formatPrice(customer.totalSpent)}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-700">
-                      {new Date(customer.lastPurchase).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
-                      <UserCheck className="w-3 h-3" />
-                      {customer.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-end gap-2">
-                      <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="View Details">
-                        <Eye className="w-4 h-4 text-gray-600" />
-                      </button>
-                      <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Send Email">
-                        <Mail className="w-4 h-4 text-gray-600" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : customers.length === 0 ? (
+          <div className="text-center py-20 text-gray-500">
+            <UserX className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+            <p className="font-medium">No customers found</p>
+            <p className="text-sm">Customers will appear here when they sign up</p>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Customer
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Joined Date
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Orders
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Total Spent
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Last Purchase
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {customers.map((customer) => (
+                    <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-semibold">
+                            {(customer.name || customer.email).charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-sm">{customer.name || "No name"}</div>
+                            <div className="text-xs text-gray-500">{customer.email}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-700">
+                          {new Date(customer.createdAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm font-semibold">{customer.totalOrders}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm font-semibold">{formatPrice(customer.totalSpent)}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-700">
+                          {customer.lastPurchase
+                            ? new Date(customer.lastPurchase).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                              })
+                            : "-"}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full ${
+                            customer.status === "ACTIVE"
+                              ? "bg-green-100 text-green-700"
+                              : customer.status === "SUSPENDED"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
+                          {customer.status === "ACTIVE" ? <UserCheck className="w-3 h-3" /> : <UserX className="w-3 h-3" />}
+                          {customer.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="View Details">
+                            <Eye className="w-4 h-4 text-gray-600" />
+                          </button>
+                          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Send Email">
+                            <Mail className="w-4 h-4 text-gray-600" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-        {/* Pagination */}
-        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            Showing {filteredCustomers.length} of {customers.length} customers
-          </div>
-          <div className="flex gap-2">
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              Previous
-            </button>
-            <button className="px-4 py-2 bg-primary text-white rounded-lg">1</button>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              Next
-            </button>
-          </div>
-        </div>
+            {/* Pagination */}
+            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                Showing {customers.length} of {pagination.total} customers
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handlePageChange(pagination.page - 1)}
+                  disabled={pagination.page <= 1}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <span className="px-4 py-2 bg-primary text-white rounded-lg">
+                  {pagination.page}
+                </span>
+                <button
+                  onClick={() => handlePageChange(pagination.page + 1)}
+                  disabled={pagination.page >= pagination.pages}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
