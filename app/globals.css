@@ -830,3 +830,152 @@ button, a, input, select, textarea {
 .page-content {
   animation: fadeIn 0.3s ease-out;
 }
+
+/* ===== ENHANCED TOUCH & CLICK FEEDBACK ===== */
+
+/* Touch manipulation for better mobile responsiveness */
+.touch-target {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Instant feedback on touch */
+button:active,
+a:active,
+[role="button"]:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+/* Nav item active feedback */
+.nav-item-active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
+
+/* Ripple container */
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Button loading state */
+.btn-loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  border-radius: inherit;
+  opacity: 0.7;
+}
+
+/* Tab indicator animation */
+@keyframes tabIndicator {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.tab-indicator {
+  animation: tabIndicator 0.2s ease-out forwards;
+  transform-origin: left;
+}
+
+/* Icon bounce on click */
+@keyframes iconBounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.85);
+  }
+}
+
+.icon-bounce:active {
+  animation: iconBounce 0.15s ease-out;
+}
+
+/* Loading spinner for navigation */
+@keyframes navSpinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.nav-spinner {
+  animation: navSpinner 0.8s linear infinite;
+}
+
+/* Skeleton loading with better animation */
+@keyframes skeletonWave {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-wave {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e8e8e8 37%,
+    #f0f0f0 63%
+  );
+  background-size: 200% 100%;
+  animation: skeletonWave 1.5s ease-in-out infinite;
+}
+
+:root.dark .skeleton-wave {
+  background: linear-gradient(
+    90deg,
+    #334155 25%,
+    #475569 37%,
+    #334155 63%
+  );
+  background-size: 200% 100%;
+}
+
+/* Card press effect */
+.card-press:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Link with arrow animation */
+.link-arrow .arrow-icon {
+  transition: transform 0.2s ease;
+}
+
+.link-arrow:hover .arrow-icon {
+  transform: translateX(4px);
+}
+
+/* Smooth page transitions */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: pageEnter 0.25s ease-out forwards;
+}

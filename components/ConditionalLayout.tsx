@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { usePathname } from "next/navigation";
 import Header from "./Header";
 import MegaMenu from "./MegaMenu";
@@ -7,6 +8,7 @@ import Footer from "./Footer";
 import BottomNav from "./BottomNav";
 import Cart from "./Cart";
 import SplashScreen from "./SplashScreen";
+import NavigationProgress from "./NavigationProgress";
 
 interface ConditionalLayoutProps {
   children: React.ReactNode;
@@ -20,12 +22,22 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
 
   // If admin page, render only children without the main site layout
   if (isAdminPage) {
-    return <>{children}</>;
+    return (
+      <>
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
+        {children}
+      </>
+    );
   }
 
   // Otherwise, render with the full site layout
   return (
     <>
+      <Suspense fallback={null}>
+        <NavigationProgress />
+      </Suspense>
       <SplashScreen />
       <Header />
       <MegaMenu />
