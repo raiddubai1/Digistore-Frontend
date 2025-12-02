@@ -134,6 +134,16 @@ export const categoriesAPI = {
 
   getBySlug: (slug: string) => api.get(`/categories/${slug}`),
 
+  create: (data: {
+    name: string;
+    slug: string;
+    description?: string;
+    icon?: string;
+    parentId?: string | null;
+    order?: number;
+    active?: boolean;
+  }) => api.post('/categories', data),
+
   update: (id: string, data: {
     name?: string;
     slug?: string;

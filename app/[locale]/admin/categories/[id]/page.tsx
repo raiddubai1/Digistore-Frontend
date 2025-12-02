@@ -129,8 +129,63 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
     );
   }
 
-  // Filter out the current category and its children from parent options
-  const parentOptions = categories.filter(c => c.id !== id && !c.parentId);
+  // Build a flat list of all categories with level info for the dropdown
+  // Exclude current category and prevent circular references (can't be child of itself or its descendants)
+  const getDescendantIds = (catId: string, cats: any[]): string[] => {
+    const ids: string[] = [catId];
+    const findChildren = (parentId: string) => {
+      cats.forEach(c => {
+        if (c.parentId === parentId) {
+          ids.push(c.id);
+          findChildren(c.id);
+        }
+        // Also check nested children
+        if (c.children) {
+          c.children.forEach((child: any) => {
+            if (child.parentId === parentId || child.id === parentId) {
+              ids.push(child.id);
+            }
+            if (child.children) {
+              child.children.forEach((grandchild: any) => {
+                if (grandchild.parentId === parentId) {
+                  ids.push(grandchild.id);
+                }
+              });
+            }
+          });
+        }
+      });
+    };
+    findChildren(catId);
+    return ids;
+  };
+
+  const excludeIds = getDescendantIds(id, categories);
+
+  // Build hierarchical options for dropdown (show level 1 and level 2 categories as possible parents)
+  const buildParentOptions = () => {
+    const options: { id: string; name: string; level: number }[] = [];
+
+    // Get top-level categories (no parentId)
+    const topLevel = categories.filter(c => !c.parentId && !excludeIds.includes(c.id));
+
+    topLevel.forEach(cat => {
+      options.push({ id: cat.id, name: cat.name, level: 1 });
+
+      // Add level 2 children (subcategories)
+      if (cat.children) {
+        cat.children.forEach((child: any) => {
+          if (!excludeIds.includes(child.id)) {
+            options.push({ id: child.id, name: child.name, level: 2 });
+          }
+        });
+      }
+    });
+
+    return options;
+  };
+
+  const parentOptions = buildParentOptions();
 
   return (
     <div className="space-y-6">
@@ -211,12 +266,12 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
               <option value="">None (Top Level Category)</option>
               {parentOptions.map((cat) => (
                 <option key={cat.id} value={cat.id}>
-                  {cat.name}
+                  {cat.level === 2 ? `── ${cat.name}` : cat.name}
                 </option>
               ))}
             </select>
             <p className="text-xs text-gray-500 mt-1">
-              Leave empty to make this a top-level category
+              Select a parent to make this a subcategory (up to 3 levels)
             </p>
           </div>
 

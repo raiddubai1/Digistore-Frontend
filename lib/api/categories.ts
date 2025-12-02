@@ -132,3 +132,47 @@ export async function updateCategory(id: string, data: UpdateCategoryData): Prom
   }
 }
 
+export interface CreateCategoryData {
+  name: string;
+  slug: string;
+  description?: string;
+  icon?: string;
+  parentId?: string | null;
+  order?: number;
+  active?: boolean;
+}
+
+export async function createCategory(data: CreateCategoryData): Promise<Category> {
+  if (!API_URL) {
+    throw new Error("API URL not configured");
+  }
+
+  // Get token from localStorage
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  if (!token) {
+    throw new Error("Authentication required");
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/categories`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || `Failed to create category: ${response.statusText}`);
+    }
+
+    const result: CategoryResponse = await response.json();
+    return result.data.category;
+  } catch (error) {
+    console.error("Error creating category:", error);
+    throw error;
+  }
+}
+
