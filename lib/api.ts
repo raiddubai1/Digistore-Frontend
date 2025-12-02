@@ -133,6 +133,16 @@ export const categoriesAPI = {
   getAll: () => api.get('/categories'),
 
   getBySlug: (slug: string) => api.get(`/categories/${slug}`),
+
+  update: (id: string, data: {
+    name?: string;
+    slug?: string;
+    description?: string;
+    icon?: string;
+    parentId?: string | null;
+    order?: number;
+    active?: boolean;
+  }) => api.put(`/categories/${id}`, data),
 };
 
 // ============================================
