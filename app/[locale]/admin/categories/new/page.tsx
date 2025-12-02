@@ -42,10 +42,13 @@ export default function NewCategoryPage() {
       try {
         const response = await categoriesAPI.getAll();
         if (response.data?.success && response.data?.data?.categories) {
-          setCategories(response.data.data.categories.map((cat: any) => ({
+          // Map categories and decode names, preserving children structure
+          const decodeCategory = (cat: any): Category => ({
             ...cat,
             name: cat.name?.replace(/&amp;/g, '&') || cat.name,
-          })));
+            children: cat.children?.map(decodeCategory),
+          });
+          setCategories(response.data.data.categories.map(decodeCategory));
         }
       } catch (error) {
         console.error("Error fetching categories:", error);

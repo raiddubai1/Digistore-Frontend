@@ -16,6 +16,7 @@ interface Category {
   parentId?: string | null;
   order: number;
   active: boolean;
+  children?: Category[];
 }
 
 export default function EditCategoryPage({ params }: { params: Promise<{ id: string }> }) {
@@ -49,10 +50,13 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
         const response = await categoriesAPI.getAll();
         let allCats: Category[] = [];
         if (response.data?.success && response.data?.data?.categories) {
-          allCats = response.data.data.categories.map((cat: any) => ({
+          // Map categories and decode names, preserving children structure
+          const decodeCategory = (cat: any): Category => ({
             ...cat,
             name: cat.name?.replace(/&amp;/g, '&') || cat.name,
-          }));
+            children: cat.children?.map(decodeCategory),
+          });
+          allCats = response.data.data.categories.map(decodeCategory);
           setCategories(allCats);
         }
 
@@ -169,18 +173,25 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
     // Get top-level categories (no parentId)
     const topLevel = categories.filter(c => !c.parentId && !excludeIds.includes(c.id));
 
+    console.log('All categories:', categories);
+    console.log('Top level categories:', topLevel);
+
     topLevel.forEach(cat => {
       options.push({ id: cat.id, name: cat.name, level: 1 });
 
+      console.log(`Category "${cat.name}" has children:`, cat.children);
+
       // Add level 2 children (subcategories)
-      if (cat.children) {
-        cat.children.forEach((child: any) => {
+      if (cat.children && cat.children.length > 0) {
+        cat.children.forEach((child: Category) => {
           if (!excludeIds.includes(child.id)) {
             options.push({ id: child.id, name: child.name, level: 2 });
           }
         });
       }
     });
+
+    console.log('Parent options built:', options);
 
     return options;
   };
