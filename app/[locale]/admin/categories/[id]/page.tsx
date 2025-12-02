@@ -4,7 +4,7 @@ import { useState, useEffect, use } from "react";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { categoriesAPI } from "@/lib/api";
 
 interface Category {
@@ -42,8 +42,15 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
     const fetchData = async () => {
       try {
         // Fetch all categories for parent dropdown
-        const allCats = await categoriesAPI.getAll();
-        setCategories(allCats);
+        const response = await categoriesAPI.getAll();
+        let allCats: Category[] = [];
+        if (response.data?.success && response.data?.data?.categories) {
+          allCats = response.data.data.categories.map((cat: any) => ({
+            ...cat,
+            name: cat.name?.replace(/&amp;/g, '&') || cat.name,
+          }));
+          setCategories(allCats);
+        }
 
         // Fetch this category by ID
         const category = allCats.find((c: Category) => c.id === id);
