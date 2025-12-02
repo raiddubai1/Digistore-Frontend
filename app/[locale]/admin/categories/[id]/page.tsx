@@ -140,7 +140,7 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
         </Link>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Edit Category</h1>
-          <p className="text-sm text-gray-500 mt-1">Update category information</p>
+          <p className="text-sm text-gray-500 mt-1">Modify category details</p>
         </div>
       </div>
 
