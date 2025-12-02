@@ -21,7 +21,11 @@ interface Category {
 
 export default function CategoriesPage() {
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'en';
+  // Extract locale/basePath from pathname
+  const validLocales = ['en', 'ar', 'es', 'fr', 'de'];
+  const segments = pathname.split('/').filter(Boolean);
+  const firstSegment = segments[0] || '';
+  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -58,7 +62,7 @@ export default function CategoriesPage() {
           <p className="text-sm text-gray-500 mt-1">Manage product categories and subcategories</p>
         </div>
         <Link
-          href={`/${locale}/admin/categories/new`}
+          href={`${basePath}/admin/categories/new`}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
         >
           <Plus className="w-5 h-5" />
@@ -143,7 +147,7 @@ export default function CategoriesPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <Link
-                        href={`/${locale}/admin/categories/${category.id}`}
+                        href={`${basePath}/admin/categories/${category.id}`}
                         className="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg transition-colors"
                         title="Edit"
                       >

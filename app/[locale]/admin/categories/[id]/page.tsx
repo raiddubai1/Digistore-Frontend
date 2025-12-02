@@ -22,7 +22,11 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
   const { id } = use(params);
   const pathname = usePathname();
   const router = useRouter();
-  const locale = pathname.split('/')[1] || 'en';
+  // Extract locale/basePath from pathname
+  const validLocales = ['en', 'ar', 'es', 'fr', 'de'];
+  const segments = pathname.split('/').filter(Boolean);
+  const firstSegment = segments[0] || '';
+  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -66,7 +70,7 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
           });
         } else {
           toast.error("Category not found");
-          router.push(`/${locale}/admin/categories`);
+          router.push(`${basePath}/admin/categories`);
         }
       } catch (error) {
         console.error("Error fetching category:", error);
@@ -76,7 +80,7 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
       }
     };
     fetchData();
-  }, [id, locale, router]);
+  }, [id, basePath, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +97,7 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
         active: formData.active,
       });
       toast.success("Category updated successfully!");
-      router.push(`/${locale}/admin/categories`);
+      router.push(`${basePath}/admin/categories`);
     } catch (error: any) {
       console.error("Error updating category:", error);
       toast.error(error.message || "Failed to update category");
@@ -133,7 +137,7 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link
-          href={`/${locale}/admin/categories`}
+          href={`${basePath}/admin/categories`}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -284,7 +288,7 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
               )}
             </button>
             <Link
-              href={`/${locale}/admin/categories`}
+              href={`${basePath}/admin/categories`}
               className="px-6 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
             >
               Cancel
