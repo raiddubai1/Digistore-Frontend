@@ -20,6 +20,7 @@ interface Product {
   category?: { name: string; slug: string } | string;
   thumbnailUrl?: string;
   downloadUrl?: string;
+  fileUrl?: string;
 }
 
 interface Category {
@@ -394,9 +395,9 @@ export default function AdminProductsPage() {
                         </div>
                         <div className="flex items-center gap-1.5 text-xs text-gray-500">
                           <span>{product.fileType?.toUpperCase() || 'N/A'}</span>
-                          {product.downloadUrl && (
+                          {(product.fileUrl || product.downloadUrl) && (
                             <a
-                              href={product.downloadUrl}
+                              href={product.fileUrl || product.downloadUrl}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
