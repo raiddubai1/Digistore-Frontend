@@ -212,7 +212,16 @@ export default function AdminProductsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold">Products</h1>
-          <p className="text-gray-600">Manage your digital products</p>
+          <p className="text-gray-600">
+            {loading ? 'Loading...' : (
+              <>
+                <span className="font-semibold text-primary">{total.toLocaleString()}</span> total products
+                {(searchQuery || categoryFilter || statusFilter) && (
+                  <span> · <span className="font-semibold">{filteredProducts.length.toLocaleString()}</span> showing</span>
+                )}
+              </>
+            )}
+          </p>
         </div>
         <button
           onClick={() => router.push(`${basePath}/admin/products/new`)}
