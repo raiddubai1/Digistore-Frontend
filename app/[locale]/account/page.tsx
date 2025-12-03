@@ -442,7 +442,7 @@ function AccountContent() {
                             </p>
                           </div>
                           <div className="text-right">
-                            <div className="text-lg font-bold text-[#FF6B35]">${order.total.toFixed(2)}</div>
+                            <div className="text-lg font-bold text-[#FF6B35]">${Number(order.total).toFixed(2)}</div>
                             <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
                               order.status === 'COMPLETED'
                                 ? 'bg-green-100 text-green-600'
