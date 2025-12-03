@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { demoProducts } from "@/data/demo-products";
 import { formatPrice } from "@/lib/utils";
-import { Plus, Search, Edit, Trash2, Eye, Loader2, MoreVertical, XCircle } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, Loader2, MoreVertical, XCircle, ExternalLink } from "lucide-react";
 import toast from "react-hot-toast";
 import { productsAPI, categoriesAPI } from "@/lib/api";
 
@@ -19,6 +19,7 @@ interface Product {
   status: string;
   category?: { name: string; slug: string } | string;
   thumbnailUrl?: string;
+  downloadUrl?: string;
 }
 
 interface Category {
@@ -391,7 +392,21 @@ export default function AdminProductsPage() {
                         <div className="font-semibold text-sm truncate">
                           {product.title}
                         </div>
-                        <div className="text-xs text-gray-500">{product.fileType?.toUpperCase() || 'N/A'}</div>
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                          <span>{product.fileType?.toUpperCase() || 'N/A'}</span>
+                          {product.downloadUrl && (
+                            <a
+                              href={product.downloadUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-blue-500 hover:text-blue-700 transition-colors"
+                              title="View download file"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </td>
