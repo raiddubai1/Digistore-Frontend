@@ -211,7 +211,10 @@ export default function CheckoutPage() {
       toast.success('Order completed successfully!');
       router.push(`/checkout/success?orderId=${response.data.data.order.id}`);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to complete order');
+      console.error('Free order error:', error);
+      console.error('Error response:', error.response?.data);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to complete order';
+      toast.error(errorMessage);
     } finally {
       setIsProcessing(false);
     }
