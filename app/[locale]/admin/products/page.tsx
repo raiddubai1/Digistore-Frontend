@@ -201,25 +201,25 @@ export default function AdminProductsPage() {
       {/* Products Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full table-fixed">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="w-[40%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Product
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
+                <th className="w-[20%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
                   Category
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="w-[12%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Price
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">
+                <th className="w-[10%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">
                   Sales
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
+                <th className="w-[12%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
                   Status
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider w-12">
+                <th className="w-[6%] px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
 
                 </th>
               </tr>
@@ -247,7 +247,7 @@ export default function AdminProductsPage() {
                       ) : (
                         <div className="w-10 h-10 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex-shrink-0" />
                       )}
-                      <div className="min-w-0 flex-1">
+                      <div className="min-w-0">
                         <div className="font-semibold text-sm truncate">
                           {product.title}
                         </div>
@@ -256,7 +256,7 @@ export default function AdminProductsPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell">
-                    <div className="text-sm text-gray-700 truncate max-w-[120px]">{getCategoryName(product)}</div>
+                    <div className="text-sm text-gray-700 truncate">{getCategoryName(product)}</div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="font-semibold text-sm">{formatPrice(product.price)}</div>
