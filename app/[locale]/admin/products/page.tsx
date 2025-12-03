@@ -393,7 +393,7 @@ export default function AdminProductsPage() {
                         <div className="font-semibold text-sm truncate">
                           {product.title}
                         </div>
-                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
                           <span>{product.fileType?.toUpperCase() || 'N/A'}</span>
                           {(product.fileUrl || product.downloadUrl) && (
                             <a
@@ -401,10 +401,11 @@ export default function AdminProductsPage() {
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="text-blue-500 hover:text-blue-700 transition-colors"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-600 hover:bg-blue-200 rounded-full transition-colors text-xs font-medium"
                               title="View download file"
                             >
-                              <ExternalLink className="w-3.5 h-3.5" />
+                              <ExternalLink className="w-3 h-3" />
+                              View
                             </a>
                           )}
                         </div>
