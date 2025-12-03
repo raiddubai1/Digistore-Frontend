@@ -48,15 +48,18 @@ export default function CheckoutPage() {
     }
   }, [user]);
 
+  const [orderCompleted, setOrderCompleted] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (mounted && items.length === 0) {
+    // Don't redirect if order was just completed
+    if (mounted && items.length === 0 && !orderCompleted) {
       router.push("/products");
     }
-  }, [mounted, items, router]);
+  }, [mounted, items, router, orderCompleted]);
 
   // Load PayPal script
   useEffect(() => {
@@ -141,6 +144,7 @@ export default function CheckoutPage() {
             couponCode: coupon?.code,
           });
 
+          setOrderCompleted(true);
           clearCart();
           toast.success('Payment successful!');
           router.push(`/checkout/success?orderId=${response.data.data.order.id}`);
@@ -207,6 +211,7 @@ export default function CheckoutPage() {
         },
       });
 
+      setOrderCompleted(true);
       clearCart();
       toast.success('Order completed successfully!');
       router.push(`/checkout/success?orderId=${response.data.data.order.id}`);

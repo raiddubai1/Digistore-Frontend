@@ -1,9 +1,9 @@
 "use client";
 
 import { Download, ShoppingBag, User, Settings, LogOut, ChevronLeft, ChevronRight, Users, FileDown, Clock, CheckCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import NotificationSettings from "@/components/NotificationSettings";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -45,13 +45,22 @@ interface DownloadItem {
   };
 }
 
-export default function AccountPage() {
+function AccountContent() {
   const { user: authUser, isAuthenticated, loading: authLoading, logout } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("downloads");
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(tabParam || "downloads");
   const [orders, setOrders] = useState<Order[]>([]);
   const [downloads, setDownloads] = useState<DownloadItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Update active tab when URL changes
+  useEffect(() => {
+    if (tabParam && ["downloads", "orders", "settings"].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -516,6 +525,14 @@ export default function AccountPage() {
       </div>
     </div>
     </>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="w-6 h-6 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin" /></div>}>
+      <AccountContent />
+    </Suspense>
   );
 }
 
