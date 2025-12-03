@@ -310,5 +310,21 @@ export const downloadsAPI = {
     api.get(`/downloads/${downloadId}/link`),
 };
 
+// ============================================
+// AI CONTENT GENERATION API
+// ============================================
+
+export const aiAPI = {
+  generateContent: (data: {
+    type: 'title' | 'shortDescription' | 'description' | 'tags' | 'all';
+    context: {
+      fileName?: string;
+      category?: string;
+      existingTitle?: string;
+      existingDescription?: string;
+    };
+  }) => api.post('/ai/generate', data),
+};
+
 export default api;
 

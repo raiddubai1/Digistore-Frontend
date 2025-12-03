@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Save, ArrowLeft, Plus, X, Upload, FileText, Loader2 } from "lucide-react";
+import { Save, ArrowLeft, Plus, X, Upload, FileText, Loader2, Sparkles, Wand2 } from "lucide-react";
 import toast from "react-hot-toast";
 import ImageUpload from "@/components/ImageUpload";
 import Link from "next/link";
-import { categoriesAPI, productsAPI } from "@/lib/api";
+import { categoriesAPI, productsAPI, aiAPI } from "@/lib/api";
 
 interface Attribute {
   id: string;
@@ -63,6 +63,61 @@ export default function NewProductPage() {
   const [newTag, setNewTag] = useState("");
   const [newIncluded, setNewIncluded] = useState("");
   const [newRequirement, setNewRequirement] = useState("");
+
+  // AI generation state
+  const [aiGenerating, setAiGenerating] = useState<string | null>(null);
+
+  // Get category name by ID
+  const getCategoryName = (categoryId: string) => {
+    return categories.find(c => c.id === categoryId)?.name || '';
+  };
+
+  // AI content generation
+  const generateWithAI = async (type: 'title' | 'shortDescription' | 'description' | 'tags' | 'all') => {
+    try {
+      setAiGenerating(type);
+      const response = await aiAPI.generateContent({
+        type,
+        context: {
+          fileName: formData.fileName || productFile?.name,
+          category: getCategoryName(formData.categoryId),
+          existingTitle: formData.title,
+          existingDescription: formData.description,
+        },
+      });
+
+      if (response.data?.success && response.data?.data) {
+        const data = response.data.data;
+        if (type === 'all') {
+          setFormData(prev => ({
+            ...prev,
+            title: data.title || prev.title,
+            shortDescription: data.shortDescription || prev.shortDescription,
+            description: data.description || prev.description,
+            tags: data.tags || prev.tags,
+          }));
+          toast.success('All fields generated with AI!');
+        } else if (type === 'title' && data.title) {
+          setFormData(prev => ({ ...prev, title: data.title }));
+          toast.success('Title generated!');
+        } else if (type === 'shortDescription' && data.shortDescription) {
+          setFormData(prev => ({ ...prev, shortDescription: data.shortDescription }));
+          toast.success('Short description generated!');
+        } else if (type === 'description' && data.description) {
+          setFormData(prev => ({ ...prev, description: data.description }));
+          toast.success('Description generated!');
+        } else if (type === 'tags' && data.tags) {
+          setFormData(prev => ({ ...prev, tags: data.tags }));
+          toast.success('Tags generated!');
+        }
+      }
+    } catch (error: any) {
+      console.error('AI generation failed:', error);
+      toast.error(error.response?.data?.message || 'AI generation failed');
+    } finally {
+      setAiGenerating(null);
+    }
+  };
 
   // Load categories and attributes on mount
   useEffect(() => {
@@ -259,12 +314,38 @@ export default function NewProductPage() {
 
             {/* Basic Information */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">Basic Information</h2>
+                <button
+                  type="button"
+                  onClick={() => generateWithAI('all')}
+                  disabled={aiGenerating !== null}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50"
+                >
+                  {aiGenerating === 'all' ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Wand2 className="w-4 h-4" />
+                  )}
+                  Generate All
+                </button>
+              </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Product Title <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-semibold text-gray-700">
+                      Product Title <span className="text-red-500">*</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => generateWithAI('title')}
+                      disabled={aiGenerating !== null}
+                      className="flex items-center gap-1 px-2 py-1 text-xs text-purple-600 hover:bg-purple-50 rounded transition-colors disabled:opacity-50"
+                    >
+                      {aiGenerating === 'title' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                      AI
+                    </button>
+                  </div>
                   <input
                     type="text"
                     value={formData.title}
@@ -276,9 +357,20 @@ export default function NewProductPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Short Description
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-semibold text-gray-700">
+                      Short Description
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => generateWithAI('shortDescription')}
+                      disabled={aiGenerating !== null}
+                      className="flex items-center gap-1 px-2 py-1 text-xs text-purple-600 hover:bg-purple-50 rounded transition-colors disabled:opacity-50"
+                    >
+                      {aiGenerating === 'shortDescription' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                      AI
+                    </button>
+                  </div>
                   <input
                     type="text"
                     value={formData.shortDescription}
@@ -290,9 +382,20 @@ export default function NewProductPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Full Description <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-semibold text-gray-700">
+                      Full Description <span className="text-red-500">*</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => generateWithAI('description')}
+                      disabled={aiGenerating !== null}
+                      className="flex items-center gap-1 px-2 py-1 text-xs text-purple-600 hover:bg-purple-50 rounded transition-colors disabled:opacity-50"
+                    >
+                      {aiGenerating === 'description' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                      AI
+                    </button>
+                  </div>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -393,7 +496,18 @@ export default function NewProductPage() {
 
             {/* Tags */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Tags</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">Tags</h2>
+                <button
+                  type="button"
+                  onClick={() => generateWithAI('tags')}
+                  disabled={aiGenerating !== null}
+                  className="flex items-center gap-1 px-2 py-1 text-xs text-purple-600 hover:bg-purple-50 rounded transition-colors disabled:opacity-50"
+                >
+                  {aiGenerating === 'tags' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                  Generate Tags
+                </button>
+              </div>
               <div className="space-y-3">
                 <div className="flex gap-2">
                   <input
