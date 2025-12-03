@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { demoProducts } from "@/data/demo-products";
 import { formatPrice } from "@/lib/utils";
-import { Plus, Search, Edit, Trash2, Eye, Loader2, MoreVertical } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, Loader2, MoreVertical, XCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { productsAPI, categoriesAPI } from "@/lib/api";
 
@@ -45,6 +45,9 @@ export default function AdminProductsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
 
   // Close action menu when clicking outside
   useEffect(() => {
@@ -133,14 +136,73 @@ export default function AdminProductsPage() {
     return typeof product.category === 'string' ? product.category : 'Uncategorized';
   };
 
-  const handleDelete = (productId: string, productTitle: string) => {
+  const handleDelete = async (productId: string, productTitle: string) => {
     if (deleteConfirm === productId) {
-      // In a real app, this would delete from database
-      toast.success(`"${productTitle}" deleted successfully!`);
+      try {
+        await productsAPI.delete(productId);
+        setProducts(products.filter(p => p.id !== productId));
+        toast.success(`"${productTitle}" deleted successfully!`);
+      } catch (error) {
+        toast.error('Failed to delete product');
+      }
       setDeleteConfirm(null);
     } else {
       setDeleteConfirm(productId);
-      setTimeout(() => setDeleteConfirm(null), 3000); // Reset after 3 seconds
+      setTimeout(() => setDeleteConfirm(null), 3000);
+    }
+  };
+
+  // Toggle single product selection
+  const toggleProductSelection = (productId: string) => {
+    const newSelected = new Set(selectedProducts);
+    if (newSelected.has(productId)) {
+      newSelected.delete(productId);
+    } else {
+      newSelected.add(productId);
+    }
+    setSelectedProducts(newSelected);
+  };
+
+  // Select/deselect all filtered products
+  const toggleSelectAll = () => {
+    if (selectedProducts.size === filteredProducts.length) {
+      setSelectedProducts(new Set());
+    } else {
+      setSelectedProducts(new Set(filteredProducts.map(p => p.id)));
+    }
+  };
+
+  // Bulk delete selected products
+  const handleBulkDelete = async () => {
+    if (!bulkDeleteConfirm) {
+      setBulkDeleteConfirm(true);
+      return;
+    }
+
+    setBulkDeleting(true);
+    const selectedArray = Array.from(selectedProducts);
+    let deleted = 0;
+    let failed = 0;
+
+    for (const productId of selectedArray) {
+      try {
+        await productsAPI.delete(productId);
+        deleted++;
+      } catch (error) {
+        failed++;
+      }
+    }
+
+    // Refresh products list
+    setProducts(products.filter(p => !selectedProducts.has(p.id)));
+    setSelectedProducts(new Set());
+    setBulkDeleting(false);
+    setBulkDeleteConfirm(false);
+
+    if (failed === 0) {
+      toast.success(`Successfully deleted ${deleted} products`);
+    } else {
+      toast.error(`Deleted ${deleted} products, ${failed} failed`);
     }
   };
 
@@ -198,13 +260,74 @@ export default function AdminProductsPage() {
         </div>
       </div>
 
+      {/* Bulk Actions Bar */}
+      {selectedProducts.size > 0 && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="font-semibold text-red-700">
+              {selectedProducts.size} product{selectedProducts.size > 1 ? 's' : ''} selected
+            </span>
+            <button
+              onClick={() => setSelectedProducts(new Set())}
+              className="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-1"
+            >
+              <XCircle className="w-4 h-4" /> Clear selection
+            </button>
+          </div>
+          <div className="flex items-center gap-3">
+            {bulkDeleteConfirm ? (
+              <>
+                <span className="text-red-600 font-medium">Are you sure?</span>
+                <button
+                  onClick={() => setBulkDeleteConfirm(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+                  disabled={bulkDeleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={bulkDeleting}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                >
+                  {bulkDeleting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" /> Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" /> Yes, Delete All
+                    </>
+                  )}
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleBulkDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" /> Delete Selected
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Products Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
         <div className="overflow-x-auto">
           <table className="w-full table-fixed">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="w-[40%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="w-[5%] px-4 py-3 text-center">
+                  <input
+                    type="checkbox"
+                    checked={filteredProducts.length > 0 && selectedProducts.size === filteredProducts.length}
+                    onChange={toggleSelectAll}
+                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                  />
+                </th>
+                <th className="w-[35%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Product
                 </th>
                 <th className="w-[20%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
@@ -227,19 +350,27 @@ export default function AdminProductsPage() {
             <tbody className="divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
+                  <td colSpan={7} className="px-6 py-12 text-center">
                     <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
                     <p className="mt-2 text-gray-500">Loading products...</p>
                   </td>
                 </tr>
               ) : filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                     No products found
                   </td>
                 </tr>
               ) : filteredProducts.map((product) => (
-                <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={product.id} className={`hover:bg-gray-50 transition-colors ${selectedProducts.has(product.id) ? 'bg-red-50' : ''}`}>
+                  <td className="px-4 py-3 text-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedProducts.has(product.id)}
+                      onChange={() => toggleProductSelection(product.id)}
+                      className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                    />
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       {product.thumbnailUrl ? (
