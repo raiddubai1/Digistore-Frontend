@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { demoProducts } from "@/data/demo-products";
 import { formatPrice } from "@/lib/utils";
-import { Plus, Search, Edit, Trash2, Eye, Loader2 } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, Loader2, MoreVertical } from "lucide-react";
 import toast from "react-hot-toast";
 import { productsAPI, categoriesAPI } from "@/lib/api";
 
@@ -40,10 +40,20 @@ export default function AdminProductsPage() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [actionMenu, setActionMenu] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
+
+  // Close action menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setActionMenu(null);
+    if (actionMenu) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [actionMenu]);
 
   useEffect(() => {
     fetchProducts();
@@ -191,26 +201,26 @@ export default function AdminProductsPage() {
       {/* Products Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px]">
+          <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Product
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
                   Category
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Price
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">
                   Sales
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
                   Status
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Actions
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider w-12">
+
                 </th>
               </tr>
             </thead>
@@ -230,39 +240,34 @@ export default function AdminProductsPage() {
                 </tr>
               ) : filteredProducts.map((product) => (
                 <tr key={product.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       {product.thumbnailUrl ? (
-                        <img src={product.thumbnailUrl} alt={product.title} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                        <img src={product.thumbnailUrl} alt={product.title} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
                       ) : (
-                        <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex-shrink-0" />
+                        <div className="w-10 h-10 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex-shrink-0" />
                       )}
-                      <div className="min-w-0">
-                        <div className="font-semibold text-sm truncate max-w-xs">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-sm truncate">
                           {product.title}
                         </div>
                         <div className="text-xs text-gray-500">{product.fileType?.toUpperCase() || 'N/A'}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-700">{getCategoryName(product)}</div>
+                  <td className="px-4 py-3 hidden sm:table-cell">
+                    <div className="text-sm text-gray-700 truncate max-w-[120px]">{getCategoryName(product)}</div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3">
                     <div className="font-semibold text-sm">{formatPrice(product.price)}</div>
-                    {product.originalPrice && (
-                      <div className="text-xs text-gray-400 line-through">
-                        {formatPrice(product.originalPrice)}
-                      </div>
-                    )}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3 hidden md:table-cell">
                     <div className="text-sm text-gray-700">
                       {(product.downloadCount || 0).toLocaleString()}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
+                  <td className="px-4 py-3 hidden sm:table-cell">
+                    <span className={`inline-block px-2 py-0.5 text-xs font-semibold rounded-full ${
                       product.status === 'APPROVED' ? 'bg-green-100 text-green-700' :
                       product.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
                       'bg-gray-100 text-gray-700'
@@ -270,33 +275,48 @@ export default function AdminProductsPage() {
                       {product.status === 'APPROVED' ? 'Published' : product.status || 'Published'}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="px-4 py-3">
+                    <div className="relative">
                       <button
-                        onClick={() => router.push(`${basePath}/products/${product.slug}`)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActionMenu(actionMenu === product.id ? null : product.id);
+                        }}
                         className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="View"
                       >
-                        <Eye className="w-4 h-4 text-gray-600" />
+                        <MoreVertical className="w-4 h-4 text-gray-600" />
                       </button>
-                      <button
-                        onClick={() => router.push(`${basePath}/admin/products/${product.id}/edit`)}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="Edit"
-                      >
-                        <Edit className="w-4 h-4 text-gray-600" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(product.id, product.title)}
-                        className={`p-2 rounded-lg transition-colors ${
-                          deleteConfirm === product.id
-                            ? "bg-red-500 text-white hover:bg-red-600"
-                            : "hover:bg-red-50 text-red-600"
-                        }`}
-                        title={deleteConfirm === product.id ? "Click again to confirm" : "Delete"}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {actionMenu === product.id && (
+                        <div className="absolute right-0 top-full mt-1 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                          <button
+                            onClick={() => {
+                              router.push(`${basePath}/products/${product.slug}`);
+                              setActionMenu(null);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                          >
+                            <Eye className="w-4 h-4" /> View
+                          </button>
+                          <button
+                            onClick={() => {
+                              router.push(`${basePath}/admin/products/${product.id}/edit`);
+                              setActionMenu(null);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                          >
+                            <Edit className="w-4 h-4" /> Edit
+                          </button>
+                          <button
+                            onClick={() => {
+                              handleDelete(product.id, product.title);
+                              setActionMenu(null);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                          >
+                            <Trash2 className="w-4 h-4" /> Delete
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>
