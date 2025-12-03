@@ -338,19 +338,22 @@ export default function AdminProductsPage() {
                     className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
                   />
                 </th>
-                <th className="w-[35%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="w-[30%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Product
                 </th>
-                <th className="w-[20%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
+                <th className="w-[10%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  File
+                </th>
+                <th className="w-[15%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
                   Category
                 </th>
-                <th className="w-[12%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="w-[10%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Price
                 </th>
-                <th className="w-[10%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">
+                <th className="w-[8%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">
                   Sales
                 </th>
-                <th className="w-[12%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
+                <th className="w-[10%] px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
                   Status
                 </th>
                 <th className="w-[6%] px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -361,14 +364,14 @@ export default function AdminProductsPage() {
             <tbody className="divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center">
+                  <td colSpan={8} className="px-6 py-12 text-center">
                     <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
                     <p className="mt-2 text-gray-500">Loading products...</p>
                   </td>
                 </tr>
               ) : filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
                     No products found
                   </td>
                 </tr>
@@ -393,24 +396,28 @@ export default function AdminProductsPage() {
                         <div className="font-semibold text-sm truncate">
                           {product.title}
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <span>{product.fileType?.toUpperCase() || 'N/A'}</span>
-                          {(product.fileUrl || product.downloadUrl) && (
-                            <a
-                              href={product.fileUrl || product.downloadUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-600 hover:bg-blue-200 rounded-full transition-colors text-xs font-medium"
-                              title="View download file"
-                            >
-                              <ExternalLink className="w-3 h-3" />
-                              View
-                            </a>
-                          )}
+                        <div className="text-xs text-gray-500">
+                          {product.fileType?.toUpperCase() || 'N/A'}
                         </div>
                       </div>
                     </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    {(product.fileUrl || product.downloadUrl) ? (
+                      <a
+                        href={product.fileUrl || product.downloadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-500 text-white hover:bg-blue-600 rounded-lg transition-colors text-xs font-medium"
+                        title="View download file"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        View
+                      </a>
+                    ) : (
+                      <span className="text-xs text-gray-400">No file</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell">
                     <div className="text-sm text-gray-700 truncate">{getCategoryName(product)}</div>
