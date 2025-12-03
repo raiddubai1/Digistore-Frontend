@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, FolderTree, Eye, EyeOff, Loader2, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import toast from "react-hot-toast";
 import { categoriesAPI } from "@/lib/api";
 
 interface Category {
@@ -53,6 +54,7 @@ export default function CategoriesPage() {
   const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCategories();
@@ -75,6 +77,28 @@ export default function CategoriesPage() {
       console.error('Failed to fetch categories:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (categoryId: string, categoryName: string, hasChildren: boolean) => {
+    if (hasChildren) {
+      toast.error("Cannot delete category with subcategories. Delete subcategories first.");
+      return;
+    }
+
+    if (deleteConfirm === categoryId) {
+      try {
+        await categoriesAPI.delete(categoryId);
+        toast.success(`"${categoryName}" deleted successfully!`);
+        fetchCategories(); // Refresh list
+      } catch (error: any) {
+        toast.error(error.message || "Failed to delete category");
+      }
+      setDeleteConfirm(null);
+    } else {
+      setDeleteConfirm(categoryId);
+      toast("Click again to confirm delete", { icon: "⚠️" });
+      setTimeout(() => setDeleteConfirm(null), 3000);
     }
   };
 
@@ -170,7 +194,11 @@ export default function CategoriesPage() {
                         <Link href={`${basePath}/admin/categories/${category.id}`} className="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg transition-colors" title="Edit">
                           <Edit className="w-4 h-4" />
                         </Link>
-                        <button className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                        <button
+                          onClick={() => handleDelete(category.id, category.name, !!(category.children && category.children.length > 0))}
+                          className={`p-2 rounded-lg transition-colors ${deleteConfirm === category.id ? 'text-white bg-red-600' : 'text-gray-600 hover:text-red-600 hover:bg-red-50'}`}
+                          title={deleteConfirm === category.id ? "Click again to confirm" : "Delete"}
+                        >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -212,7 +240,11 @@ export default function CategoriesPage() {
                             <Link href={`${basePath}/admin/categories/${subcat.id}`} className="p-1.5 text-gray-500 hover:text-primary hover:bg-gray-100 rounded-lg transition-colors" title="Edit">
                               <Edit className="w-3.5 h-3.5" />
                             </Link>
-                            <button className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                            <button
+                              onClick={() => handleDelete(subcat.id, subcat.name, !!(subcat.children && subcat.children.length > 0))}
+                              className={`p-1.5 rounded-lg transition-colors ${deleteConfirm === subcat.id ? 'text-white bg-red-600' : 'text-gray-500 hover:text-red-600 hover:bg-red-50'}`}
+                              title={deleteConfirm === subcat.id ? "Click again to confirm" : "Delete"}
+                            >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
@@ -252,7 +284,11 @@ export default function CategoriesPage() {
                               <Link href={`${basePath}/admin/categories/${subsubcat.id}`} className="p-1 text-gray-400 hover:text-primary hover:bg-gray-100 rounded transition-colors" title="Edit">
                                 <Edit className="w-3 h-3" />
                               </Link>
-                              <button className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Delete">
+                              <button
+                                onClick={() => handleDelete(subsubcat.id, subsubcat.name, false)}
+                                className={`p-1 rounded transition-colors ${deleteConfirm === subsubcat.id ? 'text-white bg-red-600' : 'text-gray-400 hover:text-red-600 hover:bg-red-50'}`}
+                                title={deleteConfirm === subsubcat.id ? "Click again to confirm" : "Delete"}
+                              >
                                 <Trash2 className="w-3 h-3" />
                               </button>
                             </div>

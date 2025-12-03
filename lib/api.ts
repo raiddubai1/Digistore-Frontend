@@ -153,6 +153,8 @@ export const categoriesAPI = {
     order?: number;
     active?: boolean;
   }) => api.put(`/categories/${id}`, data),
+
+  delete: (id: string) => api.delete(`/categories/${id}`),
 };
 
 // ============================================

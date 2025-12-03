@@ -6,7 +6,7 @@ import { demoProducts } from "@/data/demo-products";
 import { formatPrice } from "@/lib/utils";
 import { Plus, Search, Edit, Trash2, Eye, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
-import { productsAPI } from "@/lib/api";
+import { productsAPI, categoriesAPI } from "@/lib/api";
 
 interface Product {
   id: string;
@@ -21,6 +21,13 @@ interface Product {
   thumbnailUrl?: string;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  children?: Category[];
+}
+
 export default function AdminProductsPage() {
   const router = useRouter();
   const pathname = usePathname();
@@ -30,13 +37,17 @@ export default function AdminProductsPage() {
   const firstSegment = segments[0] || '';
   const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
   const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
   const fetchProducts = async () => {
@@ -60,9 +71,50 @@ export default function AdminProductsPage() {
     }
   };
 
-  const filteredProducts = products.filter((product) =>
-    product.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const fetchCategories = async () => {
+    try {
+      const response = await categoriesAPI.getAll();
+      if (response.data?.success && response.data?.data?.categories) {
+        const decodeCategory = (cat: any): Category => ({
+          ...cat,
+          name: cat.name?.replace(/&amp;/g, '&') || cat.name,
+          children: cat.children?.map(decodeCategory),
+        });
+        setCategories(response.data.data.categories.map(decodeCategory));
+      }
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    }
+  };
+
+  // Build flat list of all categories for filter dropdown
+  const buildCategoryOptions = (): { slug: string; name: string; level: number }[] => {
+    const options: { slug: string; name: string; level: number }[] = [];
+    categories.forEach(cat => {
+      options.push({ slug: cat.slug, name: cat.name, level: 1 });
+      if (cat.children) {
+        cat.children.forEach(sub => {
+          options.push({ slug: sub.slug, name: sub.name, level: 2 });
+          if (sub.children) {
+            sub.children.forEach(subsub => {
+              options.push({ slug: subsub.slug, name: subsub.name, level: 3 });
+            });
+          }
+        });
+      }
+    });
+    return options;
+  };
+
+  const categoryOptions = buildCategoryOptions();
+
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = !categoryFilter ||
+      (typeof product.category === 'object' && product.category?.slug === categoryFilter);
+    const matchesStatus = !statusFilter || product.status.toLowerCase() === statusFilter.toLowerCase();
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
 
   const getCategoryName = (product: Product) => {
     if (typeof product.category === 'object' && product.category?.name) {
@@ -112,16 +164,26 @@ export default function AdminProductsPage() {
               className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
             />
           </div>
-          <select className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-            <option>All Categories</option>
-            <option>Business and Marketing</option>
-            <option>Personal Development</option>
-            <option>Technology</option>
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+          >
+            <option value="">All Categories</option>
+            {categoryOptions.map((cat) => (
+              <option key={cat.slug} value={cat.slug}>
+                {cat.level === 2 ? `── ${cat.name}` : cat.level === 3 ? `──── ${cat.name}` : cat.name}
+              </option>
+            ))}
           </select>
-          <select className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-            <option>All Status</option>
-            <option>Published</option>
-            <option>Draft</option>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+          >
+            <option value="">All Status</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
           </select>
         </div>
       </div>
