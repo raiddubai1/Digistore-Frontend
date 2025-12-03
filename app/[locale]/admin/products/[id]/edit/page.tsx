@@ -1,10 +1,28 @@
 "use client";
 
-import { useState, use } from "react";
-import { useRouter } from "next/navigation";
-import { demoProducts } from "@/data/demo-products";
-import { Save, ArrowLeft } from "lucide-react";
+import { useState, useEffect, use } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { Save, ArrowLeft, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { productsAPI } from "@/lib/api";
+
+interface Product {
+  id: string;
+  title: string;
+  slug: string;
+  description?: string;
+  shortDescription?: string;
+  price: number;
+  originalPrice?: number;
+  category?: { id: string; name: string; slug: string } | string;
+  fileType?: string;
+  fileSize?: string;
+  featured?: boolean;
+  bestseller?: boolean;
+  newArrival?: boolean;
+  downloadUrl?: string;
+  thumbnailUrl?: string;
+}
 
 interface EditProductPageProps {
   params: Promise<{ id: string }>;
@@ -13,28 +31,77 @@ interface EditProductPageProps {
 export default function EditProductPage({ params }: EditProductPageProps) {
   const { id } = use(params);
   const router = useRouter();
-  const product = demoProducts.find((p) => p.id === id);
+  const pathname = usePathname();
+  const validLocales = ['en', 'ar', 'es', 'fr', 'de'];
+  const segments = pathname.split('/').filter(Boolean);
+  const firstSegment = segments[0] || '';
+  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
 
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    title: product?.title || "",
-    description: product?.description || "",
-    shortDescription: product?.shortDescription || "",
-    price: product?.price || 0,
-    originalPrice: product?.originalPrice || 0,
-    category: product?.category || "",
-    fileType: product?.fileType || "",
-    fileSize: product?.fileSize || "",
-    featured: product?.featured || false,
-    bestseller: product?.bestseller || false,
-    newArrival: product?.newArrival || false,
+    title: "",
+    description: "",
+    shortDescription: "",
+    price: 0,
+    originalPrice: 0,
+    category: "",
+    fileType: "",
+    fileSize: "",
+    featured: false,
+    bestseller: false,
+    newArrival: false,
   });
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await productsAPI.getById(id);
+        if (response.data?.success && response.data?.data) {
+          const p = response.data.data.product || response.data.data;
+          setProduct(p);
+          setFormData({
+            title: p.title || "",
+            description: p.description || "",
+            shortDescription: p.shortDescription || "",
+            price: p.price || 0,
+            originalPrice: p.originalPrice || 0,
+            category: typeof p.category === 'object' ? p.category?.name : p.category || "",
+            fileType: p.fileType || "",
+            fileSize: p.fileSize || "",
+            featured: p.featured || false,
+            bestseller: p.bestseller || false,
+            newArrival: p.newArrival || false,
+          });
+        } else {
+          toast.error("Product not found");
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        toast.error("Failed to load product");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold mb-4">Product Not Found</h2>
         <button
-          onClick={() => router.push("/admin/products")}
+          onClick={() => router.push(`${basePath}/admin/products`)}
           className="text-primary font-semibold hover:text-primary-dark"
         >
           Back to Products
@@ -43,11 +110,19 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     );
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would update the product in the database
-    toast.success("Product updated successfully!");
-    router.push("/admin/products");
+    try {
+      setSaving(true);
+      await productsAPI.update(id, formData);
+      toast.success("Product updated successfully!");
+      router.push(`${basePath}/admin/products`);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      toast.error("Failed to update product");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -55,7 +130,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
       {/* Header */}
       <div className="flex items-center gap-4">
         <button
-          onClick={() => router.push("/admin/products")}
+          onClick={() => router.push(`${basePath}/admin/products`)}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />

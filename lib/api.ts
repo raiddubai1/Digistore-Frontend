@@ -118,6 +118,8 @@ export const productsAPI = {
 
   getBySlug: (slug: string) => api.get(`/products/${slug}`),
 
+  getById: (id: string) => api.get(`/products/by-id/${id}`),
+
   create: (data: any) => api.post('/products', data),
 
   update: (id: string, data: any) => api.put(`/products/${id}`, data),
