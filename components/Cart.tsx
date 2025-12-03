@@ -79,9 +79,19 @@ export default function Cart() {
                     key={`${item.product.id}-${item.license}`}
                     className="flex gap-4 p-4 bg-gray-50 rounded-xl"
                   >
-                    {/* Product Image Placeholder */}
-                    <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex-shrink-0 flex items-center justify-center">
-                      <ShoppingBag className="w-8 h-8 text-primary" />
+                    {/* Product Image */}
+                    <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                      {item.product.thumbnailUrl ? (
+                        <img
+                          src={item.product.thumbnailUrl}
+                          alt={item.product.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                          <ShoppingBag className="w-8 h-8 text-primary" />
+                        </div>
+                      )}
                     </div>
 
                     {/* Product Info */}
