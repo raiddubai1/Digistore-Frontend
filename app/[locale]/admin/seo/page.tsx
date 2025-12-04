@@ -47,8 +47,11 @@ function analyzeSEO(product: Product): SEOScore {
   const description = product.metaDescription || product.shortDescription || product.description?.substring(0, 160);
   const keyword = product.focusKeyword || product.tags?.[0] || "";
 
+  type ScoreStatus = "good" | "warning" | "error";
+  type ScoreItem = { score: number; message: string; status: ScoreStatus };
+
   // Title analysis (optimal: 50-60 chars)
-  let titleScore = { score: 0, message: "", status: "error" as const };
+  let titleScore: ScoreItem;
   if (!title) {
     titleScore = { score: 0, message: "Missing title", status: "error" };
   } else if (title.length < 30) {
@@ -60,7 +63,7 @@ function analyzeSEO(product: Product): SEOScore {
   }
 
   // Description analysis (optimal: 150-160 chars)
-  let descScore = { score: 0, message: "", status: "error" as const };
+  let descScore: ScoreItem;
   if (!description) {
     descScore = { score: 0, message: "Missing meta description", status: "error" };
   } else if (description.length < 120) {
@@ -72,7 +75,7 @@ function analyzeSEO(product: Product): SEOScore {
   }
 
   // Keyword analysis
-  let keywordScore = { score: 0, message: "", status: "error" as const };
+  let keywordScore: ScoreItem;
   if (!keyword) {
     keywordScore = { score: 0, message: "No focus keyword set", status: "error" };
   } else {
@@ -88,7 +91,7 @@ function analyzeSEO(product: Product): SEOScore {
   }
 
   // Image analysis
-  let imageScore = { score: 0, message: "", status: "error" as const };
+  let imageScore: ScoreItem;
   if (!product.thumbnailUrl) {
     imageScore = { score: 0, message: "No featured image", status: "error" };
   } else {
