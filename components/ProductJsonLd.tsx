@@ -67,7 +67,9 @@ export default function ProductJsonLd({
         },
       })),
     }),
-    category: product.categoryName || product.category,
+    category: typeof product.category === 'object'
+      ? (product.category as any)?.name
+      : product.category,
     ...(product.tags && product.tags.length > 0 && {
       keywords: product.tags.join(", "),
     }),
