@@ -5,6 +5,11 @@ export interface Product {
   slug: string;
   description: string;
   shortDescription?: string;
+  // SEO Fields
+  metaTitle?: string;
+  metaDescription?: string;
+  focusKeyword?: string;
+  // Pricing
   price: number;
   originalPrice?: number;
   discount?: number;
