@@ -451,27 +451,15 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="px-4 py-3">
                     {(product.fileUrl || product.downloadUrl) ? (
-                      <button
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          try {
-                            const response = await api.get(`/admin/products/${product.id}/signed-url`);
-                            if (response.data?.success && response.data?.data?.signedUrl) {
-                              window.open(response.data.data.signedUrl, '_blank');
-                            } else {
-                              toast.error('Failed to get download link');
-                            }
-                          } catch (error) {
-                            console.error('Error getting signed URL:', error);
-                            toast.error('Failed to get download link');
-                          }
-                        }}
+                      <a
+                        href={`${process.env.NEXT_PUBLIC_API_URL || 'https://digistore1-backend.onrender.com/api'}/admin/products/${product.id}/download`}
+                        onClick={(e) => e.stopPropagation()}
                         className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-500 text-white hover:bg-blue-600 rounded-lg transition-colors text-xs font-medium"
-                        title="View download file"
+                        title="Download file"
                       >
                         <Download className="w-3.5 h-3.5" />
-                        View
-                      </button>
+                        Download
+                      </a>
                     ) : (
                       <span className="text-xs text-gray-400">No file</span>
                     )}
