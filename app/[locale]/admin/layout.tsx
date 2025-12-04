@@ -16,6 +16,7 @@ import {
   FolderTree,
   Star,
   Tag,
+  Tags,
   MoreHorizontal,
 } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -26,6 +27,7 @@ const getNavigation = (basePath: string) => [
   { name: "Products", href: `${basePath}/admin/products`, icon: Package },
   { name: "Categories", href: `${basePath}/admin/categories`, icon: FolderTree },
   { name: "Attributes", href: `${basePath}/admin/attributes`, icon: Tag },
+  { name: "Tags", href: `${basePath}/admin/tags`, icon: Tags },
   { name: "Orders", href: `${basePath}/admin/orders`, icon: ShoppingCart },
   { name: "Customers", href: `${basePath}/admin/customers`, icon: Users },
   { name: "Reviews", href: `${basePath}/admin/reviews`, icon: Star },

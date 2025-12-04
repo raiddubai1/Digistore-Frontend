@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Tag, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Tag, CheckCircle, XCircle, Loader2, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { attributesAPI } from "@/lib/api";
@@ -28,6 +28,9 @@ export default function AttributesPage() {
   const locale = pathname.split('/')[1] || 'en';
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAttributes();
@@ -44,6 +47,21 @@ export default function AttributesPage() {
       console.error('Failed to fetch attributes:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      setDeleting(true);
+      setError(null);
+      await attributesAPI.delete(id);
+      setAttributes(prev => prev.filter(a => a.id !== id));
+      setDeleteId(null);
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Failed to delete attribute';
+      setError(message);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -203,12 +221,31 @@ export default function AttributesPage() {
                       >
                         <Edit className="w-4 h-4" />
                       </Link>
-                      <button
-                        className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {deleteId === attribute.id ? (
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleDelete(attribute.id)}
+                            disabled={deleting}
+                            className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                          >
+                            {deleting ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Yes'}
+                          </button>
+                          <button
+                            onClick={() => setDeleteId(null)}
+                            className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                          >
+                            No
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setDeleteId(attribute.id)}
+                          className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -217,7 +254,18 @@ export default function AttributesPage() {
           </table>
         </div>
 
-        {attributes.length === 0 && (
+        {/* Error Message */}
+        {error && (
+          <div className="mx-6 mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            <p className="text-sm text-red-700">{error}</p>
+            <button onClick={() => setError(null)} className="ml-auto text-red-600 hover:text-red-800">
+              <XCircle className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {attributes.length === 0 && !loading && (
           <div className="p-12 text-center">
             <Tag className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500">No attributes found</p>
