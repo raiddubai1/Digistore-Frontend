@@ -9,54 +9,80 @@ import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from "recharts";
-import { productsAPI, ordersAPI } from "@/lib/api";
 
-// Demo data for charts
-const salesData = [
-  { name: "Jan", sales: 4000, orders: 24 },
-  { name: "Feb", sales: 3000, orders: 18 },
-  { name: "Mar", sales: 5000, orders: 32 },
-  { name: "Apr", sales: 4500, orders: 28 },
-  { name: "May", sales: 6000, orders: 42 },
-  { name: "Jun", sales: 5500, orders: 38 },
-  { name: "Jul", sales: 7000, orders: 52 },
-];
+interface DashboardStats {
+  totalRevenue: number;
+  totalOrders: number;
+  totalProducts: number;
+  totalCustomers: number;
+  recentOrders: any[];
+  topProducts: any[];
+}
 
-const categoryData = [
-  { name: "eBooks", value: 35, color: "#FF6B35" },
-  { name: "Templates", value: 25, color: "#4F46E5" },
-  { name: "Courses", value: 20, color: "#10B981" },
-  { name: "Graphics", value: 15, color: "#F59E0B" },
-  { name: "Other", value: 5, color: "#6B7280" },
-];
+interface CategoryData {
+  name: string;
+  value: number;
+  color: string;
+}
 
-const topProducts = [
-  { name: "Marketing eBook Bundle", sales: 156, revenue: 4680 },
-  { name: "Social Media Templates", sales: 124, revenue: 2480 },
-  { name: "Business Plan Template", sales: 98, revenue: 1960 },
-  { name: "Photography Presets", sales: 87, revenue: 2610 },
-  { name: "UI Kit Pro", sales: 76, revenue: 3800 },
-];
+const CHART_COLORS = ["#FF6B35", "#4F46E5", "#10B981", "#F59E0B", "#6B7280", "#EC4899", "#8B5CF6"];
 
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState("7d");
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalRevenue: 28500,
-    totalOrders: 234,
-    totalCustomers: 189,
-    totalDownloads: 1456,
-    revenueChange: 12.5,
-    ordersChange: 8.3,
-    customersChange: 15.2,
-    downloadsChange: -3.1,
-  });
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [categoryData, setCategoryData] = useState<CategoryData[]>([]);
+  const [salesData, setSalesData] = useState<any[]>([]);
 
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
+    fetchAnalyticsData();
   }, []);
+
+  const fetchAnalyticsData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("accessToken");
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+      // Fetch dashboard stats
+      const statsRes = await fetch(`${API_URL}/admin/dashboard/stats`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (statsRes.ok) {
+        const data = await statsRes.json();
+        setStats(data.data);
+
+        // Process top products for chart
+        if (data.data?.topProducts) {
+          const chartData = data.data.topProducts.map((p: any, i: number) => ({
+            name: p.title?.substring(0, 15) || `Product ${i + 1}`,
+            sales: p.sales || 0,
+            revenue: p.revenue || 0,
+          }));
+          setSalesData(chartData);
+        }
+      }
+
+      // Fetch categories for pie chart
+      const catRes = await fetch(`${API_URL}/categories`);
+      if (catRes.ok) {
+        const catData = await catRes.json();
+        if (catData.data?.categories) {
+          const cats = catData.data.categories.map((c: any, i: number) => ({
+            name: c.name,
+            value: c._count?.products || 0,
+            color: CHART_COLORS[i % CHART_COLORS.length],
+          })).filter((c: CategoryData) => c.value > 0);
+          setCategoryData(cats.length > 0 ? cats : [{ name: "No Data", value: 1, color: "#E5E7EB" }]);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch analytics:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const StatCard = ({
     title, value, change, icon: Icon, prefix = ""
@@ -117,35 +143,43 @@ export default function AnalyticsPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Revenue" value={stats.totalRevenue} change={stats.revenueChange} icon={DollarSign} prefix="$" />
-        <StatCard title="Total Orders" value={stats.totalOrders} change={stats.ordersChange} icon={ShoppingCart} />
-        <StatCard title="Total Customers" value={stats.totalCustomers} change={stats.customersChange} icon={Users} />
-        <StatCard title="Total Downloads" value={stats.totalDownloads} change={stats.downloadsChange} icon={Download} />
+        <StatCard title="Total Revenue" value={stats?.totalRevenue || 0} change={0} icon={DollarSign} prefix="$" />
+        <StatCard title="Total Orders" value={stats?.totalOrders || 0} change={0} icon={ShoppingCart} />
+        <StatCard title="Total Customers" value={stats?.totalCustomers || 0} change={0} icon={Users} />
+        <StatCard title="Total Products" value={stats?.totalProducts || 0} change={0} icon={Package} />
       </div>
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Sales Chart */}
         <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Sales Overview</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={salesData}>
-              <defs>
-                <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#FF6B35" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#FF6B35" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="name" stroke="#9CA3AF" fontSize={12} />
-              <YAxis stroke="#9CA3AF" fontSize={12} />
-              <Tooltip
-                contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
-                formatter={(value: number) => [`$${value}`, 'Revenue']}
-              />
-              <Area type="monotone" dataKey="sales" stroke="#FF6B35" fill="url(#salesGradient)" strokeWidth={2} />
-            </AreaChart>
-          </ResponsiveContainer>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Products Revenue</h3>
+          {salesData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={salesData}>
+                <defs>
+                  <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#FF6B35" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#FF6B35" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="name" stroke="#9CA3AF" fontSize={12} />
+                <YAxis stroke="#9CA3AF" fontSize={12} />
+                <Tooltip
+                  contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                  formatter={(value: number) => [`$${value}`, 'Revenue']}
+                />
+                <Area type="monotone" dataKey="revenue" stroke="#FF6B35" fill="url(#salesGradient)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-[300px] text-gray-500">
+              <BarChart3 className="w-16 h-16 mb-4 text-gray-300" />
+              <p>No sales data yet</p>
+              <p className="text-sm">Data will appear after orders are placed</p>
+            </div>
+          )}
         </div>
 
         {/* Category Distribution */}
@@ -200,18 +234,26 @@ export default function AnalyticsPage() {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Products</h3>
           <div className="space-y-4">
-            {topProducts.map((product, index) => (
-              <div key={product.name} className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-600">
-                  {index + 1}
+            {stats?.topProducts && stats.topProducts.length > 0 ? (
+              stats.topProducts.slice(0, 5).map((product: any, index: number) => (
+                <div key={product.id || index} className="flex items-center gap-4">
+                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-600">
+                    {index + 1}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">{product.title}</p>
+                    <p className="text-xs text-gray-500">{product.sales || 0} sales</p>
+                  </div>
+                  <p className="text-sm font-semibold text-gray-900">${(product.revenue || 0).toLocaleString()}</p>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
-                  <p className="text-xs text-gray-500">{product.sales} sales</p>
-                </div>
-                <p className="text-sm font-semibold text-gray-900">${product.revenue.toLocaleString()}</p>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No product data yet</p>
+                <p className="text-sm">Add products to see analytics</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
