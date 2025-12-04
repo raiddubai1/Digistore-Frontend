@@ -5,6 +5,7 @@ import OfferOfTheDay from "@/components/OfferOfTheDay";
 import CategoriesSection from "@/components/CategoriesSection";
 import BlogSection from "@/components/BlogSection";
 import MobileHome from "@/components/MobileHome";
+import RecentlyViewed from "@/components/RecentlyViewed";
 import { getFeaturedProducts, getBestsellers, getNewArrivals } from "@/lib/api/products";
 import { getCategories } from "@/lib/api/categories";
 import { demoProducts, demoCategories } from "@/data/demo-products";
@@ -429,6 +430,13 @@ export default async function Home({ params }: HomeProps) {
 
       {/* Blog Section */}
       <BlogSection />
+
+      {/* Recently Viewed Products */}
+      <section className="py-12 bg-gray-50 dark:bg-slate-800/50">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <RecentlyViewed title="Recently Viewed" maxItems={6} />
+        </div>
+      </section>
 
       {/* CTA Section - Modern Design */}
       <section className="py-20 bg-gradient-to-b from-white to-gray-50 dark:from-slate-900 dark:to-slate-800">

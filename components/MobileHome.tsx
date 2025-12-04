@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Search, ChevronRight, TrendingUp, Sparkles, Star, Clock } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -284,30 +285,35 @@ export default function MobileHome({
 }
 
 // Compact product card for mobile grid/scroll - with consistent padding
-function MiniProductCard({ product }: { product: Product }) {
+function MiniProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
   return (
     <Link href={`/products/${product.slug}`} className="block">
       <div className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-md active:scale-[0.98] transition-all">
         {/* Product Image - with consistent padding */}
         <div className="relative aspect-square bg-gray-50 dark:bg-slate-700 p-2">
-          <img
-            src={product.thumbnailUrl}
-            alt={product.title}
-            className="w-full h-full object-cover rounded-lg"
-          />
+          <div className="relative w-full h-full">
+            <Image
+              src={product.thumbnailUrl || '/placeholder-product.png'}
+              alt={product.title}
+              fill
+              sizes="(max-width: 768px) 50vw, 25vw"
+              priority={priority}
+              className="object-cover rounded-lg"
+            />
+          </div>
           {/* Badges */}
           {product.discount && product.discount > 0 && (
-            <span className="absolute top-3 left-3 px-2 py-0.5 bg-[#FF6B35] text-white text-[10px] font-bold rounded-md shadow-sm">
+            <span className="absolute top-3 left-3 px-2 py-0.5 bg-[#FF6B35] text-white text-[10px] font-bold rounded-md shadow-sm z-10">
               -{product.discount}%
             </span>
           )}
           {product.bestseller && !product.discount && (
-            <span className="absolute top-3 left-3 px-2 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded-md shadow-sm">
+            <span className="absolute top-3 left-3 px-2 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded-md shadow-sm z-10">
               🔥 HOT
             </span>
           )}
           {product.newArrival && !product.discount && !product.bestseller && (
-            <span className="absolute top-3 left-3 px-2 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded-md shadow-sm">
+            <span className="absolute top-3 left-3 px-2 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded-md shadow-sm z-10">
               ✨ NEW
             </span>
           )}

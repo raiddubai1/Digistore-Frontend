@@ -9,6 +9,7 @@ import {
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useRecentlyViewedStore } from "@/store/recentlyViewedStore";
+import ProductJsonLd from "@/components/ProductJsonLd";
 import { Product, Review } from "@/types";
 import toast from "react-hot-toast";
 
@@ -108,6 +109,13 @@ export default function ProductDetailClient({
 
   return (
     <>
+      {/* JSON-LD Structured Data for SEO */}
+      <ProductJsonLd
+        product={product}
+        reviews={reviews}
+        averageRating={averageRating}
+      />
+
       {/* ===== MOBILE LAYOUT ===== */}
       <div className="lg:hidden min-h-screen bg-white pb-24">
         {/* Image Carousel - Full width, edge to edge, with overlaid buttons */}

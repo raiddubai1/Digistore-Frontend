@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Product } from "@/types";
 import { Heart, ShoppingCart, Star, Download, GitCompare } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
@@ -12,9 +13,10 @@ import toast from "react-hot-toast";
 
 interface ProductCardProps {
   product: Product;
+  priority?: boolean; // For above-the-fold images
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, priority = false }: ProductCardProps) {
   const { addItem } = useCartStore();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
   const { addItem: addToCompare, removeItem: removeFromCompare, isInCompare, items: compareItems } = useCompareStore();
@@ -66,10 +68,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="relative aspect-square lg:aspect-[4/3] bg-gray-50 dark:bg-slate-700 overflow-hidden flex-shrink-0 p-2 lg:p-3">
           {/* Product Image */}
           {product.thumbnailUrl ? (
-            <img
+            <Image
               src={product.thumbnailUrl}
               alt={product.title}
-              className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+              fill
+              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+              priority={priority}
+              className="object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
             <div className="absolute inset-2 lg:inset-3 flex items-center justify-center rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-600 dark:to-slate-700">

@@ -4,7 +4,9 @@ import { useState, use, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { useRateLimit } from '@/hooks/useRateLimit';
+import toast from 'react-hot-toast';
 
 interface LoginPageProps {
   params: Promise<{ locale: string }>;
@@ -20,6 +22,36 @@ export default function LoginPage({ params }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
+  const [blockTimeRemaining, setBlockTimeRemaining] = useState(0);
+
+  // Rate limiting for login attempts
+  const {
+    isBlocked,
+    getRemainingBlockTime,
+    getRemainingAttempts,
+    recordAttempt,
+    reset: resetRateLimit
+  } = useRateLimit({
+    maxAttempts: 5,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    blockDurationMs: 30 * 60 * 1000, // 30 minutes block
+    storageKey: 'login_rate_limit',
+  });
+
+  // Update block time countdown
+  useEffect(() => {
+    if (isBlocked()) {
+      setBlockTimeRemaining(getRemainingBlockTime());
+      const interval = setInterval(() => {
+        const remaining = getRemainingBlockTime();
+        setBlockTimeRemaining(remaining);
+        if (remaining <= 0) {
+          clearInterval(interval);
+        }
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isBlocked, getRemainingBlockTime]);
 
   // Handle GitHub OAuth callback
   useEffect(() => {
@@ -34,12 +66,26 @@ export default function LoginPage({ params }: LoginPageProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if blocked
+    if (isBlocked()) {
+      toast.error(`Too many login attempts. Please try again in ${Math.ceil(blockTimeRemaining / 60)} minutes.`);
+      return;
+    }
+
     setLoading(true);
 
     try {
       await login(email, password, locale);
+      // Reset rate limit on successful login
+      resetRateLimit();
     } catch (error) {
-      // Error is handled in AuthContext
+      // Record failed attempt
+      recordAttempt();
+      const remaining = getRemainingAttempts();
+      if (remaining > 0 && remaining <= 3) {
+        toast.error(`${remaining} attempts remaining before temporary lockout.`);
+      }
     } finally {
       setLoading(false);
     }
@@ -112,6 +158,18 @@ export default function LoginPage({ params }: LoginPageProps) {
             </Link>
           </p>
         </div>
+
+        {/* Rate Limit Warning */}
+        {isBlocked() && (
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-4 shadow-sm">
+            <div className="flex items-center gap-2 text-red-700 dark:text-red-400">
+              <AlertTriangle className="w-5 h-5" />
+              <p className="text-sm font-medium">
+                Too many login attempts. Please try again in {Math.floor(blockTimeRemaining / 60)}:{String(blockTimeRemaining % 60).padStart(2, '0')}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Demo Accounts */}
         <div className="bg-blue-50 dark:bg-slate-700 border border-blue-200 dark:border-slate-600 rounded-xl p-4 shadow-sm">
@@ -209,7 +267,7 @@ export default function LoginPage({ params }: LoginPageProps) {
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isBlocked()}
               className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-teal-600 dark:bg-[#FF6B35] hover:bg-teal-700 dark:hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 dark:focus:ring-[#FF6B35] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? (

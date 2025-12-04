@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
+import Breadcrumb from "@/components/Breadcrumb";
 import { demoProducts, demoCategories } from "@/data/demo-products";
-import { Filter, Grid, List, X, Search, Star, Heart, ShoppingCart, Download } from "lucide-react";
+import { Filter, Grid, List, X, Search, Star, Heart, ShoppingCart, Download, Loader2 } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useFilterStore } from "@/store/filterStore";
 import toast from "react-hot-toast";
@@ -68,6 +69,8 @@ export default function ProductsClient() {
   const [total, setTotal] = useState((demoProducts || []).length);
   const [page, setPage] = useState(1);
   const [isLoadMore, setIsLoadMore] = useState(false); // Track if "Load More" was clicked
+  const [isLoadingMore, setIsLoadingMore] = useState(false); // Track loading state for infinite scroll
+  const loadMoreRef = useRef<HTMLDivElement>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
@@ -342,6 +345,38 @@ export default function ProductsClient() {
   const hasActiveFilters =
     selectedCategories.length > 0 || selectedSubcategories.length > 0 || selectedTags.length > 0 || selectedPriceRanges.length > 0 || selectedRatings.length > 0 || selectedFileTypes.length > 0;
 
+  // Infinite scroll handler
+  const loadMoreProducts = useCallback(() => {
+    if (isLoadingMore || products.length >= total) return;
+
+    setIsLoadingMore(true);
+    setIsLoadMore(true);
+    setPage(prev => prev + 1);
+
+    // Simulate loading delay for smooth UX
+    setTimeout(() => {
+      setIsLoadingMore(false);
+    }, 300);
+  }, [isLoadingMore, products.length, total]);
+
+  // Intersection Observer for infinite scroll on mobile
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading && products.length < total) {
+          loadMoreProducts();
+        }
+      },
+      { threshold: 0.1, rootMargin: '100px' }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [loading, products.length, total, loadMoreProducts]);
+
   // Update filter count in store for bottom nav badge
   useEffect(() => {
     const count = selectedCategories.length + selectedSubcategories.length + selectedTags.length + selectedPriceRanges.length + selectedRatings.length + selectedFileTypes.length;
@@ -598,18 +633,29 @@ export default function ProductsClient() {
           )}
         </div>
 
-        {/* Load More (Mobile) */}
+        {/* Infinite Scroll Trigger (Mobile) */}
         {!loading && products.length > 0 && products.length < total && (
-          <div className="px-4 py-6">
-            <button
-              onClick={() => {
-                setIsLoadMore(true);
-                setPage(page + 1);
-              }}
-              className="w-full py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 active:bg-gray-50"
-            >
-              Load more products
-            </button>
+          <div ref={loadMoreRef} className="px-4 py-6 flex justify-center">
+            {isLoadingMore ? (
+              <div className="flex items-center gap-2 text-gray-500">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span className="text-sm">Loading more...</span>
+              </div>
+            ) : (
+              <button
+                onClick={loadMoreProducts}
+                className="w-full py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 active:bg-gray-50"
+              >
+                Load more products ({products.length} of {total})
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* End of products indicator */}
+        {!loading && products.length > 0 && products.length >= total && (
+          <div className="px-4 py-6 text-center text-gray-400 text-sm">
+            You&apos;ve seen all {total} products
           </div>
         )}
       </div>
@@ -617,6 +663,9 @@ export default function ProductsClient() {
       {/* ===== DESKTOP LAYOUT ===== */}
       <div className="hidden lg:block min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-8 py-8">
+          {/* Breadcrumb */}
+          <Breadcrumb className="mb-4" />
+
           {/* Page Header */}
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2">All Products</h1>

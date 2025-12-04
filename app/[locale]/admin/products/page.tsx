@@ -50,6 +50,7 @@ export default function AdminProductsPage() {
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
+  const [bulkStatusUpdating, setBulkStatusUpdating] = useState(false);
 
   // Close action menu when clicking outside
   useEffect(() => {
@@ -208,6 +209,36 @@ export default function AdminProductsPage() {
     }
   };
 
+  // Bulk update status of selected products
+  const handleBulkStatusUpdate = async (newStatus: string) => {
+    setBulkStatusUpdating(true);
+    const selectedArray = Array.from(selectedProducts);
+    let updated = 0;
+    let failed = 0;
+
+    for (const productId of selectedArray) {
+      try {
+        await productsAPI.update(productId, { status: newStatus });
+        updated++;
+      } catch (error) {
+        failed++;
+      }
+    }
+
+    // Update local state
+    setProducts(products.map(p =>
+      selectedProducts.has(p.id) ? { ...p, status: newStatus } : p
+    ));
+    setSelectedProducts(new Set());
+    setBulkStatusUpdating(false);
+
+    if (failed === 0) {
+      toast.success(`Successfully updated ${updated} products to ${newStatus}`);
+    } else {
+      toast.error(`Updated ${updated} products, ${failed} failed`);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -273,25 +304,44 @@ export default function AdminProductsPage() {
 
       {/* Bulk Actions Bar */}
       {selectedProducts.size > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center justify-between">
+        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="font-semibold text-red-700">
+            <span className="font-semibold text-gray-700">
               {selectedProducts.size} product{selectedProducts.size > 1 ? 's' : ''} selected
             </span>
             <button
               onClick={() => setSelectedProducts(new Set())}
               className="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-1"
             >
-              <XCircle className="w-4 h-4" /> Clear selection
+              <XCircle className="w-4 h-4" /> Clear
             </button>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Bulk Status Update */}
+            <button
+              onClick={() => handleBulkStatusUpdate('published')}
+              disabled={bulkStatusUpdating}
+              className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm flex items-center gap-1 disabled:opacity-50"
+            >
+              {bulkStatusUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />}
+              Publish
+            </button>
+            <button
+              onClick={() => handleBulkStatusUpdate('draft')}
+              disabled={bulkStatusUpdating}
+              className="px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 text-sm flex items-center gap-1 disabled:opacity-50"
+            >
+              {bulkStatusUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Edit className="w-4 h-4" />}
+              Draft
+            </button>
+
+            {/* Bulk Delete */}
             {bulkDeleteConfirm ? (
               <>
-                <span className="text-red-600 font-medium">Are you sure?</span>
+                <span className="text-red-600 font-medium text-sm">Confirm delete?</span>
                 <button
                   onClick={() => setBulkDeleteConfirm(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+                  className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 text-sm"
                   disabled={bulkDeleting}
                 >
                   Cancel
@@ -299,25 +349,21 @@ export default function AdminProductsPage() {
                 <button
                   onClick={handleBulkDelete}
                   disabled={bulkDeleting}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                  className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-1 text-sm"
                 >
                   {bulkDeleting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" /> Deleting...
-                    </>
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Deleting...</>
                   ) : (
-                    <>
-                      <Trash2 className="w-4 h-4" /> Yes, Delete All
-                    </>
+                    <><Trash2 className="w-4 h-4" /> Yes, Delete</>
                   )}
                 </button>
               </>
             ) : (
               <button
                 onClick={handleBulkDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-1 text-sm"
               >
-                <Trash2 className="w-4 h-4" /> Delete Selected
+                <Trash2 className="w-4 h-4" /> Delete
               </button>
             )}
           </div>

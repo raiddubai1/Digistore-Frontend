@@ -22,11 +22,24 @@ export const viewport: Viewport = {
   ],
 };
 
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://digistore1.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
   title: "Digistore1 - Premium Digital Products Marketplace",
   description: "Download high-quality digital products instantly. eBooks, templates, tools, and more. Your one-stop shop for digital downloads.",
   keywords: ["digital products", "ebooks", "templates", "downloads", "digital marketplace"],
   authors: [{ name: "Digistore1" }],
+  alternates: {
+    canonical: "/",
+    languages: {
+      "en": "/en",
+      "ar": "/ar",
+      "es": "/es",
+      "fr": "/fr",
+      "de": "/de",
+    },
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -38,7 +51,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Digistore1 - Premium Digital Products",
     description: "Download high-quality digital products instantly",
-    url: "https://www.digistore1.com",
+    url: BASE_URL,
     siteName: "Digistore1",
     type: "website",
   },

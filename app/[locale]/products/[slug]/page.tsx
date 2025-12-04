@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { demoProducts } from "@/data/demo-products";
 import { getProductReviews as getDemoReviews } from "@/data/demo-reviews";
@@ -5,8 +6,47 @@ import { getProductBySlug, getProducts } from "@/lib/api/products";
 import { getProductReviews } from "@/lib/api/reviews";
 import ProductDetailClient from "./ProductDetailClient";
 
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://digistore1.vercel.app";
+
 interface ProductPageProps {
   params: Promise<{ slug: string; locale: string }>;
+}
+
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { slug, locale } = await params;
+  let product = demoProducts.find((p) => p.slug === slug);
+
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    try {
+      const apiProduct = await getProductBySlug(slug);
+      if (apiProduct) product = apiProduct;
+    } catch {
+      // Use demo data
+    }
+  }
+
+  if (!product) {
+    return { title: "Product Not Found" };
+  }
+
+  return {
+    title: `${product.title} | Digistore1`,
+    description: product.description?.slice(0, 160) || `Buy ${product.title} - Premium digital product`,
+    alternates: {
+      canonical: `/${locale}/products/${slug}`,
+      languages: {
+        "en": `/en/products/${slug}`,
+        "ar": `/ar/products/${slug}`,
+      },
+    },
+    openGraph: {
+      title: product.title,
+      description: product.description?.slice(0, 160),
+      url: `${BASE_URL}/${locale}/products/${slug}`,
+      images: [product.thumbnailUrl],
+      type: "website",
+    },
+  };
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
