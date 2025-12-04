@@ -4,6 +4,9 @@ import { getCategories } from "@/lib/api/categories";
 import type { Category } from "@/types";
 import { ArrowRight, Briefcase, User, Home, Code, Globe, Heart, Package, ChevronRight } from "lucide-react";
 
+// Force dynamic rendering to prevent build-time API calls
+export const dynamic = 'force-dynamic';
+
 const categoryIcons: Record<string, any> = {
   briefcase: Briefcase,
   user: User,

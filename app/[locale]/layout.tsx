@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -10,22 +10,23 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const locales = ['en', 'ar', 'es', 'fr', 'de'];
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover", // For iPhone notch support
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+};
+
 export const metadata: Metadata = {
   title: "Digistore1 - Premium Digital Products Marketplace",
   description: "Download high-quality digital products instantly. eBooks, templates, tools, and more. Your one-stop shop for digital downloads.",
   keywords: ["digital products", "ebooks", "templates", "downloads", "digital marketplace"],
   authors: [{ name: "Digistore1" }],
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: "cover", // For iPhone notch support
-  },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
