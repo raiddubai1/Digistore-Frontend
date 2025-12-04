@@ -23,6 +23,7 @@ interface CategoryData {
   name: string;
   value: number;
   color: string;
+  [key: string]: string | number;
 }
 
 const CHART_COLORS = ["#FF6B35", "#4F46E5", "#10B981", "#F59E0B", "#6B7280", "#EC4899", "#8B5CF6"];
