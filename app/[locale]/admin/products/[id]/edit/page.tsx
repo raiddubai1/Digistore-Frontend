@@ -5,13 +5,28 @@ import { useRouter, usePathname } from "next/navigation";
 import { Save, ArrowLeft, Loader2, Upload, X, Plus, Image as ImageIcon, FileDown } from "lucide-react";
 import toast from "react-hot-toast";
 import Image from "next/image";
-import { productsAPI, categoriesAPI } from "@/lib/api";
+import { productsAPI, categoriesAPI, attributesAPI } from "@/lib/api";
 
 interface Category {
   id: string;
   name: string;
   slug: string;
   children?: Category[];
+}
+
+interface Attribute {
+  id: string;
+  name: string;
+  slug: string;
+  type: string;
+  options: string[];
+  required: boolean;
+}
+
+interface ProductAttribute {
+  attributeId: string;
+  value: string;
+  attribute: Attribute;
 }
 
 interface Product {
@@ -56,6 +71,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [newTag, setNewTag] = useState("");
   const [newIncluded, setNewIncluded] = useState("");
   const [newRequirement, setNewRequirement] = useState("");
@@ -92,6 +109,12 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           setCategories(catResponse.data.data?.categories || []);
         }
 
+        // Fetch attributes
+        const attrResponse = await attributesAPI.getAll();
+        if (attrResponse.data?.success) {
+          setAttributes(attrResponse.data.data || []);
+        }
+
         // Fetch product
         const response = await productsAPI.getById(id);
         if (response.data?.success && response.data?.data) {
@@ -117,6 +140,16 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             bestseller: p.bestseller || false,
             newArrival: p.newArrival || false,
           });
+
+          // Fetch product's current attributes
+          const prodAttrResponse = await attributesAPI.getProductAttributes(p.id);
+          if (prodAttrResponse.data?.success && prodAttrResponse.data?.data) {
+            const attrMap: Record<string, string> = {};
+            prodAttrResponse.data.data.forEach((pa: ProductAttribute) => {
+              attrMap[pa.attributeId] = pa.value;
+            });
+            setSelectedAttributes(attrMap);
+          }
         } else {
           toast.error("Product not found");
         }
@@ -190,6 +223,16 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     try {
       setSaving(true);
       await productsAPI.update(id, formData);
+
+      // Save attributes
+      const attributesToSave = Object.entries(selectedAttributes)
+        .filter(([_, value]) => value)
+        .map(([attributeId, value]) => ({ attributeId, value }));
+
+      if (attributesToSave.length > 0) {
+        await attributesAPI.setProductAttributes(id, attributesToSave);
+      }
+
       toast.success("Product updated successfully!");
       router.push(`${basePath}/admin/products`);
     } catch (error) {
@@ -443,6 +486,55 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                 </div>
               </div>
             </div>
+
+            {/* Attributes */}
+            {attributes.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                <h2 className="text-lg font-bold mb-4">Product Attributes</h2>
+                <div className="space-y-4">
+                  {attributes.map((attr) => (
+                    <div key={attr.id}>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {attr.name} {attr.required && <span className="text-red-500">*</span>}
+                      </label>
+                      {attr.type === "SELECT" && (
+                        <select value={selectedAttributes[attr.id] || ""}
+                          onChange={(e) => setSelectedAttributes({ ...selectedAttributes, [attr.id]: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary">
+                          <option value="">Select {attr.name}</option>
+                          {attr.options?.map((option) => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
+                        </select>
+                      )}
+                      {attr.type === "MULTISELECT" && (
+                        <select multiple value={selectedAttributes[attr.id]?.split(',') || []}
+                          onChange={(e) => {
+                            const values = Array.from(e.target.selectedOptions, option => option.value);
+                            setSelectedAttributes({ ...selectedAttributes, [attr.id]: values.join(',') });
+                          }}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                          size={Math.min(attr.options?.length || 4, 4)}>
+                          {attr.options?.map((option) => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
+                        </select>
+                      )}
+                      {(attr.type === "TEXT" || !attr.type) && (
+                        <input type="text" value={selectedAttributes[attr.id] || ""}
+                          onChange={(e) => setSelectedAttributes({ ...selectedAttributes, [attr.id]: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary" />
+                      )}
+                      {attr.type === "NUMBER" && (
+                        <input type="number" value={selectedAttributes[attr.id] || ""}
+                          onChange={(e) => setSelectedAttributes({ ...selectedAttributes, [attr.id]: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Status Flags */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">

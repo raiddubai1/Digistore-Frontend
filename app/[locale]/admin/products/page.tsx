@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { demoProducts } from "@/data/demo-products";
 import { formatPrice } from "@/lib/utils";
-import { Plus, Search, Edit, Trash2, Eye, Loader2, MoreVertical, XCircle, ExternalLink } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, Loader2, MoreVertical, XCircle, Download } from "lucide-react";
 import toast from "react-hot-toast";
 import { productsAPI, categoriesAPI } from "@/lib/api";
+import api from "@/lib/api";
 
 interface Product {
   id: string;
@@ -450,17 +451,27 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="px-4 py-3">
                     {(product.fileUrl || product.downloadUrl) ? (
-                      <a
-                        href={product.fileUrl || product.downloadUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            const response = await api.get(`/admin/products/${product.id}/signed-url`);
+                            if (response.data?.success && response.data?.data?.signedUrl) {
+                              window.open(response.data.data.signedUrl, '_blank');
+                            } else {
+                              toast.error('Failed to get download link');
+                            }
+                          } catch (error) {
+                            console.error('Error getting signed URL:', error);
+                            toast.error('Failed to get download link');
+                          }
+                        }}
                         className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-500 text-white hover:bg-blue-600 rounded-lg transition-colors text-xs font-medium"
                         title="View download file"
                       >
-                        <ExternalLink className="w-3.5 h-3.5" />
+                        <Download className="w-3.5 h-3.5" />
                         View
-                      </a>
+                      </button>
                     ) : (
                       <span className="text-xs text-gray-400">No file</span>
                     )}
