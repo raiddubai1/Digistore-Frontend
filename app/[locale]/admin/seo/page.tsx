@@ -17,7 +17,7 @@ import {
   Facebook,
   Twitter,
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { productsAPI } from "@/lib/api";
 import toast from "react-hot-toast";
 
 interface Product {
@@ -128,7 +128,6 @@ function StatusIcon({ status }: { status: "good" | "warning" | "error" }) {
 }
 
 export default function SEODashboardPage() {
-  const { token } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -138,8 +137,6 @@ export default function SEODashboardPage() {
   const [saving, setSaving] = useState(false);
   const [filter, setFilter] = useState<"all" | "good" | "needs-improvement" | "poor">("all");
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://digistore1-backend.onrender.com";
-
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -147,10 +144,9 @@ export default function SEODashboardPage() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/api/products?limit=100`);
-      const data = await response.json();
-      if (data.success) {
-        setProducts(data.data.products || []);
+      const response = await productsAPI.getAll({ limit: 100 });
+      if (response.data?.success) {
+        setProducts(response.data.data.products || []);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -164,15 +160,8 @@ export default function SEODashboardPage() {
     if (!selectedProduct) return;
     setSaving(true);
     try {
-      const response = await fetch(`${API_URL}/api/products/${selectedProduct.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(seoData),
-      });
-      if (response.ok) {
+      const response = await productsAPI.update(selectedProduct.id, seoData);
+      if (response.data?.success) {
         toast.success("SEO data saved successfully!");
         setProducts(products.map(p =>
           p.id === selectedProduct.id ? { ...p, ...seoData } : p
