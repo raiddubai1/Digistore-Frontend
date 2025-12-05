@@ -8,7 +8,6 @@ import MobileHome from "@/components/MobileHome";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import { getFeaturedProducts, getBestsellers, getNewArrivals } from "@/lib/api/products";
 import { getCategories } from "@/lib/api/categories";
-import { demoProducts, demoCategories } from "@/data/demo-products";
 
 interface HomeProps {
   params: Promise<{ locale: string }>;
@@ -21,30 +20,28 @@ export const revalidate = 0;
 export default async function Home({ params }: HomeProps) {
   const { locale } = await params;
 
-  // Use demo data by default (API integration can be enabled when backend is ready)
-  let featuredProducts = demoProducts.filter((p) => p.featured);
-  let bestsellerProducts = demoProducts.filter((p) => p.bestseller).slice(0, 3);
-  let newProducts = demoProducts.filter((p) => p.newArrival);
-  let categories = demoCategories;
+  // Initialize with empty arrays - we use real API data
+  let featuredProducts: any[] = [];
+  let bestsellerProducts: any[] = [];
+  let newProducts: any[] = [];
+  let categories: any[] = [];
 
-  // Try to fetch from API if available
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    try {
-      const [featured, bestsellers, newArrivals, apiCategories] = await Promise.all([
-        getFeaturedProducts(),
-        getBestsellers(),
-        getNewArrivals(),
-        getCategories(),
-      ]);
+  // Fetch from API
+  try {
+    const [featured, bestsellers, newArrivals, apiCategories] = await Promise.all([
+      getFeaturedProducts(),
+      getBestsellers(),
+      getNewArrivals(),
+      getCategories(),
+    ]);
 
-      if (featured && featured.length > 0) featuredProducts = featured;
-      if (bestsellers && bestsellers.length > 0) bestsellerProducts = bestsellers;
-      if (newArrivals && newArrivals.length > 0) newProducts = newArrivals;
-      if (apiCategories && apiCategories.length > 0) categories = apiCategories;
-    } catch (error) {
-      console.error("Error fetching data, using demo data:", error);
-      // Continue with demo data
-    }
+    featuredProducts = featured || [];
+    bestsellerProducts = bestsellers || [];
+    newProducts = newArrivals || [];
+    categories = apiCategories || [];
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    // Continue with empty arrays - sections will be hidden if no data
   }
 
   return (
@@ -324,75 +321,79 @@ export default async function Home({ params }: HomeProps) {
       </section>
 
       {/* Featured Products Section */}
-      <section className="py-24 bg-white dark:bg-slate-900">
-        <div className="max-w-7xl mx-auto px-12">
-          {/* Section Header */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-800 rounded-full mb-4">
-              <Sparkles className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-bold text-gray-500 dark:text-gray-400">FEATURED COLLECTION</span>
+      {featuredProducts.length > 0 && (
+        <section className="py-24 bg-white dark:bg-slate-900">
+          <div className="max-w-7xl mx-auto px-12">
+            {/* Section Header */}
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-800 rounded-full mb-4">
+                <Sparkles className="w-4 h-4 text-gray-500" />
+                <span className="text-sm font-bold text-gray-500 dark:text-gray-400">FEATURED COLLECTION</span>
+              </div>
+              <h2 className="text-4xl font-black mb-3">
+                <span className="text-gray-900 dark:text-white">Discover Our </span>
+                <span className="bg-gradient-to-r from-gray-500 to-[#ff6f61] bg-clip-text text-transparent">Best Products</span>
+              </h2>
+              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                Hand-picked premium digital products
+              </p>
             </div>
-            <h2 className="text-4xl font-black mb-3">
-              <span className="text-gray-900 dark:text-white">Discover Our </span>
-              <span className="bg-gradient-to-r from-gray-500 to-[#ff6f61] bg-clip-text text-transparent">Best Products</span>
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Hand-picked premium digital products
-            </p>
-          </div>
 
-          {/* Products Grid */}
-          <div className="grid grid-cols-3 gap-8 mb-12">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+            {/* Products Grid */}
+            <div className="grid grid-cols-3 gap-8 mb-12">
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
 
-          {/* View All Button */}
-          <div className="text-center">
-            <Link
-              href={`/${locale}/products`}
-              className="inline-flex items-center gap-3 px-8 py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 transition-all hover:scale-105 group"
-            >
-              View All Products
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            {/* View All Button */}
+            <div className="text-center">
+              <Link
+                href={`/${locale}/products`}
+                className="inline-flex items-center gap-3 px-8 py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 transition-all hover:scale-105 group"
+              >
+                View All Products
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Offer of the Day */}
       <OfferOfTheDay />
 
       {/* Bestsellers Section */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white dark:from-slate-800 dark:to-slate-900">
-        <div className="max-w-7xl mx-auto px-12">
-          <div className="flex items-center justify-between mb-12">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 dark:bg-orange-900/30 rounded-full mb-4">
-                <TrendingUp className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                <span className="text-sm font-bold text-orange-600 dark:text-orange-400">TRENDING NOW</span>
+      {bestsellerProducts.length > 0 && (
+        <section className="py-24 bg-gradient-to-b from-gray-50 to-white dark:from-slate-800 dark:to-slate-900">
+          <div className="max-w-7xl mx-auto px-12">
+            <div className="flex items-center justify-between mb-12">
+              <div>
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 dark:bg-orange-900/30 rounded-full mb-4">
+                  <TrendingUp className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                  <span className="text-sm font-bold text-orange-600 dark:text-orange-400">TRENDING NOW</span>
+                </div>
+                <h2 className="text-5xl font-black text-gray-900 dark:text-white">Bestsellers</h2>
+                <p className="text-lg text-gray-600 dark:text-gray-300 mt-2">Most popular this month</p>
               </div>
-              <h2 className="text-5xl font-black text-gray-900 dark:text-white">Bestsellers</h2>
-              <p className="text-lg text-gray-600 dark:text-gray-300 mt-2">Most popular this month</p>
+              <Link
+                href={`/${locale}/products?filter=bestsellers`}
+                className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 font-bold hover:gap-3 transition-all"
+              >
+                View All
+                <ArrowRight className="w-5 h-5" />
+              </Link>
             </div>
-            <Link
-              href={`/${locale}/products?filter=bestsellers`}
-              className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 font-bold hover:gap-3 transition-all"
-            >
-              View All
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </div>
 
-          {/* Products Grid */}
-          <div className="grid grid-cols-3 gap-8">
-            {bestsellerProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {/* Products Grid */}
+            <div className="grid grid-cols-3 gap-8">
+              {bestsellerProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Categories Section */}
       <CategoriesSection categories={categories} />
