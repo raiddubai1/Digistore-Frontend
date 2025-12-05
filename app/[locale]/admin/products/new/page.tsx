@@ -21,6 +21,15 @@ interface Category {
   id: string;
   name: string;
   slug: string;
+  parentId?: string | null;
+  children?: Category[];
+}
+
+interface FlatCategory {
+  id: string;
+  name: string;
+  level: number;
+  displayName: string;
 }
 
 export default function NewProductPage() {
@@ -35,10 +44,30 @@ export default function NewProductPage() {
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [productFile, setProductFile] = useState<File | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [flatCategories, setFlatCategories] = useState<FlatCategory[]>([]);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+
+  // Flatten categories with hierarchy indicators
+  const flattenCategories = (cats: Category[], level: number = 0): FlatCategory[] => {
+    const result: FlatCategory[] = [];
+    for (const cat of cats) {
+      const prefix = level === 0 ? '' : level === 1 ? '└─ ' : '    └─ ';
+      const displayName = level === 0 ? cat.name : `${prefix}${cat.name}`;
+      result.push({
+        id: cat.id,
+        name: cat.name,
+        level,
+        displayName,
+      });
+      if (cat.children && cat.children.length > 0) {
+        result.push(...flattenCategories(cat.children, level + 1));
+      }
+    }
+    return result;
+  };
 
   const [formData, setFormData] = useState({
     title: "",
@@ -125,16 +154,20 @@ export default function NewProductPage() {
       try {
         setIsLoadingCategories(true);
         const response = await categoriesAPI.getAll();
+        let cats: Category[] = [];
         if (response.data?.success && response.data?.data?.categories) {
-          setCategories(response.data.data.categories);
+          cats = response.data.data.categories;
         } else if (response.data?.data) {
           // Handle different response formats
-          setCategories(Array.isArray(response.data.data) ? response.data.data : []);
+          cats = Array.isArray(response.data.data) ? response.data.data : [];
         }
+        setCategories(cats);
+        setFlatCategories(flattenCategories(cats));
       } catch (error) {
         console.error('Failed to fetch categories:', error);
         // Fallback to empty - categories should be created via WooCommerce import
         setCategories([]);
+        setFlatCategories([]);
         toast.error('Failed to load categories. Please try again.');
       } finally {
         setIsLoadingCategories(false);
@@ -640,32 +673,26 @@ export default function NewProductPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Main Category
+                    Category
                   </label>
                   <select
                     value={formData.categoryId}
                     onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
                     required
                   >
                     <option value="">Select a category</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    {flatCategories.map((cat) => (
+                      <option
+                        key={cat.id}
+                        value={cat.id}
+                        className={cat.level === 0 ? 'font-bold' : ''}
+                        style={{ paddingLeft: cat.level * 12 }}
+                      >
+                        {cat.displayName}
+                      </option>
                     ))}
                   </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Subcategory (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.subcategory}
-                    onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="e.g., Social Media Marketing"
-                  />
                 </div>
               </div>
             </div>

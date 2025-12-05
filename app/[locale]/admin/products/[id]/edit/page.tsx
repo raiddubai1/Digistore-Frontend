@@ -11,7 +11,15 @@ interface Category {
   id: string;
   name: string;
   slug: string;
+  parentId?: string | null;
   children?: Category[];
+}
+
+interface FlatCategory {
+  id: string;
+  name: string;
+  level: number;
+  displayName: string;
 }
 
 interface Attribute {
@@ -71,11 +79,31 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [flatCategories, setFlatCategories] = useState<FlatCategory[]>([]);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [newTag, setNewTag] = useState("");
   const [newIncluded, setNewIncluded] = useState("");
   const [newRequirement, setNewRequirement] = useState("");
+
+  // Flatten categories with hierarchy indicators
+  const flattenCategories = (cats: Category[], level: number = 0, parentPath: string = ''): FlatCategory[] => {
+    const result: FlatCategory[] = [];
+    for (const cat of cats) {
+      const prefix = level === 0 ? '' : level === 1 ? '└─ ' : '    └─ ';
+      const displayName = level === 0 ? cat.name : `${prefix}${cat.name}`;
+      result.push({
+        id: cat.id,
+        name: cat.name,
+        level,
+        displayName,
+      });
+      if (cat.children && cat.children.length > 0) {
+        result.push(...flattenCategories(cat.children, level + 1, cat.name));
+      }
+    }
+    return result;
+  };
 
   const [formData, setFormData] = useState({
     title: "",
@@ -106,7 +134,9 @@ export default function EditProductPage({ params }: EditProductPageProps) {
         // Fetch categories
         const catResponse = await categoriesAPI.getAll();
         if (catResponse.data?.success) {
-          setCategories(catResponse.data.data?.categories || []);
+          const cats = catResponse.data.data?.categories || [];
+          setCategories(cats);
+          setFlatCategories(flattenCategories(cats));
         }
 
         // Fetch attributes
@@ -436,19 +466,19 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                   <select value={formData.categoryId}
                     onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary">
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary font-mono text-sm">
                     <option value="">Select category...</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    {flatCategories.map((cat) => (
+                      <option
+                        key={cat.id}
+                        value={cat.id}
+                        className={cat.level === 0 ? 'font-bold' : ''}
+                        style={{ paddingLeft: cat.level * 12 }}
+                      >
+                        {cat.displayName}
+                      </option>
                     ))}
                   </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Subcategory</label>
-                  <input type="text" value={formData.subcategory}
-                    onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                    placeholder="Optional subcategory" />
                 </div>
               </div>
             </div>
