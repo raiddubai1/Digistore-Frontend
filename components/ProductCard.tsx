@@ -86,6 +86,11 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
 
           {/* Badges - Improved Visibility with accent color */}
           <div className="absolute top-3 left-3 lg:top-4 lg:left-4 flex flex-col gap-1.5">
+            {product.price === 0 && (
+              <span className="px-2.5 py-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-[10px] lg:text-xs font-bold rounded-full shadow-lg">
+                🎁 Free
+              </span>
+            )}
             {product.bestseller && (
               <span className="px-2.5 py-1 bg-gradient-to-r from-[#FF6B35] to-orange-500 text-white text-[10px] lg:text-xs font-bold rounded-full shadow-lg">
                 🔥 Bestseller

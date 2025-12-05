@@ -219,8 +219,10 @@ export default function ProductDetailClient({
 
           {/* Price */}
           <div className="flex items-baseline gap-3 mb-2">
-            <span className="text-2xl font-bold text-gray-900">${product.price}</span>
-            {product.originalPrice && (
+            <span className={`text-2xl font-bold ${product.price === 0 ? 'text-green-600' : 'text-gray-900'}`}>
+              {product.price === 0 ? 'Free' : `$${product.price}`}
+            </span>
+            {product.originalPrice && product.price > 0 && (
               <>
                 <span className="text-base text-gray-400 line-through">${product.originalPrice}</span>
                 <span className="text-sm text-[#ff6f61] font-medium">({product.discount}% off)</span>
@@ -507,10 +509,10 @@ export default function ProductDetailClient({
               {/* Price */}
               <div className="bg-gray-50 rounded-2xl p-6 mb-6">
                 <div className="flex items-baseline gap-3 mb-4">
-                  <span className="text-4xl font-bold text-gray-900">
-                    ${product.price}
+                  <span className={`text-4xl font-bold ${product.price === 0 ? 'text-green-600' : 'text-gray-900'}`}>
+                    {product.price === 0 ? 'Free' : `$${product.price}`}
                   </span>
-                  {product.originalPrice && (
+                  {product.originalPrice && product.price > 0 && (
                     <>
                       <span className="text-xl text-gray-400 line-through">
                         ${product.originalPrice}

@@ -51,8 +51,14 @@ export function convertPrice(priceUSD: number, targetCurrency?: CurrencyCode): n
 
 /**
  * Format price in specified or current currency
+ * Returns "Free" for $0 prices
  */
 export function formatPrice(price: number, currency?: CurrencyCode): string {
+  // Show "Free" for zero-price items
+  if (price === 0) {
+    return "Free";
+  }
+
   const currencyCode = currency || getCurrentCurrency();
   const convertedPrice = currency ? price : convertPrice(price, currencyCode);
 

@@ -477,8 +477,10 @@ export default function ProductsClient() {
             <span className="text-[10px] text-gray-400">({product.reviewCount})</span>
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-sm font-bold text-gray-900">${product.price}</span>
-            {product.originalPrice && (
+            <span className={`text-sm font-bold ${product.price === 0 ? 'text-green-600' : 'text-gray-900'}`}>
+              {product.price === 0 ? 'Free' : `$${product.price}`}
+            </span>
+            {product.originalPrice && product.price > 0 && (
               <span className="text-[10px] text-gray-400 line-through">${product.originalPrice}</span>
             )}
           </div>
@@ -1123,8 +1125,10 @@ function ProductListCard({ product }: { product: Product }) {
           {/* Price & Actions */}
           <div className="flex items-center justify-between mt-auto">
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-gray-900">${product.price}</span>
-              {product.originalPrice && (
+              <span className={`text-2xl font-bold ${product.price === 0 ? 'text-green-600' : 'text-gray-900'}`}>
+                {product.price === 0 ? 'Free' : `$${product.price}`}
+              </span>
+              {product.originalPrice && product.price > 0 && (
                 <span className="text-sm text-gray-400 line-through">${product.originalPrice}</span>
               )}
             </div>
