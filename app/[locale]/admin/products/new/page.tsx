@@ -50,23 +50,63 @@ export default function NewProductPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
 
-  // Flatten categories with hierarchy indicators
-  const flattenCategories = (cats: Category[], level: number = 0): FlatCategory[] => {
-    const result: FlatCategory[] = [];
-    for (const cat of cats) {
-      const prefix = level === 0 ? '' : level === 1 ? '└─ ' : '    └─ ';
-      const displayName = level === 0 ? cat.name : `${prefix}${cat.name}`;
-      result.push({
-        id: cat.id,
-        name: cat.name,
-        level,
-        displayName,
-      });
-      if (cat.children && cat.children.length > 0) {
-        result.push(...flattenCategories(cat.children, level + 1));
+  // Build category tree from flat list
+  const buildCategoryTree = (cats: Category[]): Category[] => {
+    const catMap = new Map<string, Category & { children: Category[] }>();
+    const roots: Category[] = [];
+
+    // First pass: create map with children arrays
+    cats.forEach(cat => {
+      catMap.set(cat.id, { ...cat, children: [] });
+    });
+
+    // Second pass: build tree structure
+    cats.forEach(cat => {
+      const node = catMap.get(cat.id)!;
+      if (cat.parentId && catMap.has(cat.parentId)) {
+        catMap.get(cat.parentId)!.children.push(node);
+      } else if (!cat.parentId) {
+        roots.push(node);
       }
+    });
+
+    // If no roots found, it means all items have parentId - find orphans
+    if (roots.length === 0) {
+      cats.forEach(cat => {
+        if (cat.parentId && !catMap.has(cat.parentId)) {
+          roots.push(catMap.get(cat.id)!);
+        }
+      });
     }
-    return result;
+
+    return roots;
+  };
+
+  // Flatten categories with hierarchy indicators
+  const flattenCategories = (cats: Category[]): FlatCategory[] => {
+    // First build the tree from flat list
+    const tree = buildCategoryTree(cats);
+
+    // Then flatten with proper indentation
+    const flattenTree = (nodes: Category[], level: number = 0): FlatCategory[] => {
+      const result: FlatCategory[] = [];
+      for (const cat of nodes) {
+        const prefix = level === 0 ? '' : level === 1 ? '└─ ' : '    └─ ';
+        const displayName = level === 0 ? cat.name : `${prefix}${cat.name}`;
+        result.push({
+          id: cat.id,
+          name: cat.name,
+          level,
+          displayName,
+        });
+        if (cat.children && cat.children.length > 0) {
+          result.push(...flattenTree(cat.children, level + 1));
+        }
+      }
+      return result;
+    };
+
+    return flattenTree(tree);
   };
 
   const [formData, setFormData] = useState({
