@@ -72,8 +72,9 @@ export default function ProductsClient() {
   const [isLoadMore, setIsLoadMore] = useState(false); // Track if "Load More" was clicked
   const [isLoadingMore, setIsLoadingMore] = useState(false); // Track loading state for infinite scroll
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);  // Level 1
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);  // Level 2
+  const [selectedLevel3, setSelectedLevel3] = useState<string[]>([]);  // Level 3
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [selectedFileTypes, setSelectedFileTypes] = useState<string[]>([]);
@@ -188,10 +189,17 @@ export default function ProductsClient() {
       });
     }
 
-    // Filter by subcategory (if any selected)
+    // Filter by subcategory (Level 2) if any selected
     if (selectedSubcategories.length > 0) {
       filtered = filtered.filter(product =>
         selectedSubcategories.includes(product.category)
+      );
+    }
+
+    // Filter by Level 3 category if any selected
+    if (selectedLevel3.length > 0) {
+      filtered = filtered.filter(product =>
+        selectedLevel3.includes(product.category)
       );
     }
 
@@ -268,21 +276,28 @@ export default function ProductsClient() {
     }
 
     setTotal(filtered.length);
-  }, [page, isLoadMore, selectedCategories, selectedSubcategories, selectedTags, selectedPriceRanges, selectedRatings, selectedFileTypes, sortBy, allProducts, categories]);
+  }, [page, isLoadMore, selectedCategories, selectedSubcategories, selectedLevel3, selectedTags, selectedPriceRanges, selectedRatings, selectedFileTypes, sortBy, allProducts, categories]);
 
   const toggleCategory = (categorySlug: string) => {
     setSelectedCategories((prev) => {
       const isSelected = prev.includes(categorySlug);
       if (isSelected) {
-        // When deselecting a category, also clear its subcategories
+        // When deselecting a category, also clear its subcategories and level 3
         const category = categories.find(c => c.slug === categorySlug);
         if (category) {
           const subcategorySlugs = categories
             .filter(c => c.parentId === category.id)
             .map(c => c.slug);
+          // Clear level 2
           setSelectedSubcategories(prevSub =>
             prevSub.filter(s => !subcategorySlugs.includes(s))
           );
+          // Clear level 3 (children of the subcategories)
+          const level3Slugs = subcategorySlugs.flatMap(subSlug => {
+            const sub = categories.find(c => c.slug === subSlug);
+            return sub ? categories.filter(c => c.parentId === sub.id).map(c => c.slug) : [];
+          });
+          setSelectedLevel3(prevL3 => prevL3.filter(s => !level3Slugs.includes(s)));
         }
         return prev.filter((c) => c !== categorySlug);
       }
@@ -293,8 +308,28 @@ export default function ProductsClient() {
   };
 
   const toggleSubcategory = (subcategorySlug: string) => {
-    setSelectedSubcategories((prev) =>
-      prev.includes(subcategorySlug) ? prev.filter((c) => c !== subcategorySlug) : [...prev, subcategorySlug]
+    setSelectedSubcategories((prev) => {
+      const isSelected = prev.includes(subcategorySlug);
+      if (isSelected) {
+        // When deselecting a subcategory, also clear its level 3 children
+        const subcategory = categories.find(c => c.slug === subcategorySlug);
+        if (subcategory) {
+          const level3Slugs = categories
+            .filter(c => c.parentId === subcategory.id)
+            .map(c => c.slug);
+          setSelectedLevel3(prevL3 => prevL3.filter(s => !level3Slugs.includes(s)));
+        }
+        return prev.filter((c) => c !== subcategorySlug);
+      }
+      return [...prev, subcategorySlug];
+    });
+    setPage(1);
+    setIsLoadMore(false);
+  };
+
+  const toggleLevel3 = (level3Slug: string) => {
+    setSelectedLevel3((prev) =>
+      prev.includes(level3Slug) ? prev.filter((c) => c !== level3Slug) : [...prev, level3Slug]
     );
     setPage(1);
     setIsLoadMore(false);
@@ -335,6 +370,7 @@ export default function ProductsClient() {
   const clearAllFilters = () => {
     setSelectedCategories([]);
     setSelectedSubcategories([]);
+    setSelectedLevel3([]);
     setSelectedTags([]);
     setSelectedPriceRanges([]);
     setSelectedRatings([]);
@@ -346,12 +382,13 @@ export default function ProductsClient() {
   const clearCategories = () => {
     setSelectedCategories([]);
     setSelectedSubcategories([]);
+    setSelectedLevel3([]);
     setPage(1);
     setIsLoadMore(false);
   };
 
   const hasActiveFilters =
-    selectedCategories.length > 0 || selectedSubcategories.length > 0 || selectedTags.length > 0 || selectedPriceRanges.length > 0 || selectedRatings.length > 0 || selectedFileTypes.length > 0;
+    selectedCategories.length > 0 || selectedSubcategories.length > 0 || selectedLevel3.length > 0 || selectedTags.length > 0 || selectedPriceRanges.length > 0 || selectedRatings.length > 0 || selectedFileTypes.length > 0;
 
   // Infinite scroll handler
   const loadMoreProducts = useCallback(() => {
@@ -387,9 +424,9 @@ export default function ProductsClient() {
 
   // Update filter count in store for bottom nav badge
   useEffect(() => {
-    const count = selectedCategories.length + selectedSubcategories.length + selectedTags.length + selectedPriceRanges.length + selectedRatings.length + selectedFileTypes.length;
+    const count = selectedCategories.length + selectedSubcategories.length + selectedLevel3.length + selectedTags.length + selectedPriceRanges.length + selectedRatings.length + selectedFileTypes.length;
     setFilterCount(count);
-  }, [selectedCategories, selectedSubcategories, selectedTags, selectedPriceRanges, selectedRatings, selectedFileTypes, setFilterCount]);
+  }, [selectedCategories, selectedSubcategories, selectedLevel3, selectedTags, selectedPriceRanges, selectedRatings, selectedFileTypes, setFilterCount]);
 
   // Compute categories with product counts (only categories that have products)
   const categoriesWithCounts = categories.map(cat => {
@@ -703,13 +740,15 @@ export default function ProductsClient() {
                   )}
               </div>
 
-              {/* Categories - Dual Column Miller Columns */}
+              {/* Categories - 3-Level Drill-Down */}
               <CategoryFilter
                 categories={categoriesWithCounts}
                 selectedCategories={selectedCategories}
                 selectedSubcategories={selectedSubcategories}
+                selectedLevel3={selectedLevel3}
                 onToggleCategory={toggleCategory}
                 onToggleSubcategory={toggleSubcategory}
+                onToggleLevel3={toggleLevel3}
                 onClearCategories={clearCategories}
               />
 
