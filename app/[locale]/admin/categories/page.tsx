@@ -168,10 +168,7 @@ export default function CategoriesPage() {
                         <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-white">
                           <FolderTree className="w-5 h-5" />
                         </div>
-                        <div>
-                          <div className="font-bold text-gray-900">{category.name}</div>
-                          <div className="text-sm text-gray-500">{category.description || 'No description'}</div>
-                        </div>
+                        <div className="font-bold text-gray-900">{category.name}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -215,10 +212,7 @@ export default function CategoriesPage() {
                             <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
                               <FolderTree className="w-4 h-4" />
                             </div>
-                            <div>
-                              <div className="font-semibold text-gray-800">{subcat.name}</div>
-                              <div className="text-xs text-gray-500">{subcat.description || 'Subcategory'}</div>
-                            </div>
+                            <div className="font-semibold text-gray-800">{subcat.name}</div>
                           </div>
                         </td>
                         <td className="px-6 py-3">
