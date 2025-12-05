@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import { Product } from "@/types";
 import SortBottomSheet from "@/components/SortBottomSheet";
 import FilterBottomSheet from "@/components/FilterBottomSheet";
+import CategoryFilter from "@/components/shop/CategoryFilter";
 import { productsAPI, categoriesAPI } from "@/lib/api";
 
 // Category icon mapping
@@ -338,6 +339,13 @@ export default function ProductsClient() {
     setSelectedPriceRanges([]);
     setSelectedRatings([]);
     setSelectedFileTypes([]);
+    setPage(1);
+    setIsLoadMore(false);
+  };
+
+  const clearCategories = () => {
+    setSelectedCategories([]);
+    setSelectedSubcategories([]);
     setPage(1);
     setIsLoadMore(false);
   };
@@ -695,65 +703,15 @@ export default function ProductsClient() {
                   )}
               </div>
 
-              {/* Categories - Only parent categories with products */}
-              <div className="mb-6">
-                <h3 className="font-semibold text-sm text-gray-700 mb-3">Categories</h3>
-                <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                  {categoriesWithCounts.filter(c => !c.parentId && c.productCount > 0).length > 0 ? (
-                    categoriesWithCounts
-                      .filter(c => !c.parentId && c.productCount > 0)
-                      .map((category) => (
-                        <label
-                          key={category.id}
-                          className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedCategories.includes(category.slug || '')}
-                            onChange={() => toggleCategory(category.slug || '')}
-                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-                          />
-                          <span className="text-sm flex-1">{category.name || 'Unknown'}</span>
-                          <span className="text-xs text-gray-400">
-                            {category.productCount}
-                          </span>
-                        </label>
-                      ))
-                  ) : (
-                    <p className="text-sm text-gray-500">No categories available</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Subcategories - Only show when parent category is selected */}
-              {selectedCategories.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="font-semibold text-sm text-gray-700 mb-3">Subcategories</h3>
-                  <div className="space-y-2 max-h-[150px] overflow-y-auto">
-                    {categoriesWithCounts
-                      .filter(c => {
-                        if (!c.parentId) return false;
-                        const parent = categories.find(p => p.id === c.parentId);
-                        return parent && selectedCategories.includes(parent.slug) && c.productCount > 0;
-                      })
-                      .map((subcategory) => (
-                        <label
-                          key={subcategory.id}
-                          className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedSubcategories.includes(subcategory.slug || '')}
-                            onChange={() => toggleSubcategory(subcategory.slug || '')}
-                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-                          />
-                          <span className="text-sm flex-1">{subcategory.name}</span>
-                          <span className="text-xs text-gray-400">{subcategory.productCount}</span>
-                        </label>
-                      ))}
-                  </div>
-                </div>
-              )}
+              {/* Categories - Dual Column Miller Columns */}
+              <CategoryFilter
+                categories={categoriesWithCounts}
+                selectedCategories={selectedCategories}
+                selectedSubcategories={selectedSubcategories}
+                onToggleCategory={toggleCategory}
+                onToggleSubcategory={toggleSubcategory}
+                onClearCategories={clearCategories}
+              />
 
               {/* Tags - Only show when we have available tags */}
               {availableTags.length > 0 && (

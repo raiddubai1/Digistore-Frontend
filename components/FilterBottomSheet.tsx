@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Check, RotateCcw, ChevronDown, ChevronUp, Tag, DollarSign, Star, FileType, ChevronRight } from "lucide-react";
+import { X, Check, RotateCcw, ChevronDown, ChevronUp, Tag, DollarSign, Star, FileType, ChevronRight, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CategoryWithChildren {
@@ -148,16 +148,36 @@ export default function FilterBottomSheet({
 }: FilterBottomSheetProps) {
   const totalFilters = selectedCategories.length + selectedSubcategories.length + selectedPriceRanges.length + selectedRatings.length + selectedFileTypes.length + selectedTags.length;
 
+  // Drill-down state for category navigation
+  const [categoryDrillDown, setCategoryDrillDown] = useState<string | null>(null);
+
   // Filter to only parent categories with products
   const parentCategories = categories.filter(cat => !cat.parentId && (cat.productCount || 0) > 0);
 
-  // Get subcategories for selected parent categories
+  // Get subcategories for a specific parent
+  const getSubcategoriesForParent = (parentSlug: string) => {
+    const parent = categories.find(c => c.slug === parentSlug);
+    if (!parent) return [];
+    return categories.filter(c => c.parentId === parent.id && (c.productCount || 0) > 0);
+  };
+
+  // Get subcategories for drill-down view
+  const drillDownSubcategories = categoryDrillDown ? getSubcategoriesForParent(categoryDrillDown) : [];
+  const drillDownParent = categoryDrillDown ? categories.find(c => c.slug === categoryDrillDown) : null;
+
+  // Get subcategories for selected parent categories (for display)
   const availableSubcategories = categories.filter(cat => {
     if (!cat.parentId) return false;
-    // Find if parent is in selectedCategories by slug
     const parentSlug = categories.find(p => p.id === cat.parentId)?.slug;
     return parentSlug && selectedCategories.includes(parentSlug) && (cat.productCount || 0) > 0;
   });
+
+  // Reset drill-down when sheet closes
+  useEffect(() => {
+    if (!isOpen) {
+      setCategoryDrillDown(null);
+    }
+  }, [isOpen]);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -218,54 +238,155 @@ export default function FilterBottomSheet({
           className="flex-1 overflow-y-auto overscroll-contain touch-pan-y px-4"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          {/* Categories Section - Only parent categories with products */}
-          {parentCategories.length > 0 && (
+          {/* Active Category Filters Summary */}
+          {(selectedCategories.length > 0 || selectedSubcategories.length > 0) && (
+            <div className="py-3 border-b border-gray-100 mb-2">
+              <div className="text-xs text-gray-500 mb-2 font-medium">Active Category Filters</div>
+              <div className="flex flex-wrap gap-2">
+                {selectedCategories.map(slug => {
+                  const cat = categories.find(c => c.slug === slug);
+                  return cat ? (
+                    <button
+                      key={slug}
+                      onClick={() => onToggleCategory(slug)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#ff6f61] text-white text-xs rounded-full font-medium"
+                    >
+                      {cat.name}
+                      <X className="w-3 h-3" />
+                    </button>
+                  ) : null;
+                })}
+                {selectedSubcategories.map(slug => {
+                  const cat = categories.find(c => c.slug === slug);
+                  return cat && onToggleSubcategory ? (
+                    <button
+                      key={slug}
+                      onClick={() => onToggleSubcategory(slug)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-200 text-gray-700 text-xs rounded-full font-medium"
+                    >
+                      {cat.name}
+                      <X className="w-3 h-3" />
+                    </button>
+                  ) : null;
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Categories Section with Drill-Down */}
+          {parentCategories.length > 0 && !categoryDrillDown && (
             <FilterSection
               title="Categories"
               icon={Tag}
               count={selectedCategories.length}
               defaultOpen={true}
-              maxHeight="280px"
+              maxHeight="320px"
             >
               <div className="space-y-2">
-                {parentCategories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => onToggleCategory(category.slug)}
-                    className={cn(
-                      "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all",
-                      selectedCategories.includes(category.slug)
-                        ? "bg-[#ff6f61] text-white shadow-sm"
-                        : "bg-gray-50 text-gray-700 active:bg-gray-100"
-                    )}
-                  >
-                    <div className="flex items-center gap-2">
-                      {selectedCategories.includes(category.slug) && (
-                        <Check className="w-4 h-4 flex-shrink-0" />
+                {parentCategories.map((category) => {
+                  const hasSubcategories = getSubcategoriesForParent(category.slug).length > 0;
+                  const isSelected = selectedCategories.includes(category.slug);
+
+                  return (
+                    <div key={category.id} className="flex gap-2">
+                      {/* Select button */}
+                      <button
+                        onClick={() => onToggleCategory(category.slug)}
+                        className={cn(
+                          "flex-1 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left",
+                          isSelected
+                            ? "bg-[#ff6f61] text-white shadow-sm"
+                            : "bg-gray-50 text-gray-700 active:bg-gray-100"
+                        )}
+                      >
+                        {isSelected && <Check className="w-4 h-4 flex-shrink-0" />}
+                        <span className="flex-1 truncate">{category.name}</span>
+                        <span className={cn(
+                          "text-xs px-2 py-0.5 rounded-full",
+                          isSelected ? "bg-white/20" : "bg-gray-200 text-gray-600"
+                        )}>
+                          {category.productCount || 0}
+                        </span>
+                      </button>
+                      {/* Drill-down button (only if has subcategories) */}
+                      {hasSubcategories && (
+                        <button
+                          onClick={() => setCategoryDrillDown(category.slug)}
+                          className="px-3 py-3 rounded-xl bg-gray-100 text-gray-600 active:bg-gray-200 transition-all"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
                       )}
-                      <span className="truncate">{category.name}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={cn(
-                        "text-xs px-2 py-0.5 rounded-full",
-                        selectedCategories.includes(category.slug) ? "bg-white/20" : "bg-gray-200 text-gray-600"
-                      )}>
-                        {category.productCount || 0}
-                      </span>
-                      {category.children && category.children.length > 0 && (
-                        <ChevronRight className={cn(
-                          "w-4 h-4 transition-transform",
-                          selectedCategories.includes(category.slug) && "rotate-90"
-                        )} />
-                      )}
-                    </div>
-                  </button>
-                ))}
+                  );
+                })}
               </div>
             </FilterSection>
           )}
 
-          {/* Subcategories Section - Only show when parent category is selected */}
+          {/* Subcategories Drill-Down View */}
+          {categoryDrillDown && drillDownParent && onToggleSubcategory && (
+            <div className="py-2">
+              {/* Back button */}
+              <button
+                onClick={() => setCategoryDrillDown(null)}
+                className="flex items-center gap-2 px-2 py-2 mb-3 text-sm font-semibold text-gray-700 active:bg-gray-50 rounded-lg w-full"
+              >
+                <ChevronLeft className="w-5 h-5" />
+                <span>Back to Categories</span>
+              </button>
+
+              {/* Parent category header */}
+              <div className="flex items-center justify-between px-2 mb-3">
+                <h3 className="text-lg font-bold text-gray-900">{drillDownParent.name}</h3>
+                <button
+                  onClick={() => onToggleCategory(drillDownParent.slug)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-xs font-semibold transition-all",
+                    selectedCategories.includes(drillDownParent.slug)
+                      ? "bg-[#ff6f61] text-white"
+                      : "bg-gray-100 text-gray-700"
+                  )}
+                >
+                  {selectedCategories.includes(drillDownParent.slug) ? "Selected ✓" : "Select All"}
+                </button>
+              </div>
+
+              {/* Subcategories grid */}
+              <div className="grid grid-cols-2 gap-2">
+                {drillDownSubcategories.map((subcategory) => {
+                  const isSelected = selectedSubcategories.includes(subcategory.slug);
+
+                  return (
+                    <button
+                      key={subcategory.id}
+                      onClick={() => onToggleSubcategory(subcategory.slug)}
+                      className={cn(
+                        "flex items-center gap-2 px-3 py-3 rounded-xl text-sm font-medium transition-all text-left",
+                        isSelected
+                          ? "bg-[#ff6f61] text-white shadow-sm"
+                          : "bg-gray-50 text-gray-700 active:bg-gray-100"
+                      )}
+                    >
+                      {isSelected && <Check className="w-4 h-4 flex-shrink-0" />}
+                      <span className="flex-1 truncate">{subcategory.name}</span>
+                      <span className={cn(
+                        "text-xs px-1.5 py-0.5 rounded-full",
+                        isSelected ? "bg-white/20" : "bg-gray-200 text-gray-500"
+                      )}>
+                        {subcategory.productCount || 0}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Only show other filters when NOT in drill-down mode */}
+          {!categoryDrillDown && (
+            <>
+          {/* Subcategories Section - Quick access when parent category is selected */}
           {availableSubcategories.length > 0 && onToggleSubcategory && (
             <FilterSection
               title="Subcategories"
@@ -440,6 +561,8 @@ export default function FilterBottomSheet({
                 ))}
               </div>
             </FilterSection>
+          )}
+            </>
           )}
 
           {/* Bottom padding for safe area */}
