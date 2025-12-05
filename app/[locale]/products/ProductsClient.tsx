@@ -670,7 +670,7 @@ export default function ProductsClient() {
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2">All Products</h1>
             <p className="text-gray-600">
-              Browse our collection of {demoProducts.length} premium digital products
+              Browse our collection of {total} premium digital products
             </p>
           </div>
 
