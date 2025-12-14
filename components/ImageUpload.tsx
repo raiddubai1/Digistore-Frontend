@@ -1,26 +1,43 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, X, Image as ImageIcon, CheckCircle } from "lucide-react";
+import { Upload, X, Image as ImageIcon, CheckCircle, Sparkles, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { aiAPI } from "@/lib/api";
+
+export interface ImageWithAlt {
+  file: File;
+  preview: string;
+  altText: string;
+}
 
 interface ImageUploadProps {
-  onUpload: (files: File[]) => void;
+  onUpload: (files: File[], altTexts?: string[]) => void;
+  onAltTextChange?: (index: number, altText: string) => void;
   maxFiles?: number;
   maxSizeMB?: number;
   existingImages?: string[];
   onRemove?: (index: number) => void;
+  showAltText?: boolean;
+  productTitle?: string;
+  productCategory?: string;
 }
 
 export default function ImageUpload({
   onUpload,
+  onAltTextChange,
   maxFiles = 5,
   maxSizeMB = 5,
   existingImages = [],
   onRemove,
+  showAltText = true,
+  productTitle = "",
+  productCategory = "",
 }: ImageUploadProps) {
   const [dragActive, setDragActive] = useState(false);
   const [previews, setPreviews] = useState<string[]>(existingImages);
+  const [altTexts, setAltTexts] = useState<string[]>(existingImages.map(() => ""));
+  const [generatingAlt, setGeneratingAlt] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDrag = (e: React.DragEvent) => {
@@ -90,6 +107,9 @@ export default function ImageUpload({
     const newPreviews = files.map((file) => URL.createObjectURL(file));
     setPreviews([...previews, ...newPreviews]);
 
+    // Add empty alt texts for new files
+    setAltTexts([...altTexts, ...files.map(() => "")]);
+
     // Call parent callback
     onUpload(files);
 
@@ -98,9 +118,63 @@ export default function ImageUpload({
 
   const handleRemove = (index: number) => {
     const newPreviews = previews.filter((_, i) => i !== index);
+    const newAltTexts = altTexts.filter((_, i) => i !== index);
     setPreviews(newPreviews);
+    setAltTexts(newAltTexts);
     if (onRemove) {
       onRemove(index);
+    }
+  };
+
+  const handleAltTextChange = (index: number, value: string) => {
+    const newAltTexts = [...altTexts];
+    newAltTexts[index] = value;
+    setAltTexts(newAltTexts);
+    if (onAltTextChange) {
+      onAltTextChange(index, value);
+    }
+  };
+
+  const generateAltText = async (index: number) => {
+    if (!productTitle && !productCategory) {
+      toast.error("Please add a product title first to generate alt text");
+      return;
+    }
+
+    setGeneratingAlt(index);
+    try {
+      const response = await aiAPI.generate({
+        type: 'imageAlt',
+        context: {
+          productTitle,
+          category: productCategory,
+          imageIndex: index,
+          isMainImage: index === 0,
+        }
+      });
+
+      if (response.data?.success && response.data?.data?.imageAlt) {
+        handleAltTextChange(index, response.data.data.imageAlt);
+        toast.success("Alt text generated!");
+      } else {
+        throw new Error('Failed to generate alt text');
+      }
+    } catch (error: any) {
+      console.error('Alt text generation error:', error);
+      toast.error(error.response?.data?.message || "Failed to generate alt text");
+    } finally {
+      setGeneratingAlt(null);
+    }
+  };
+
+  const generateAllAltTexts = async () => {
+    if (!productTitle && !productCategory) {
+      toast.error("Please add a product title first to generate alt text");
+      return;
+    }
+
+    for (let i = 0; i < previews.length; i++) {
+      await generateAltText(i);
     }
   };
 
@@ -175,31 +249,86 @@ export default function ImageUpload({
         </div>
       </div>
 
-      {/* Preview Grid */}
+      {/* Preview Grid with Alt Text */}
       {previews.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {previews.map((preview, index) => (
-            <div key={index} className="relative group aspect-square">
-              <img
-                src={preview}
-                alt={`Preview ${index + 1}`}
-                className="w-full h-full object-cover rounded-lg border border-gray-200"
-              />
+        <>
+          {showAltText && (
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-700">
+                Image Alt Text (for SEO)
+              </p>
               <button
                 type="button"
-                onClick={() => handleRemove(index)}
-                className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                onClick={generateAllAltTexts}
+                disabled={generatingAlt !== null}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 rounded-lg transition-colors disabled:opacity-50"
               >
-                <X className="w-4 h-4" />
+                <Sparkles className="w-3.5 h-3.5" />
+                AI Generate All
               </button>
-              {index === 0 && (
-                <div className="absolute bottom-2 left-2 px-2 py-1 bg-primary text-white text-xs font-semibold rounded">
-                  Main Image
-                </div>
-              )}
             </div>
-          ))}
-        </div>
+          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {previews.map((preview, index) => (
+              <div key={index} className="flex gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                {/* Image Preview */}
+                <div className="relative w-24 h-24 flex-shrink-0">
+                  <img
+                    src={preview}
+                    alt={altTexts[index] || `Preview ${index + 1}`}
+                    className="w-full h-full object-cover rounded-lg border border-gray-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemove(index)}
+                    className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                  {index === 0 && (
+                    <div className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-primary text-white text-[10px] font-semibold rounded">
+                      Main
+                    </div>
+                  )}
+                </div>
+
+                {/* Alt Text Input */}
+                {showAltText && (
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-gray-600">
+                        Alt Text {index === 0 ? "(Main Image)" : `(Image ${index + 1})`}
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => generateAltText(index)}
+                        disabled={generatingAlt === index}
+                        className="flex items-center gap-1 px-2 py-1 text-xs text-primary hover:bg-primary/10 rounded transition-colors disabled:opacity-50"
+                      >
+                        {generatingAlt === index ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Sparkles className="w-3 h-3" />
+                        )}
+                        AI
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      value={altTexts[index] || ""}
+                      onChange={(e) => handleAltTextChange(index, e.target.value)}
+                      placeholder="Describe this image for SEO..."
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                    <p className="text-[10px] text-gray-400">
+                      {altTexts[index]?.length || 0}/125 characters
+                    </p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

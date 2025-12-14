@@ -42,6 +42,7 @@ export default function NewProductPage() {
   const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
 
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [imageAltTexts, setImageAltTexts] = useState<string[]>([]);
   const [productFiles, setProductFiles] = useState<File[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [flatCategories, setFlatCategories] = useState<FlatCategory[]>([]);
@@ -227,10 +228,25 @@ export default function NewProductPage() {
 
   const handleImageUpload = (files: File[]) => {
     setUploadedImages([...uploadedImages, ...files]);
+    // Add empty alt texts for new images
+    setImageAltTexts([...imageAltTexts, ...files.map(() => "")]);
   };
 
   const handleImageRemove = (index: number) => {
     setUploadedImages(uploadedImages.filter((_, i) => i !== index));
+    setImageAltTexts(imageAltTexts.filter((_, i) => i !== index));
+  };
+
+  const handleAltTextChange = (index: number, altText: string) => {
+    const newAltTexts = [...imageAltTexts];
+    newAltTexts[index] = altText;
+    setImageAltTexts(newAltTexts);
+  };
+
+  // Get selected category name for AI generation
+  const getSelectedCategoryName = () => {
+    const category = flatCategories.find(c => c.id === formData.categoryId);
+    return category?.name || "";
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -387,7 +403,9 @@ export default function NewProductPage() {
         fileName: fileNames || primaryFile.fileName,
         fileUrl: primaryFile.url,
         thumbnailUrl: imageUrls[0] || 'https://via.placeholder.com/400x300',
+        thumbnailAlt: imageAltTexts[0] || formData.title,
         previewImages: imageUrls.slice(1),
+        previewImageAlts: imageAltTexts.slice(1),
         whatsIncluded: formData.whatsIncluded,
         requirements: formData.requirements,
         // Include files metadata for multiple files support
@@ -446,10 +464,14 @@ export default function NewProductPage() {
               <ImageUpload
                 onUpload={handleImageUpload}
                 onRemove={handleImageRemove}
+                onAltTextChange={handleAltTextChange}
                 maxFiles={5}
                 maxSizeMB={5}
+                showAltText={true}
+                productTitle={formData.title}
+                productCategory={getSelectedCategoryName()}
               />
-              <p className="text-xs text-gray-500 mt-2">Upload up to 5 images. First image will be the thumbnail.</p>
+              <p className="text-xs text-gray-500 mt-2">Upload up to 5 images. First image will be the thumbnail. Alt text helps with SEO.</p>
             </div>
 
             {/* Basic Information */}
