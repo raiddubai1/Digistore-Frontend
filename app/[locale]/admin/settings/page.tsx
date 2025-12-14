@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Settings, Store, CreditCard, Mail, Shield, Bell, Loader2, Save, Check, ArrowLeft } from "lucide-react";
+import { Settings, Store, CreditCard, Mail, Shield, Bell, Loader2, Save, Check, ArrowLeft, Key, Eye, EyeOff } from "lucide-react";
+import toast from "react-hot-toast";
 
 type SettingsTab = "general" | "payment" | "email" | "notifications" | "security";
 
@@ -291,13 +292,168 @@ function NotificationSettings({ settings, onChange }: { settings: SettingsData; 
 function SecuritySettings({ settings, onChange }: { settings: SettingsData; onChange: (k: keyof SettingsData, v: any) => void }) {
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Input label="Session Timeout (hours)" value={settings.sessionTimeout} onChange={(v) => onChange("sessionTimeout", v)} />
-        <Input label="Max Login Attempts" value={settings.maxLoginAttempts} onChange={(v) => onChange("maxLoginAttempts", v)} />
+      {/* Change Password Section */}
+      <ChangePasswordSection />
+
+      <div className="border-t pt-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Session Settings</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Input label="Session Timeout (hours)" value={settings.sessionTimeout} onChange={(v) => onChange("sessionTimeout", v)} />
+          <Input label="Max Login Attempts" value={settings.maxLoginAttempts} onChange={(v) => onChange("maxLoginAttempts", v)} />
+        </div>
       </div>
       <div className="border-t pt-6">
         <Toggle label="Require Email Verification" desc="New users must verify email before accessing account" checked={settings.requireEmailVerification} onChange={(v) => onChange("requireEmailVerification", v)} />
         <Toggle label="Allow Guest Checkout" desc="Customers can checkout without creating an account" checked={settings.allowGuestCheckout} onChange={(v) => onChange("allowGuestCheckout", v)} />
+      </div>
+    </div>
+  );
+}
+
+function ChangePasswordSection() {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [changing, setChanging] = useState(false);
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error("Please fill in all password fields");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error("New passwords don't match");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    setChanging(true);
+    try {
+      const token = localStorage.getItem("accessToken");
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+      const res = await fetch(`${API_URL}/auth/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        toast.success("Password changed successfully!");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        toast.error(data.message || "Failed to change password");
+      }
+    } catch (error) {
+      console.error("Change password error:", error);
+      toast.error("Failed to change password");
+    } finally {
+      setChanging(false);
+    }
+  };
+
+  return (
+    <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
+          <Key className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900">Change Password</h3>
+          <p className="text-sm text-gray-500">Update your admin account password</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Current Password</label>
+          <div className="relative">
+            <input
+              type={showCurrent ? "text" : "password"}
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent pr-10"
+              placeholder="Enter current password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowCurrent(!showCurrent)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              {showCurrent ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">New Password</label>
+            <div className="relative">
+              <input
+                type={showNew ? "text" : "password"}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent pr-10"
+                placeholder="Enter new password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNew(!showNew)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showNew ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm New Password</label>
+            <div className="relative">
+              <input
+                type={showConfirm ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent pr-10"
+                placeholder="Confirm new password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-2">
+          <button
+            onClick={handleChangePassword}
+            disabled={changing}
+            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 font-medium"
+          >
+            {changing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Key className="w-4 h-4" />}
+            {changing ? "Changing..." : "Change Password"}
+          </button>
+        </div>
       </div>
     </div>
   );
