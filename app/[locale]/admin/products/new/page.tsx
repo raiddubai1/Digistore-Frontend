@@ -596,11 +596,18 @@ export default function NewProductPage() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-gray-900">Product Files *</h2>
                 {productFiles.length > 0 && (
-                  <span className="text-sm text-gray-500">{productFiles.length} file(s) selected</span>
+                  <span className="text-sm text-green-600 font-medium">{productFiles.length} file(s) selected ✓</span>
                 )}
               </div>
               <div className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                <label
+                  htmlFor="product-file"
+                  className={`block border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${
+                    productFiles.length > 0
+                      ? "border-green-400 bg-green-50 hover:border-green-500 hover:bg-green-100"
+                      : "border-gray-300 hover:border-primary hover:bg-primary/5"
+                  } active:scale-[0.98] active:border-primary active:bg-primary/10`}
+                >
                   <input
                     type="file"
                     id="product-file"
@@ -609,19 +616,29 @@ export default function NewProductPage() {
                     accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.mp4,.mp3,.psd,.ai,.rar"
                     multiple
                   />
-                  <label htmlFor="product-file" className="cursor-pointer">
-                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-sm font-semibold text-gray-700 mb-1">
-                      Click to upload product files
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      PDF, DOCX, XLSX, ZIP, RAR, MP4, MP3, PSD, AI (Max 100MB each)
-                    </p>
-                    <p className="text-xs text-primary mt-1">
-                      You can select multiple files
-                    </p>
-                  </label>
-                </div>
+                  <div className={`w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center ${
+                    productFiles.length > 0 ? "bg-green-100" : "bg-gray-100"
+                  }`}>
+                    {productFiles.length > 0 ? (
+                      <CheckCircle className="w-8 h-8 text-green-600" />
+                    ) : (
+                      <Upload className="w-8 h-8 text-gray-400" />
+                    )}
+                  </div>
+                  <p className="text-sm font-semibold mb-1">
+                    {productFiles.length > 0 ? (
+                      <span className="text-green-700">Files selected - Click to add more</span>
+                    ) : (
+                      <span className="text-gray-700">Click to upload product files</span>
+                    )}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    PDF, DOCX, XLSX, ZIP, RAR, MP4, MP3, PSD, AI (Max 100MB each)
+                  </p>
+                  <p className="text-xs text-primary mt-1">
+                    You can select multiple files
+                  </p>
+                </label>
                 {productFiles.length > 0 && (
                   <div className="space-y-2">
                     {productFiles.map((file, index) => (

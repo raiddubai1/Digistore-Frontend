@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { Upload, X, Image as ImageIcon, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface ImageUploadProps {
@@ -112,15 +112,18 @@ export default function ImageUpload({
     <div className="space-y-4">
       {/* Upload Area */}
       <div
-        className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
+        className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer ${
           dragActive
-            ? "border-primary bg-primary/5"
-            : "border-gray-300 hover:border-primary hover:bg-gray-50"
-        }`}
+            ? "border-primary bg-primary/10 scale-[1.02]"
+            : previews.length > 0
+            ? "border-green-400 bg-green-50 hover:border-green-500 hover:bg-green-100"
+            : "border-gray-300 hover:border-primary hover:bg-primary/5"
+        } active:scale-[0.98] active:border-primary active:bg-primary/10`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
+        onClick={onButtonClick}
       >
         <input
           ref={inputRef}
@@ -132,20 +135,28 @@ export default function ImageUpload({
         />
 
         <div className="flex flex-col items-center gap-3">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <Upload className="w-8 h-8 text-primary" />
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors ${
+            previews.length > 0 ? "bg-green-100" : "bg-primary/10"
+          }`}>
+            {previews.length > 0 ? (
+              <CheckCircle className="w-8 h-8 text-green-600" />
+            ) : (
+              <Upload className="w-8 h-8 text-primary" />
+            )}
           </div>
 
           <div>
             <p className="text-lg font-semibold mb-1">
-              Drop images here or{" "}
-              <button
-                type="button"
-                onClick={onButtonClick}
-                className="text-primary hover:text-primary-dark underline"
-              >
-                browse
-              </button>
+              {previews.length > 0 ? (
+                <span className="text-green-700">
+                  {previews.length} image(s) selected - Click to add more
+                </span>
+              ) : (
+                <>
+                  Drop images here or{" "}
+                  <span className="text-primary underline">browse</span>
+                </>
+              )}
             </p>
             <p className="text-sm text-gray-500">
               Upload up to {maxFiles} images (max {maxSizeMB}MB each)
