@@ -326,5 +326,51 @@ export const aiAPI = {
   }) => api.post('/ai/generate', data),
 };
 
+// ============================================
+// UPLOAD API
+// ============================================
+
+export const uploadAPI = {
+  // Upload single image to Cloudinary
+  uploadImage: (file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    return api.post('/upload/image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  // Upload multiple images to Cloudinary
+  uploadImages: (files: File[]) => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('images', file);
+    });
+    return api.post('/upload/images', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  // Upload single product file to S3
+  uploadProductFile: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/upload/product-file', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  // Upload multiple product files to S3
+  uploadProductFiles: (files: File[]) => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+    return api.post('/upload/product-files', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+};
+
 export default api;
 

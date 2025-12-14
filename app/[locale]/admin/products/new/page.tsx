@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Save, ArrowLeft, Plus, X, Upload, FileText, Loader2, Sparkles, Wand2 } from "lucide-react";
+import { Save, ArrowLeft, Plus, X, Upload, FileText, Loader2, Sparkles, Wand2, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import ImageUpload from "@/components/ImageUpload";
 import Link from "next/link";
-import { categoriesAPI, productsAPI, aiAPI } from "@/lib/api";
+import { categoriesAPI, productsAPI, aiAPI, uploadAPI } from "@/lib/api";
 
 interface Attribute {
   id: string;
@@ -49,6 +49,7 @@ export default function NewProductPage() {
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
 
   // Build category tree from flat list
   const buildCategoryTree = (cats: Category[]): Category[] => {
@@ -337,17 +338,41 @@ export default function NewProductPage() {
     setIsLoading(true);
 
     try {
-      // For now, use placeholder URLs for files
-      // In production, you would first upload files to cloud storage (S3, Cloudinary, etc.)
-      // and get back the URLs
-      const thumbnailUrl = uploadedImages[0]
-        ? URL.createObjectURL(uploadedImages[0])
-        : 'https://via.placeholder.com/400x300';
+      // Step 1: Upload images to Cloudinary
+      setUploadProgress("Uploading images...");
+      let imageUrls: string[] = [];
+      try {
+        const imageResponse = await uploadAPI.uploadImages(uploadedImages);
+        if (imageResponse.data?.success && imageResponse.data?.data?.images) {
+          imageUrls = imageResponse.data.data.images.map((img: { url: string }) => img.url);
+        } else {
+          throw new Error('Failed to upload images');
+        }
+      } catch (imgError: any) {
+        console.error('Image upload error:', imgError);
+        throw new Error(imgError.response?.data?.message || 'Failed to upload images to cloud storage');
+      }
 
-      // Build file info from all product files
-      const primaryFile = productFiles[0];
-      const fileTypes = [...new Set(productFiles.map(f => f.name.split('.').pop() || ''))].join(', ');
-      const fileNames = productFiles.map(f => f.name).join(', ');
+      // Step 2: Upload product files to S3
+      setUploadProgress("Uploading product files...");
+      let uploadedFileData: Array<{ url: string; key: string; fileName: string; fileSize: number; fileType: string }> = [];
+      try {
+        const fileResponse = await uploadAPI.uploadProductFiles(productFiles);
+        if (fileResponse.data?.success && fileResponse.data?.data?.files) {
+          uploadedFileData = fileResponse.data.data.files;
+        } else {
+          throw new Error('Failed to upload product files');
+        }
+      } catch (fileError: any) {
+        console.error('File upload error:', fileError);
+        throw new Error(fileError.response?.data?.message || 'Failed to upload product files to cloud storage');
+      }
+
+      // Step 3: Create product with uploaded URLs
+      setUploadProgress("Creating product...");
+      const primaryFile = uploadedFileData[0];
+      const fileTypes = [...new Set(uploadedFileData.map(f => f.fileType.split('/').pop() || ''))].join(', ');
+      const fileNames = uploadedFileData.map(f => f.fileName).join(', ');
 
       const productData = {
         title: formData.title,
@@ -358,18 +383,19 @@ export default function NewProductPage() {
         categoryId: formData.categoryId,
         subcategory: formData.subcategory || null,
         tags: formData.tags,
-        fileType: fileTypes || primaryFile.name.split('.').pop() || 'pdf',
-        fileName: fileNames || primaryFile.name,
-        fileUrl: 'pending-upload', // Placeholder - would be real URL after upload
-        thumbnailUrl: thumbnailUrl,
-        previewImages: [],
+        fileType: fileTypes || 'pdf',
+        fileName: fileNames || primaryFile.fileName,
+        fileUrl: primaryFile.url,
+        thumbnailUrl: imageUrls[0] || 'https://via.placeholder.com/400x300',
+        previewImages: imageUrls.slice(1),
         whatsIncluded: formData.whatsIncluded,
         requirements: formData.requirements,
         // Include files metadata for multiple files support
-        files: productFiles.map((f, idx) => ({
-          fileName: f.name,
-          fileType: f.name.split('.').pop() || '',
-          fileSize: f.size,
+        files: uploadedFileData.map((f, idx) => ({
+          fileName: f.fileName,
+          fileType: f.fileType,
+          fileSize: f.fileSize,
+          fileUrl: f.url,
           order: idx,
         })),
       };
@@ -389,6 +415,7 @@ export default function NewProductPage() {
       const message = error.response?.data?.message || error.message || 'Failed to create product';
       toast.error(message);
       setIsLoading(false);
+      setUploadProgress(null);
     }
   };
 
@@ -918,7 +945,7 @@ export default function NewProductPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Creating Product...
+                    {uploadProgress || "Processing..."}
                   </>
                 ) : (
                   <>
@@ -927,6 +954,30 @@ export default function NewProductPage() {
                   </>
                 )}
               </button>
+              {isLoading && uploadProgress && (
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    {uploadProgress.includes("images") && (
+                      <span className="flex items-center gap-1">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Uploading to Cloudinary...
+                      </span>
+                    )}
+                    {uploadProgress.includes("files") && (
+                      <span className="flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3 text-green-500" />
+                        Images uploaded
+                      </span>
+                    )}
+                    {uploadProgress.includes("Creating") && (
+                      <>
+                        <CheckCircle className="w-3 h-3 text-green-500" />
+                        Files uploaded
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
               <p className="text-xs text-gray-500 text-center mt-3">
                 Product will be saved as {formData.status}
               </p>
