@@ -375,8 +375,10 @@ export default function NewProductPage() {
       };
 
       const response = await productsAPI.create(productData);
+      console.log('Create product response:', response);
 
-      if (response.data?.success) {
+      // Handle different response structures
+      if (response.data?.success || response.status === 201 || response.status === 200) {
         toast.success("Product created successfully!");
         router.push(`${basePath}/admin/products`);
       } else {
@@ -386,7 +388,6 @@ export default function NewProductPage() {
       console.error('Failed to create product:', error);
       const message = error.response?.data?.message || error.message || 'Failed to create product';
       toast.error(message);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -911,10 +912,20 @@ export default function NewProductPage() {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+                disabled={isLoading}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Save className="w-5 h-5" />
-                Create Product
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Creating Product...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-5 h-5" />
+                    Create Product
+                  </>
+                )}
               </button>
               <p className="text-xs text-gray-500 text-center mt-3">
                 Product will be saved as {formData.status}
