@@ -324,6 +324,17 @@ export const aiAPI = {
       existingDescription?: string;
     };
   }) => api.post('/ai/generate', data),
+
+  // Generate image alt text for SEO
+  generateImageAlt: (data: {
+    productTitle?: string;
+    categoryName?: string;
+    imageIndex?: number;
+    isMainImage?: boolean;
+  }) => api.post('/ai/generate', {
+    type: 'imageAlt',
+    context: data,
+  }),
 };
 
 // ============================================

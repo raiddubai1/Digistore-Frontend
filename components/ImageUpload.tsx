@@ -143,14 +143,11 @@ export default function ImageUpload({
 
     setGeneratingAlt(index);
     try {
-      const response = await aiAPI.generate({
-        type: 'imageAlt',
-        context: {
-          productTitle,
-          category: productCategory,
-          imageIndex: index,
-          isMainImage: index === 0,
-        }
+      const response = await aiAPI.generateImageAlt({
+        productTitle,
+        categoryName: productCategory,
+        imageIndex: index,
+        isMainImage: index === 0,
       });
 
       if (response.data?.success && response.data?.data?.imageAlt) {
