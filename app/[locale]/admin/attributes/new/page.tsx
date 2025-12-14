@@ -1,15 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Save, Plus, X } from "lucide-react";
+import { ArrowLeft, Save, Plus, X, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { attributesAPI } from "@/lib/api";
 
 type AttributeType = "TEXT" | "NUMBER" | "SELECT" | "MULTISELECT" | "COLOR" | "BOOLEAN";
 
 export default function NewAttributePage() {
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'en';
+  const router = useRouter();
+  // Extract locale/basePath from pathname - validate against known locales
+  const validLocales = ['en', 'ar', 'es', 'fr', 'de'];
+  const segments = pathname.split('/').filter(Boolean);
+  const firstSegment = segments[0] || '';
+  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
 
   const [formData, setFormData] = useState({
     name: "",
@@ -23,11 +30,41 @@ export default function NewAttributePage() {
   });
 
   const [newOption, setNewOption] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: API call to create attribute
-    console.log("Creating attribute:", formData);
+
+    // Validation
+    if (!formData.name || !formData.slug) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    const needsOptions = formData.type === "SELECT" || formData.type === "MULTISELECT";
+    if (needsOptions && formData.options.length === 0) {
+      toast.error("Please add at least one option for this attribute type");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await attributesAPI.create(formData);
+
+      if (response.data?.success || response.status === 201 || response.status === 200) {
+        toast.success("Attribute created successfully!");
+        router.push(`${basePath}/admin/attributes`);
+      } else {
+        throw new Error(response.data?.message || 'Failed to create attribute');
+      }
+    } catch (error: any) {
+      console.error('Failed to create attribute:', error);
+      const message = error.response?.data?.message || error.message || 'Failed to create attribute';
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const generateSlug = (name: string) => {
@@ -69,7 +106,7 @@ export default function NewAttributePage() {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link
-          href={`/${locale}/admin/attributes`}
+          href={`${basePath}/admin/attributes`}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -263,14 +300,23 @@ export default function NewAttributePage() {
           <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
             <button
               type="submit"
-              className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-semibold"
-              disabled={needsOptions && formData.options.length === 0}
+              className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading || (needsOptions && formData.options.length === 0)}
             >
-              <Save className="w-4 h-4" />
-              Create Attribute
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  Create Attribute
+                </>
+              )}
             </button>
             <Link
-              href={`/${locale}/admin/attributes`}
+              href={`${basePath}/admin/attributes`}
               className="px-6 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
             >
               Cancel
