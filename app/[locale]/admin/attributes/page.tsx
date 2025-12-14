@@ -25,7 +25,11 @@ interface Attribute {
 
 export default function AttributesPage() {
   const pathname = usePathname();
-  const locale = pathname.split('/')[1] || 'en';
+  // Extract locale/basePath from pathname - validate against known locales
+  const validLocales = ['en', 'ar', 'es', 'fr', 'de'];
+  const segments = pathname.split('/').filter(Boolean);
+  const firstSegment = segments[0] || '';
+  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -90,7 +94,7 @@ export default function AttributesPage() {
           <p className="text-sm text-gray-500 mt-1">Manage product attributes and specifications</p>
         </div>
         <Link
-          href={`/${locale}/admin/attributes/new`}
+          href={`${basePath}/admin/attributes/new`}
           className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-semibold"
         >
           <Plus className="w-4 h-4" />
@@ -215,7 +219,7 @@ export default function AttributesPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <Link
-                        href={`/${locale}/admin/attributes/${attribute.id}`}
+                        href={`${basePath}/admin/attributes/${attribute.id}`}
                         className="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg transition-colors"
                         title="Edit"
                       >
