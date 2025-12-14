@@ -42,7 +42,7 @@ export default function NewProductPage() {
   const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
 
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
-  const [productFile, setProductFile] = useState<File | null>(null);
+  const [productFiles, setProductFiles] = useState<File[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [flatCategories, setFlatCategories] = useState<FlatCategory[]>([]);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
@@ -148,7 +148,7 @@ export default function NewProductPage() {
       const response = await aiAPI.generateContent({
         type,
         context: {
-          fileName: formData.fileName || productFile?.name,
+          fileName: formData.fileName || productFiles[0]?.name,
           category: getCategoryName(formData.categoryId),
           existingTitle: formData.title,
           existingDescription: formData.description,
@@ -233,15 +233,42 @@ export default function NewProductPage() {
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setProductFile(file);
-      setFormData({
-        ...formData,
-        fileName: file.name,
-        fileType: file.name.split('.').pop() || '',
-      });
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const newFiles = Array.from(files);
+      setProductFiles(prev => [...prev, ...newFiles]);
+      // Update formData with first file info for backward compatibility
+      if (productFiles.length === 0 && newFiles.length > 0) {
+        setFormData({
+          ...formData,
+          fileName: newFiles[0].name,
+          fileType: newFiles[0].name.split('.').pop() || '',
+        });
+      }
     }
+    // Reset input so same file can be selected again
+    e.target.value = '';
+  };
+
+  const handleFileRemove = (index: number) => {
+    setProductFiles(prev => {
+      const updated = prev.filter((_, i) => i !== index);
+      // Update formData with new first file info
+      if (updated.length > 0) {
+        setFormData({
+          ...formData,
+          fileName: updated[0].name,
+          fileType: updated[0].name.split('.').pop() || '',
+        });
+      } else {
+        setFormData({
+          ...formData,
+          fileName: '',
+          fileType: '',
+        });
+      }
+      return updated;
+    });
   };
 
   // Array management functions
@@ -292,8 +319,8 @@ export default function NewProductPage() {
       return;
     }
 
-    if (!productFile) {
-      toast.error("Please upload the product file");
+    if (productFiles.length === 0) {
+      toast.error("Please upload at least one product file");
       return;
     }
 
@@ -317,6 +344,11 @@ export default function NewProductPage() {
         ? URL.createObjectURL(uploadedImages[0])
         : 'https://via.placeholder.com/400x300';
 
+      // Build file info from all product files
+      const primaryFile = productFiles[0];
+      const fileTypes = [...new Set(productFiles.map(f => f.name.split('.').pop() || ''))].join(', ');
+      const fileNames = productFiles.map(f => f.name).join(', ');
+
       const productData = {
         title: formData.title,
         description: formData.description,
@@ -326,13 +358,20 @@ export default function NewProductPage() {
         categoryId: formData.categoryId,
         subcategory: formData.subcategory || null,
         tags: formData.tags,
-        fileType: formData.fileType || productFile.name.split('.').pop() || 'pdf',
-        fileName: productFile.name,
+        fileType: fileTypes || primaryFile.name.split('.').pop() || 'pdf',
+        fileName: fileNames || primaryFile.name,
         fileUrl: 'pending-upload', // Placeholder - would be real URL after upload
         thumbnailUrl: thumbnailUrl,
         previewImages: [],
         whatsIncluded: formData.whatsIncluded,
         requirements: formData.requirements,
+        // Include files metadata for multiple files support
+        files: productFiles.map((f, idx) => ({
+          fileName: f.name,
+          fileType: f.name.split('.').pop() || '',
+          fileSize: f.size,
+          order: idx,
+        })),
       };
 
       const response = await productsAPI.create(productData);
@@ -524,9 +563,14 @@ export default function NewProductPage() {
               </div>
             </div>
 
-            {/* Product File Upload */}
+            {/* Product Files Upload */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Product File *</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">Product Files *</h2>
+                {productFiles.length > 0 && (
+                  <span className="text-sm text-gray-500">{productFiles.length} file(s) selected</span>
+                )}
+              </div>
               <div className="space-y-4">
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
                   <input
@@ -534,34 +578,42 @@ export default function NewProductPage() {
                     id="product-file"
                     onChange={handleFileUpload}
                     className="hidden"
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.mp4,.mp3,.psd,.ai"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.mp4,.mp3,.psd,.ai,.rar"
+                    multiple
                   />
                   <label htmlFor="product-file" className="cursor-pointer">
                     <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                     <p className="text-sm font-semibold text-gray-700 mb-1">
-                      {productFile ? productFile.name : "Click to upload product file"}
+                      Click to upload product files
                     </p>
                     <p className="text-xs text-gray-500">
-                      PDF, DOCX, XLSX, ZIP, MP4, MP3, PSD, AI (Max 100MB)
+                      PDF, DOCX, XLSX, ZIP, RAR, MP4, MP3, PSD, AI (Max 100MB each)
+                    </p>
+                    <p className="text-xs text-primary mt-1">
+                      You can select multiple files
                     </p>
                   </label>
                 </div>
-                {productFile && (
-                  <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <FileText className="w-5 h-5 text-green-600" />
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-green-900">{productFile.name}</p>
-                      <p className="text-xs text-green-600">
-                        {(productFile.size / 1024 / 1024).toFixed(2)} MB
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setProductFile(null)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
+                {productFiles.length > 0 && (
+                  <div className="space-y-2">
+                    {productFiles.map((file, index) => (
+                      <div key={`${file.name}-${index}`} className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <FileText className="w-5 h-5 text-green-600 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-green-900 truncate">{file.name}</p>
+                          <p className="text-xs text-green-600">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleFileRemove(index)}
+                          className="text-red-600 hover:text-red-700 flex-shrink-0"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>

@@ -75,12 +75,14 @@ export async function uploadImages(files: File[], token: string): Promise<string
   }
 }
 
-export async function uploadProductFile(file: File, token: string): Promise<{
+export interface ProductFileData {
   url: string;
   fileName: string;
   fileSize: number;
   fileType: string;
-}> {
+}
+
+export async function uploadProductFile(file: File, token: string): Promise<ProductFileData> {
   try {
     const formData = new FormData();
     formData.append('file', file);
@@ -107,6 +109,39 @@ export async function uploadProductFile(file: File, token: string): Promise<{
     };
   } catch (error) {
     console.error('Error uploading product file:', error);
+    throw error;
+  }
+}
+
+export async function uploadProductFiles(files: File[], token: string): Promise<ProductFileData[]> {
+  try {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+
+    const response = await fetch(`${API_URL}/upload/product-files`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to upload files');
+    }
+
+    const result = await response.json();
+    return result.data.files.map((file: { url: string; fileName: string; fileSize: number; fileType: string }) => ({
+      url: file.url,
+      fileName: file.fileName,
+      fileSize: file.fileSize,
+      fileType: file.fileType,
+    }));
+  } catch (error) {
+    console.error('Error uploading product files:', error);
     throw error;
   }
 }

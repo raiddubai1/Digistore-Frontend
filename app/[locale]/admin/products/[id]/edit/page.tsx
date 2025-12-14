@@ -37,6 +37,15 @@ interface ProductAttribute {
   attribute: Attribute;
 }
 
+interface ProductFile {
+  id?: string;
+  fileName: string;
+  fileUrl: string;
+  fileSize?: number;
+  fileType: string;
+  order?: number;
+}
+
 interface Product {
   id: string;
   title: string;
@@ -60,6 +69,7 @@ interface Product {
   featured?: boolean;
   bestseller?: boolean;
   newArrival?: boolean;
+  files?: ProductFile[];
 }
 
 interface EditProductPageProps {
@@ -85,6 +95,10 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   const [newTag, setNewTag] = useState("");
   const [newIncluded, setNewIncluded] = useState("");
   const [newRequirement, setNewRequirement] = useState("");
+  const [productFiles, setProductFiles] = useState<ProductFile[]>([]);
+  const [newFileUrl, setNewFileUrl] = useState("");
+  const [newFileName, setNewFileName] = useState("");
+  const [newFileType, setNewFileType] = useState("");
 
   // Build category tree from flat list
   const buildCategoryTree = (cats: Category[]): Category[] => {
@@ -211,6 +225,19 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             newArrival: p.newArrival || false,
           });
 
+          // Initialize product files from product data or legacy single file
+          if (p.files && p.files.length > 0) {
+            setProductFiles(p.files);
+          } else if (p.fileUrl) {
+            // Convert legacy single file to array format
+            setProductFiles([{
+              fileName: p.fileName || 'Product File',
+              fileUrl: p.fileUrl,
+              fileType: p.fileType || '',
+              order: 0,
+            }]);
+          }
+
           // Fetch product's current attributes
           const prodAttrResponse = await attributesAPI.getProductAttributes(p.id);
           if (prodAttrResponse.data?.success && prodAttrResponse.data?.data) {
@@ -266,6 +293,25 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     setFormData({ ...formData, requirements: formData.requirements.filter(r => r !== item) });
   };
 
+  const addProductFile = () => {
+    if (newFileUrl.trim() && newFileName.trim()) {
+      const newFile: ProductFile = {
+        fileName: newFileName.trim(),
+        fileUrl: newFileUrl.trim(),
+        fileType: newFileType.trim() || newFileName.split('.').pop() || '',
+        order: productFiles.length,
+      };
+      setProductFiles([...productFiles, newFile]);
+      setNewFileUrl("");
+      setNewFileName("");
+      setNewFileType("");
+    }
+  };
+
+  const removeProductFile = (index: number) => {
+    setProductFiles(productFiles.filter((_, i) => i !== index));
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -292,7 +338,28 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     e.preventDefault();
     try {
       setSaving(true);
-      await productsAPI.update(id, formData);
+
+      // Build file info from productFiles array
+      const primaryFile = productFiles[0];
+      const fileTypes = [...new Set(productFiles.map(f => f.fileType))].join(', ');
+      const fileNames = productFiles.map(f => f.fileName).join(', ');
+
+      // Update formData with files info for backward compatibility
+      const updatedFormData = {
+        ...formData,
+        fileUrl: primaryFile?.fileUrl || formData.fileUrl,
+        fileName: fileNames || formData.fileName,
+        fileType: fileTypes || formData.fileType,
+        files: productFiles.map((f, idx) => ({
+          fileName: f.fileName,
+          fileUrl: f.fileUrl,
+          fileType: f.fileType,
+          fileSize: f.fileSize,
+          order: idx,
+        })),
+      };
+
+      await productsAPI.update(id, updatedFormData);
 
       // Save attributes
       const attributesToSave = Object.entries(selectedAttributes)
@@ -523,37 +590,78 @@ export default function EditProductPage({ params }: EditProductPageProps) {
               </div>
             </div>
 
-            {/* Downloadable File */}
+            {/* Downloadable Files */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold mb-4">Downloadable File</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold">Downloadable Files</h2>
+                {productFiles.length > 0 && (
+                  <span className="text-sm text-gray-500">{productFiles.length} file(s)</span>
+                )}
+              </div>
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">File URL</label>
-                  <input type="text" value={formData.fileUrl}
-                    onChange={(e) => setFormData({ ...formData, fileUrl: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                    placeholder="https://cloudinary.com/..." />
-                  {formData.fileUrl && (
-                    <a href={formData.fileUrl} target="_blank" rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-2 text-primary hover:underline text-sm">
-                      <FileDown className="w-4 h-4" /> Test download link
-                    </a>
-                  )}
+                {/* Existing files list */}
+                {productFiles.length > 0 && (
+                  <div className="space-y-2">
+                    {productFiles.map((file, index) => (
+                      <div key={`${file.fileName}-${index}`} className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <FileDown className="w-5 h-5 text-green-600 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-green-900 truncate">{file.fileName}</p>
+                          <a href={file.fileUrl} target="_blank" rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline truncate block">
+                            {file.fileUrl.length > 50 ? file.fileUrl.substring(0, 50) + '...' : file.fileUrl}
+                          </a>
+                        </div>
+                        <span className="text-xs text-gray-500 uppercase">{file.fileType}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeProductFile(index)}
+                          className="text-red-600 hover:text-red-700 flex-shrink-0"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add new file form */}
+                <div className="border-t pt-4 mt-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">Add New File</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <input type="text" value={newFileUrl}
+                        onChange={(e) => setNewFileUrl(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary text-sm"
+                        placeholder="File URL (https://...)" />
+                    </div>
+                    <div>
+                      <input type="text" value={newFileName}
+                        onChange={(e) => setNewFileName(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary text-sm"
+                        placeholder="File name" />
+                    </div>
+                    <div className="flex gap-2">
+                      <input type="text" value={newFileType}
+                        onChange={(e) => setNewFileType(e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary text-sm"
+                        placeholder="Type (pdf, zip)" />
+                      <button
+                        type="button"
+                        onClick={addProductFile}
+                        disabled={!newFileUrl.trim() || !newFileName.trim()}
+                        className="px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">File Name</label>
-                  <input type="text" value={formData.fileName}
-                    onChange={(e) => setFormData({ ...formData, fileName: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                    placeholder="product-file.pdf" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">File Type</label>
-                  <input type="text" value={formData.fileType}
-                    onChange={(e) => setFormData({ ...formData, fileType: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                    placeholder="pdf, xlsx, zip" />
-                </div>
+
+                {/* Legacy single file fields (hidden but kept for backward compatibility) */}
+                <input type="hidden" value={formData.fileUrl} />
+                <input type="hidden" value={formData.fileName} />
+                <input type="hidden" value={formData.fileType} />
               </div>
             </div>
 
