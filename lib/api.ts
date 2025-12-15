@@ -403,5 +403,17 @@ export const tagsAPI = {
   bulkDelete: (tags: string[]) => api.post('/admin/tags/bulk-delete', { tags }),
 };
 
+export const newsletterAPI = {
+  // Get all subscribers (admin only)
+  getSubscribers: () => api.get('/newsletter/subscribers'),
+
+  // Unsubscribe an email (admin only)
+  unsubscribe: (email: string) => api.post('/newsletter/unsubscribe', { email }),
+
+  // Send promotional email (admin only)
+  sendPromotion: (data: { subject: string; title: string; body: string; ctaText?: string; ctaUrl?: string }) =>
+    api.post('/newsletter/send-promotion', data),
+};
+
 export default api;
 
