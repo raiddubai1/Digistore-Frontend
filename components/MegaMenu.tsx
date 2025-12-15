@@ -6,9 +6,10 @@ import { usePathname } from "next/navigation";
 import {
   ChevronDown, TrendingUp, Sparkles, Clock, Tag, Home, Briefcase, Code,
   Heart, Palette, DollarSign, ArrowRight, Flame, Zap, Menu,
-  LucideIcon, Star, Gift, Rocket, Package, Users
+  LucideIcon, Star, Gift, Rocket, Package, Users, ExternalLink
 } from "lucide-react";
 import { useCategories } from "@/hooks/useCategories";
+import { useMenuItems } from "@/hooks/useMenuItems";
 
 // Icon mapping for categories
 const iconMap: Record<string, LucideIcon> = {
@@ -115,6 +116,9 @@ export default function MegaMenu() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
+  // Fetch dynamic menu items from settings
+  const { menuItems } = useMenuItems();
+
   const handleMouseEnter = (categoryId: string) => {
     setActiveCategory(categoryId);
     setIsOpen(true);
@@ -153,38 +157,18 @@ export default function MegaMenu() {
                 </button>
               </div>
 
-            <Link
-              href="/"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all"
-            >
-              <Home className="w-4 h-4" />
-              Home
-            </Link>
-
-            <Link
-              href="/products?filter=trending"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all"
-            >
-              <TrendingUp className="w-4 h-4" />
-              Trending
-            </Link>
-
-            <Link
-              href="/products?filter=new"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all"
-            >
-              <Sparkles className="w-4 h-4" />
-              New Arrivals
-            </Link>
-
-            <Link
-              href="/products?filter=bestsellers"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all"
-            >
-              <Flame className="w-4 h-4" />
-              Bestsellers
-            </Link>
-          </div>
+              {/* Dynamic Menu Items from Settings */}
+              {/* Dynamic Menu Items from Settings */}
+              {menuItems.map((item) => (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-500 hover:bg-gray-50 transition-all"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
 
           {/* Right Side - Special Links */}
           <div className="flex items-center gap-1">

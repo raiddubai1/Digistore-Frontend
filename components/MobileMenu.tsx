@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { X, ChevronDown, ChevronRight, Briefcase, Sparkles, Code, Heart, Palette, DollarSign, Flame, Zap, Tag, Globe, Check, LucideIcon, Home, Search, Gift, Package, Users } from "lucide-react";
+import { X, ChevronDown, ChevronRight, Briefcase, Sparkles, Code, Heart, Palette, DollarSign, Flame, Zap, Tag, Globe, Check, LucideIcon, Home, Search, Gift, Package, Users, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCategories } from "@/hooks/useCategories";
+import { useMenuItems } from "@/hooks/useMenuItems";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -152,6 +153,9 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   // Fetch categories from API
   const { categories: apiCategories } = useCategories();
 
+  // Fetch menu items from settings
+  const { menuItems } = useMenuItems();
+
   // Use API categories if available, otherwise use demo categories
   const categories = apiCategories.length > 0 ? apiCategories.map(cat => ({
     id: cat.slug,
@@ -249,6 +253,28 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
         {/* Content */}
         <div className="px-4 py-6">
+          {/* Navigation Menu Items */}
+          {menuItems.length > 0 && (
+            <div className="space-y-1 mb-8">
+              <h3 className="px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+                Navigation
+              </h3>
+              {menuItems.map((item) => (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  onClick={onClose}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 active:bg-gray-100 dark:active:bg-slate-700 transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-gray-500 to-gray-600 flex items-center justify-center">
+                    <ExternalLink className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-base font-medium text-gray-700 dark:text-gray-300">{item.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+
           {/* Categories */}
           <div className="space-y-1 mb-8">
             <h3 className="px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">

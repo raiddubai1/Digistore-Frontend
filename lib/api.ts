@@ -383,5 +383,20 @@ export const uploadAPI = {
   },
 };
 
+// ============================================
+// SETTINGS API
+// ============================================
+
+export const settingsAPI = {
+  // Get public settings (includes menuItems)
+  getPublic: () => api.get('/settings/public'),
+
+  // Get all settings (admin only)
+  getAll: () => api.get('/settings'),
+
+  // Update settings (admin only)
+  update: (data: Record<string, any>) => api.put('/settings', data),
+};
+
 export default api;
 

@@ -1,10 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Settings, Store, CreditCard, Mail, Shield, Bell, Loader2, Save, Check, ArrowLeft, Key, Eye, EyeOff } from "lucide-react";
+import { Settings, Store, CreditCard, Mail, Shield, Bell, Loader2, Save, Check, ArrowLeft, Key, Eye, EyeOff, Menu, Plus, Trash2, GripVertical } from "lucide-react";
 import toast from "react-hot-toast";
 
-type SettingsTab = "general" | "payment" | "email" | "notifications" | "security";
+type SettingsTab = "general" | "payment" | "email" | "notifications" | "security" | "menu";
+
+interface MenuItem {
+  id: string;
+  label: string;
+  href: string;
+  enabled: boolean;
+  order: number;
+}
 
 interface SettingsData {
   // General
@@ -40,6 +48,8 @@ interface SettingsData {
   maxLoginAttempts: string;
   requireEmailVerification: boolean;
   allowGuestCheckout: boolean;
+  // Menu
+  menuItems: MenuItem[];
 }
 
 const DEFAULT_SETTINGS: SettingsData = {
@@ -71,6 +81,13 @@ const DEFAULT_SETTINGS: SettingsData = {
   maxLoginAttempts: "5",
   requireEmailVerification: true,
   allowGuestCheckout: false,
+  menuItems: [
+    { id: "1", label: "Home", href: "/", enabled: true, order: 0 },
+    { id: "2", label: "Shop", href: "/products", enabled: true, order: 1 },
+    { id: "3", label: "Categories", href: "/categories", enabled: true, order: 2 },
+    { id: "4", label: "New Arrivals", href: "/products?sort=newest", enabled: true, order: 3 },
+    { id: "5", label: "Best Sellers", href: "/products?sort=bestsellers", enabled: true, order: 4 },
+  ],
 };
 
 export default function SettingsPage() {
@@ -153,6 +170,7 @@ export default function SettingsPage() {
           <SettingsCard icon={Mail} title="Email" desc="SMTP configuration" color="purple" onClick={() => setActiveTab("email")} />
           <SettingsCard icon={Bell} title="Notifications" desc="Email notification preferences" color="yellow" onClick={() => setActiveTab("notifications")} />
           <SettingsCard icon={Shield} title="Security" desc="Auth & password policies" color="red" onClick={() => setActiveTab("security")} />
+          <SettingsCard icon={Menu} title="Menu" desc="Navigation menu items" color="cyan" onClick={() => setActiveTab("menu")} />
         </div>
       </div>
     );
@@ -181,13 +199,14 @@ export default function SettingsPage() {
         {activeTab === "email" && <EmailSettings settings={settings} onChange={updateSetting} />}
         {activeTab === "notifications" && <NotificationSettings settings={settings} onChange={updateSetting} />}
         {activeTab === "security" && <SecuritySettings settings={settings} onChange={updateSetting} />}
+        {activeTab === "menu" && <MenuSettings settings={settings} onChange={updateSetting} />}
       </div>
     </div>
   );
 }
 
 function SettingsCard({ icon: Icon, title, desc, color, onClick }: { icon: any; title: string; desc: string; color: string; onClick: () => void }) {
-  const colors: Record<string, string> = { blue: "from-blue-500 to-cyan-500", green: "from-green-500 to-emerald-500", purple: "from-purple-500 to-pink-500", yellow: "from-yellow-500 to-amber-500", red: "from-red-500 to-orange-500" };
+  const colors: Record<string, string> = { blue: "from-blue-500 to-cyan-500", green: "from-green-500 to-emerald-500", purple: "from-purple-500 to-pink-500", yellow: "from-yellow-500 to-amber-500", red: "from-red-500 to-orange-500", cyan: "from-cyan-500 to-teal-500" };
   return (
     <div onClick={onClick} className="bg-white rounded-2xl shadow-sm border p-6 hover:shadow-md transition-shadow cursor-pointer">
       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors[color]} flex items-center justify-center mb-4`}><Icon className="w-6 h-6 text-white" /></div>
@@ -454,6 +473,157 @@ function ChangePasswordSection() {
             {changing ? "Changing..." : "Change Password"}
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function MenuSettings({ settings, onChange }: { settings: SettingsData; onChange: (k: keyof SettingsData, v: any) => void }) {
+  const menuItems = settings.menuItems || [];
+
+  const addMenuItem = () => {
+    const newItem: MenuItem = {
+      id: Date.now().toString(),
+      label: "New Link",
+      href: "/",
+      enabled: true,
+      order: menuItems.length,
+    };
+    onChange("menuItems", [...menuItems, newItem]);
+  };
+
+  const updateMenuItem = (id: string, field: keyof MenuItem, value: any) => {
+    const updated = menuItems.map((item) =>
+      item.id === id ? { ...item, [field]: value } : item
+    );
+    onChange("menuItems", updated);
+  };
+
+  const removeMenuItem = (id: string) => {
+    onChange("menuItems", menuItems.filter((item) => item.id !== id));
+  };
+
+  const moveItem = (index: number, direction: "up" | "down") => {
+    if ((direction === "up" && index === 0) || (direction === "down" && index === menuItems.length - 1)) return;
+    const newItems = [...menuItems];
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+    [newItems[index], newItems[swapIndex]] = [newItems[swapIndex], newItems[index]];
+    // Update order values
+    newItems.forEach((item, i) => (item.order = i));
+    onChange("menuItems", newItems);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="font-semibold text-gray-900">Navigation Menu Items</h3>
+          <p className="text-sm text-gray-500 mt-1">Add, remove, or reorder menu items that appear in the main navigation</p>
+        </div>
+        <button
+          onClick={addMenuItem}
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 text-sm"
+        >
+          <Plus className="w-4 h-4" />
+          Add Item
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        {menuItems.length === 0 ? (
+          <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-xl">
+            No menu items yet. Click "Add Item" to get started.
+          </div>
+        ) : (
+          menuItems
+            .sort((a, b) => a.order - b.order)
+            .map((item, index) => (
+              <div
+                key={item.id}
+                className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200"
+              >
+                {/* Drag Handle / Order Controls */}
+                <div className="flex flex-col gap-1">
+                  <button
+                    onClick={() => moveItem(index, "up")}
+                    disabled={index === 0}
+                    className="p-1 hover:bg-gray-200 rounded disabled:opacity-30"
+                    title="Move up"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => moveItem(index, "down")}
+                    disabled={index === menuItems.length - 1}
+                    className="p-1 hover:bg-gray-200 rounded disabled:opacity-30"
+                    title="Move down"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Label */}
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Label</label>
+                  <input
+                    type="text"
+                    value={item.label}
+                    onChange={(e) => updateMenuItem(item.id, "label", e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+                    placeholder="Menu label"
+                  />
+                </div>
+
+                {/* URL */}
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-gray-500 mb-1">URL</label>
+                  <input
+                    type="text"
+                    value={item.href}
+                    onChange={(e) => updateMenuItem(item.id, "href", e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+                    placeholder="/page-url"
+                  />
+                </div>
+
+                {/* Enabled Toggle */}
+                <div className="flex flex-col items-center">
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Visible</label>
+                  <button
+                    onClick={() => updateMenuItem(item.id, "enabled", !item.enabled)}
+                    className={`relative w-10 h-5 rounded-full transition-colors ${
+                      item.enabled ? "bg-green-500" : "bg-gray-300"
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
+                        item.enabled ? "translate-x-5" : ""
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Delete */}
+                <button
+                  onClick={() => removeMenuItem(item.id)}
+                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Remove item"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))
+        )}
+      </div>
+
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <p className="text-sm text-blue-800">
+          <strong>Tip:</strong> Changes will appear in the main navigation after you save. Menu items marked as hidden will not be visible to customers.
+        </p>
       </div>
     </div>
   );
