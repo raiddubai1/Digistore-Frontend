@@ -80,9 +80,14 @@ export default function CategoriesPage() {
     }
   };
 
-  const handleDelete = async (categoryId: string, categoryName: string, hasChildren: boolean) => {
+  const handleDelete = async (categoryId: string, categoryName: string, hasChildren: boolean, productCount: number = 0) => {
     if (hasChildren) {
       toast.error("Cannot delete category with subcategories. Delete subcategories first.");
+      return;
+    }
+
+    if (productCount > 0) {
+      toast.error(`Cannot delete "${categoryName}" - it has ${productCount} product(s). Move or delete products first.`);
       return;
     }
 
@@ -92,7 +97,9 @@ export default function CategoriesPage() {
         toast.success(`"${categoryName}" deleted successfully!`);
         fetchCategories(); // Refresh list
       } catch (error: any) {
-        toast.error(error.message || "Failed to delete category");
+        // Extract error message from API response
+        const errorMessage = error.response?.data?.message || error.message || "Failed to delete category";
+        toast.error(errorMessage);
       }
       setDeleteConfirm(null);
     } else {
@@ -192,7 +199,7 @@ export default function CategoriesPage() {
                           <Edit className="w-4 h-4" />
                         </Link>
                         <button
-                          onClick={() => handleDelete(category.id, category.name, !!(category.children && category.children.length > 0))}
+                          onClick={() => handleDelete(category.id, category.name, !!(category.children && category.children.length > 0), category._count?.products || 0)}
                           className={`p-2 rounded-lg transition-colors ${deleteConfirm === category.id ? 'text-white bg-red-600' : 'text-gray-600 hover:text-red-600 hover:bg-red-50'}`}
                           title={deleteConfirm === category.id ? "Click again to confirm" : "Delete"}
                         >
@@ -235,7 +242,7 @@ export default function CategoriesPage() {
                               <Edit className="w-3.5 h-3.5" />
                             </Link>
                             <button
-                              onClick={() => handleDelete(subcat.id, subcat.name, !!(subcat.children && subcat.children.length > 0))}
+                              onClick={() => handleDelete(subcat.id, subcat.name, !!(subcat.children && subcat.children.length > 0), subcat._count?.products || 0)}
                               className={`p-1.5 rounded-lg transition-colors ${deleteConfirm === subcat.id ? 'text-white bg-red-600' : 'text-gray-500 hover:text-red-600 hover:bg-red-50'}`}
                               title={deleteConfirm === subcat.id ? "Click again to confirm" : "Delete"}
                             >
@@ -279,7 +286,7 @@ export default function CategoriesPage() {
                                 <Edit className="w-3 h-3" />
                               </Link>
                               <button
-                                onClick={() => handleDelete(subsubcat.id, subsubcat.name, false)}
+                                onClick={() => handleDelete(subsubcat.id, subsubcat.name, false, subsubcat._count?.products || 0)}
                                 className={`p-1 rounded transition-colors ${deleteConfirm === subsubcat.id ? 'text-white bg-red-600' : 'text-gray-400 hover:text-red-600 hover:bg-red-50'}`}
                                 title={deleteConfirm === subsubcat.id ? "Click again to confirm" : "Delete"}
                               >
