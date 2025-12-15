@@ -398,5 +398,10 @@ export const settingsAPI = {
   update: (data: Record<string, any>) => api.put('/settings', data),
 };
 
+export const tagsAPI = {
+  // Bulk delete tags from all products (admin only)
+  bulkDelete: (tags: string[]) => api.post('/admin/tags/bulk-delete', { tags }),
+};
+
 export default api;
 
