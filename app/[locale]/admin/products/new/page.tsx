@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Save, ArrowLeft, Plus, X, Upload, FileText, Loader2, Sparkles, Wand2, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
@@ -51,6 +51,7 @@ export default function NewProductPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
+  const isSubmittingRef = useRef(false); // Prevent duplicate submissions
 
   // Build category tree from flat list
   const buildCategoryTree = (cats: Category[]): Category[] => {
@@ -325,6 +326,12 @@ export default function NewProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Prevent duplicate submissions
+    if (isSubmittingRef.current || isLoading) {
+      toast.error("Please wait, product is being created...");
+      return;
+    }
+
     // Validation
     if (!formData.title || !formData.description || !formData.price || !formData.categoryId) {
       toast.error("Please fill in all required fields");
@@ -351,6 +358,7 @@ export default function NewProductPage() {
       return;
     }
 
+    isSubmittingRef.current = true;
     setIsLoading(true);
 
     try {
@@ -432,6 +440,8 @@ export default function NewProductPage() {
       console.error('Failed to create product:', error);
       const message = error.response?.data?.message || error.message || 'Failed to create product';
       toast.error(message);
+    } finally {
+      isSubmittingRef.current = false;
       setIsLoading(false);
       setUploadProgress(null);
     }

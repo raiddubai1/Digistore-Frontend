@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Save, ArrowLeft, Loader2, Upload, X, Plus, Image as ImageIcon, FileDown } from "lucide-react";
+import { Save, ArrowLeft, Loader2, Upload, X, Plus, Image as ImageIcon, FileDown, Trash2, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import Image from "next/image";
-import { productsAPI, categoriesAPI, attributesAPI } from "@/lib/api";
+import { productsAPI, categoriesAPI, attributesAPI, uploadAPI } from "@/lib/api";
 
 interface Category {
   id: string;
@@ -99,6 +99,17 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   const [newFileUrl, setNewFileUrl] = useState("");
   const [newFileName, setNewFileName] = useState("");
   const [newFileType, setNewFileType] = useState("");
+
+  // New file upload states
+  const [newFilesToUpload, setNewFilesToUpload] = useState<File[]>([]);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Image upload states
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [newImagesToUpload, setNewImagesToUpload] = useState<File[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   // Build category tree from flat list
   const buildCategoryTree = (cats: Category[]): Category[] => {
@@ -238,6 +249,14 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             }]);
           }
 
+          // Initialize existing images
+          const allImages: string[] = [];
+          if (p.thumbnailUrl) allImages.push(p.thumbnailUrl);
+          if (p.previewImages && p.previewImages.length > 0) {
+            allImages.push(...p.previewImages);
+          }
+          setExistingImages(allImages);
+
           // Fetch product's current attributes
           const prodAttrResponse = await attributesAPI.getProductAttributes(p.id);
           if (prodAttrResponse.data?.success && prodAttrResponse.data?.data) {
@@ -312,6 +331,40 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     setProductFiles(productFiles.filter((_, i) => i !== index));
   };
 
+  // New image upload functions
+  const handleImageFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const newFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+      if (newFiles.length !== files.length) {
+        toast.error('Only image files are allowed');
+      }
+      setNewImagesToUpload(prev => [...prev, ...newFiles]);
+    }
+    e.target.value = '';
+  };
+
+  const removeNewImage = (index: number) => {
+    setNewImagesToUpload(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (index: number) => {
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // New file upload functions
+  const handleProductFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setNewFilesToUpload(prev => [...prev, ...Array.from(files)]);
+    }
+    e.target.value = '';
+  };
+
+  const removeNewFile = (index: number) => {
+    setNewFilesToUpload(prev => prev.filter((_, i) => i !== index));
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -339,18 +392,64 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     try {
       setSaving(true);
 
-      // Build file info from productFiles array
-      const primaryFile = productFiles[0];
-      const fileTypes = [...new Set(productFiles.map(f => f.fileType))].join(', ');
-      const fileNames = productFiles.map(f => f.fileName).join(', ');
+      // Step 1: Upload new images if any
+      let allImageUrls = [...existingImages];
+      if (newImagesToUpload.length > 0) {
+        setUploadingImages(true);
+        try {
+          const imageResponse = await uploadAPI.uploadImages(newImagesToUpload);
+          if (imageResponse.data?.success && imageResponse.data?.data?.images) {
+            const newUrls = imageResponse.data.data.images.map((img: { url: string }) => img.url);
+            allImageUrls = [...allImageUrls, ...newUrls];
+          }
+        } catch (imgError: any) {
+          toast.error(imgError.response?.data?.message || 'Failed to upload new images');
+          setSaving(false);
+          setUploadingImages(false);
+          return;
+        }
+        setUploadingImages(false);
+      }
 
-      // Update formData with files info for backward compatibility
+      // Step 2: Upload new files if any
+      let allFiles = [...productFiles];
+      if (newFilesToUpload.length > 0) {
+        setUploadingFiles(true);
+        try {
+          const fileResponse = await uploadAPI.uploadProductFiles(newFilesToUpload);
+          if (fileResponse.data?.success && fileResponse.data?.data?.files) {
+            const newFiles = fileResponse.data.data.files.map((f: any, idx: number) => ({
+              fileName: f.fileName,
+              fileUrl: f.url,
+              fileType: f.fileType?.split('/').pop() || '',
+              fileSize: f.fileSize,
+              order: allFiles.length + idx,
+            }));
+            allFiles = [...allFiles, ...newFiles];
+          }
+        } catch (fileError: any) {
+          toast.error(fileError.response?.data?.message || 'Failed to upload new files');
+          setSaving(false);
+          setUploadingFiles(false);
+          return;
+        }
+        setUploadingFiles(false);
+      }
+
+      // Build file info from all files
+      const primaryFile = allFiles[0];
+      const fileTypes = [...new Set(allFiles.map(f => f.fileType))].join(', ');
+      const fileNames = allFiles.map(f => f.fileName).join(', ');
+
+      // Update formData with files and images info
       const updatedFormData = {
         ...formData,
+        thumbnailUrl: allImageUrls[0] || formData.thumbnailUrl,
+        previewImages: allImageUrls.slice(1),
         fileUrl: primaryFile?.fileUrl || formData.fileUrl,
         fileName: fileNames || formData.fileName,
         fileType: fileTypes || formData.fileType,
-        files: productFiles.map((f, idx) => ({
+        files: allFiles.map((f, idx) => ({
           fileName: f.fileName,
           fileUrl: f.fileUrl,
           fileType: f.fileType,
@@ -372,9 +471,9 @@ export default function EditProductPage({ params }: EditProductPageProps) {
 
       toast.success("Product updated successfully!");
       router.push(`${basePath}/admin/products`);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating product:", error);
-      toast.error("Failed to update product");
+      toast.error(error.response?.data?.message || "Failed to update product");
     } finally {
       setSaving(false);
     }
@@ -466,37 +565,96 @@ export default function EditProductPage({ params }: EditProductPageProps) {
 
             {/* Product Images */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold mb-4">Product Images</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Thumbnail URL</label>
-                  <input type="text" value={formData.thumbnailUrl}
-                    onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                    placeholder="https://..." />
-                  {formData.thumbnailUrl && (
-                    <div className="mt-2 relative w-32 h-32 rounded-lg overflow-hidden border">
-                      <Image src={formData.thumbnailUrl} alt="Thumbnail" fill className="object-cover" />
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Preview Images (comma-separated URLs)</label>
-                  <textarea value={formData.previewImages.join(", ")}
-                    onChange={(e) => setFormData({ ...formData, previewImages: e.target.value.split(",").map(s => s.trim()).filter(Boolean) })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary" rows={2}
-                    placeholder="https://img1.jpg, https://img2.jpg" />
-                  {formData.previewImages.length > 0 && (
-                    <div className="mt-2 flex gap-2 flex-wrap">
-                      {formData.previewImages.map((img, i) => (
-                        <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border">
-                          <Image src={img} alt={`Preview ${i+1}`} fill className="object-cover" />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold">Product Images</h2>
+                <span className="text-sm text-gray-500">
+                  {existingImages.length + newImagesToUpload.length} image(s)
+                </span>
               </div>
+
+              {/* Upload new images button */}
+              <div className="mb-4">
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageFileSelect}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => imageInputRef.current?.click()}
+                  className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg w-full hover:border-primary hover:bg-primary/5 transition-colors"
+                >
+                  <Upload className="w-5 h-5 text-gray-400" />
+                  <span className="text-gray-600">Click to upload new images</span>
+                </button>
+              </div>
+
+              {/* Existing images */}
+              {existingImages.length > 0 && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Current Images</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {existingImages.map((img, index) => (
+                      <div key={`existing-${index}`} className="relative group">
+                        <div className="relative w-full aspect-square rounded-lg overflow-hidden border-2 border-gray-200">
+                          <Image src={img} alt={`Image ${index + 1}`} fill className="object-cover" />
+                          {index === 0 && (
+                            <div className="absolute bottom-1 left-1 px-2 py-0.5 bg-primary text-white text-xs font-semibold rounded">
+                              Main
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeExistingImage(index)}
+                          className="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* New images to upload */}
+              {newImagesToUpload.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    New Images to Upload <span className="text-green-600">({newImagesToUpload.length} pending)</span>
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {newImagesToUpload.map((file, index) => (
+                      <div key={`new-${index}`} className="relative group">
+                        <div className="relative w-full aspect-square rounded-lg overflow-hidden border-2 border-green-400 bg-green-50">
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={file.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute bottom-0 left-0 right-0 px-2 py-1 bg-green-600 text-white text-xs truncate">
+                            {file.name}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeNewImage(index)}
+                          className="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <p className="text-xs text-gray-500 mt-3">
+                First image will be the main thumbnail. Hover over images to delete.
+              </p>
             </div>
 
             {/* Tags */}
@@ -594,69 +752,94 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold">Downloadable Files</h2>
-                {productFiles.length > 0 && (
-                  <span className="text-sm text-gray-500">{productFiles.length} file(s)</span>
-                )}
+                <span className="text-sm text-gray-500">
+                  {productFiles.length + newFilesToUpload.length} file(s)
+                </span>
               </div>
               <div className="space-y-4">
+                {/* Upload new files button */}
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.mp4,.mp3,.psd,.ai,.rar"
+                    onChange={handleProductFileSelect}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg w-full hover:border-primary hover:bg-primary/5 transition-colors"
+                  >
+                    <Upload className="w-5 h-5 text-gray-400" />
+                    <span className="text-gray-600">Click to upload new files</span>
+                  </button>
+                  <p className="text-xs text-gray-500 mt-1">PDF, DOCX, XLSX, ZIP, RAR, MP4, MP3, PSD, AI</p>
+                </div>
+
                 {/* Existing files list */}
                 {productFiles.length > 0 && (
-                  <div className="space-y-2">
-                    {productFiles.map((file, index) => (
-                      <div key={`${file.fileName}-${index}`} className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                        <FileDown className="w-5 h-5 text-green-600 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-green-900 truncate">{file.fileName}</p>
-                          <a href={file.fileUrl} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-primary hover:underline truncate block">
-                            {file.fileUrl.length > 50 ? file.fileUrl.substring(0, 50) + '...' : file.fileUrl}
-                          </a>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Current Files</label>
+                    <div className="space-y-2">
+                      {productFiles.map((file, index) => (
+                        <div key={`existing-${index}`} className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg group">
+                          <FileDown className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">{file.fileName}</p>
+                            <a href={file.fileUrl} target="_blank" rel="noopener noreferrer"
+                              className="text-xs text-primary hover:underline truncate block">
+                              View file ↗
+                            </a>
+                          </div>
+                          <span className="text-xs text-gray-500 uppercase bg-gray-200 px-2 py-1 rounded">{file.fileType}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeProductFile(index)}
+                            className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Remove file"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
-                        <span className="text-xs text-gray-500 uppercase">{file.fileType}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeProductFile(index)}
-                          className="text-red-600 hover:text-red-700 flex-shrink-0"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 )}
 
-                {/* Add new file form */}
-                <div className="border-t pt-4 mt-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Add New File</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div>
-                      <input type="text" value={newFileUrl}
-                        onChange={(e) => setNewFileUrl(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary text-sm"
-                        placeholder="File URL (https://...)" />
-                    </div>
-                    <div>
-                      <input type="text" value={newFileName}
-                        onChange={(e) => setNewFileName(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary text-sm"
-                        placeholder="File name" />
-                    </div>
-                    <div className="flex gap-2">
-                      <input type="text" value={newFileType}
-                        onChange={(e) => setNewFileType(e.target.value)}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary text-sm"
-                        placeholder="Type (pdf, zip)" />
-                      <button
-                        type="button"
-                        onClick={addProductFile}
-                        disabled={!newFileUrl.trim() || !newFileName.trim()}
-                        className="px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Plus className="w-5 h-5" />
-                      </button>
+                {/* New files to upload */}
+                {newFilesToUpload.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      New Files to Upload <span className="text-green-600">({newFilesToUpload.length} pending)</span>
+                    </label>
+                    <div className="space-y-2">
+                      {newFilesToUpload.map((file, index) => (
+                        <div key={`new-${index}`} className="flex items-center gap-3 p-3 bg-green-50 border border-green-300 rounded-lg">
+                          <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-green-900 truncate">{file.name}</p>
+                            <p className="text-xs text-green-600">
+                              {(file.size / 1024 / 1024).toFixed(2)} MB • Ready to upload
+                            </p>
+                          </div>
+                          <span className="text-xs text-green-700 uppercase bg-green-200 px-2 py-1 rounded">
+                            {file.name.split('.').pop()}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => removeNewFile(index)}
+                            className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg"
+                            title="Remove file"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </div>
+                )}
 
                 {/* Legacy single file fields (hidden but kept for backward compatibility) */}
                 <input type="hidden" value={formData.fileUrl} />
@@ -744,8 +927,22 @@ export default function EditProductPage({ params }: EditProductPageProps) {
               <button type="submit" disabled={saving}
                 className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-full font-semibold hover:shadow-lg transition-all disabled:opacity-50">
                 {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                {saving ? "Saving..." : "Save Changes"}
+                {saving
+                  ? uploadingImages
+                    ? "Uploading images..."
+                    : uploadingFiles
+                      ? "Uploading files..."
+                      : "Saving..."
+                  : "Save Changes"}
               </button>
+              {(newImagesToUpload.length > 0 || newFilesToUpload.length > 0) && (
+                <p className="text-xs text-center text-gray-500 mt-2">
+                  {newImagesToUpload.length > 0 && `${newImagesToUpload.length} new image(s)`}
+                  {newImagesToUpload.length > 0 && newFilesToUpload.length > 0 && ' and '}
+                  {newFilesToUpload.length > 0 && `${newFilesToUpload.length} new file(s)`}
+                  {' '}will be uploaded
+                </p>
+              )}
             </div>
           </div>
         </div>
