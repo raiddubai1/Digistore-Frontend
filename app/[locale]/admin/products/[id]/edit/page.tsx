@@ -438,26 +438,44 @@ export default function EditProductPage({ params }: EditProductPageProps) {
 
       // Build file info from all files
       const primaryFile = allFiles[0];
-      const fileTypes = [...new Set(allFiles.map(f => f.fileType))].join(', ');
-      const fileNames = allFiles.map(f => f.fileName).join(', ');
+      const fileTypes = [...new Set(allFiles.map(f => f.fileType).filter(Boolean))].join(', ');
+      const fileNames = allFiles.map(f => f.fileName).filter(Boolean).join(', ');
 
-      // Update formData with files and images info
-      const updatedFormData = {
-        ...formData,
+      // Build clean update payload - only include fields that have values
+      const updatedFormData: Record<string, any> = {
+        title: formData.title,
+        description: formData.description,
+        shortDescription: formData.shortDescription || null,
+        price: formData.price,
+        originalPrice: formData.originalPrice || null,
+        categoryId: formData.categoryId,
+        subcategory: formData.subcategory || null,
+        tags: formData.tags || [],
+        featured: formData.featured || false,
+        bestseller: formData.bestseller || false,
+        newArrival: formData.newArrival || false,
+        whatsIncluded: formData.whatsIncluded || [],
+        requirements: formData.requirements || [],
+        // Images
         thumbnailUrl: allImageUrls[0] || formData.thumbnailUrl,
-        previewImages: allImageUrls.slice(1),
-        fileUrl: primaryFile?.fileUrl || formData.fileUrl,
-        fileName: fileNames || formData.fileName,
-        fileType: fileTypes || formData.fileType,
-        files: allFiles.map((f, idx) => ({
-          fileName: f.fileName,
-          fileUrl: f.fileUrl,
-          fileType: f.fileType,
-          fileSize: f.fileSize,
-          order: idx,
-        })),
+        previewImages: allImageUrls.length > 1 ? allImageUrls.slice(1) : (formData.previewImages || []),
       };
 
+      // Only include file fields if we have files
+      if (allFiles.length > 0) {
+        updatedFormData.fileUrl = primaryFile?.fileUrl;
+        updatedFormData.fileName = fileNames || primaryFile?.fileName;
+        updatedFormData.fileType = fileTypes || primaryFile?.fileType;
+        updatedFormData.files = allFiles.map((f, idx) => ({
+          fileName: f.fileName,
+          fileUrl: f.fileUrl,
+          fileType: f.fileType || '',
+          fileSize: f.fileSize || null,
+          order: idx,
+        }));
+      }
+
+      console.log('Updating product with:', updatedFormData);
       await productsAPI.update(id, updatedFormData);
 
       // Save attributes
