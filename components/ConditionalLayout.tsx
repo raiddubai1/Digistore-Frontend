@@ -20,14 +20,19 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
   // Check if we're on an admin page
   const isAdminPage = pathname.includes('/admin');
 
-  // If admin page, render only children without the main site layout
-  if (isAdminPage) {
+  // Check if we're on the ultimate-bundle landing page (minimal layout)
+  const isLandingPage = pathname.includes('/ultimate-bundle');
+
+  // If admin page or landing page, render only children without the main site layout
+  if (isAdminPage || isLandingPage) {
     return (
       <>
         <Suspense fallback={null}>
           <NavigationProgress />
         </Suspense>
         {children}
+        {/* Keep cart available on landing page */}
+        {isLandingPage && <Cart />}
       </>
     );
   }

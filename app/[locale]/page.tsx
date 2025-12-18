@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Download, Shield, Star, Sparkles, TrendingUp, Award, Gift, Tag, ShoppingCart, Package } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
@@ -17,8 +18,16 @@ interface HomeProps {
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+// Set to true to redirect homepage to the landing page
+const REDIRECT_TO_LANDING = true;
+
 export default async function Home({ params }: HomeProps) {
   const { locale } = await params;
+
+  // Redirect to Ultimate Bundle landing page if enabled
+  if (REDIRECT_TO_LANDING) {
+    redirect(`/${locale}/ultimate-bundle`);
+  }
 
   // Initialize with empty arrays - we use real API data
   let featuredProducts: any[] = [];
