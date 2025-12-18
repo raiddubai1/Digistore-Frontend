@@ -141,8 +141,11 @@ export default function UltimateBundlePage() {
           setIsProcessing(false);
         }
       },
-      onError: () => {
-        toast.error("Payment failed. Please try again.");
+      onError: (err: any) => {
+        // Don't show generic error if it was a form validation issue
+        if (err?.message !== "Missing form data") {
+          toast.error("Payment failed. Please try again.");
+        }
         setIsProcessing(false);
       },
       onCancel: () => {
@@ -170,6 +173,9 @@ export default function UltimateBundlePage() {
       openCart();
     }
   };
+
+  // Check if form is valid
+  const isFormValid = formData.email && formData.firstName && formData.lastName && formData.email.includes('@');
 
   const price = product?.price || 29;
   const originalPrice = product?.originalPrice || 99;
@@ -357,6 +363,17 @@ export default function UltimateBundlePage() {
               <div className="w-full py-4 bg-gray-100 rounded-xl flex items-center justify-center gap-2">
                 <Loader2 className="w-5 h-5 animate-spin text-gray-600" />
                 <span className="text-gray-700 font-semibold">Processing...</span>
+              </div>
+            ) : !isFormValid ? (
+              <div className="space-y-3">
+                <div className="w-full py-4 bg-yellow-50 border border-yellow-200 rounded-xl flex items-center justify-center gap-2">
+                  <span className="text-yellow-700 font-medium text-sm">
+                    Please fill in your details above to continue
+                  </span>
+                </div>
+                <div className="opacity-50 pointer-events-none">
+                  <div id="paypal-button-landing"></div>
+                </div>
               </div>
             ) : paypalLoaded ? (
               <div id="paypal-button-landing"></div>
