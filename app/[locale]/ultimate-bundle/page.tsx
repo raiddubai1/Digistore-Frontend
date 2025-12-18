@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useCartStore } from "@/store/cartStore";
 import { productsAPI, paymentsAPI } from "@/lib/api";
 import { Lock, Download, Mail, Lightbulb, Zap, Check, ShoppingCart, Loader2 } from "lucide-react";
