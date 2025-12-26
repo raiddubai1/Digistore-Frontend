@@ -19,7 +19,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 // Set to true to redirect homepage to the landing page
-const REDIRECT_TO_LANDING = true;
+// Landing page saved at: /[locale]/ultimate-bundle (hidden, not linked)
+const REDIRECT_TO_LANDING = false;
 
 export default async function Home({ params }: HomeProps) {
   const { locale } = await params;
