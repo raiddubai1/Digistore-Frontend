@@ -80,13 +80,13 @@ export default async function Home({ params }: HomeProps) {
               {/* Main Heading */}
               <div className="space-y-3 lg:space-y-4">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
-                  <span className="block text-gray-900 dark:text-white">Your Gateway to</span>
+                  <span className="block text-gray-900 dark:text-white">Design Smarter with</span>
                   <span className="block bg-gradient-to-r from-gray-600 via-[#ff8a7a] to-[#ff6f61] bg-clip-text text-transparent">
-                    Digital Excellence
+                    Canva Templates
                   </span>
                 </h1>
                 <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                  Discover, download, and deploy premium digital products instantly. 🚀
+                  High-quality Canva templates for creators, entrepreneurs, and marketers — no design skills needed.
                 </p>
               </div>
 
