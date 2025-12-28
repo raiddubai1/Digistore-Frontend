@@ -219,7 +219,7 @@ export default function AttributesPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <Link
-                        href={`${basePath}/admin/attributes/${attribute.id}`}
+                        href={`${basePath}/admin/attributes/${attribute.id}/edit`}
                         className="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg transition-colors"
                         title="Edit"
                       >
