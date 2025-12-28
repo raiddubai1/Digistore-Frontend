@@ -125,6 +125,8 @@ export const productsAPI = {
   update: (id: string, data: any) => api.put(`/products/${id}`, data),
 
   delete: (id: string) => api.delete(`/products/${id}`),
+
+  getSuggestions: () => api.get('/products/suggestions'),
 };
 
 // ============================================

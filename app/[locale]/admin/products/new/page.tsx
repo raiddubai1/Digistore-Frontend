@@ -139,6 +139,16 @@ export default function NewProductPage() {
   const [newIncluded, setNewIncluded] = useState("");
   const [newRequirement, setNewRequirement] = useState("");
 
+  // Suggestions from existing products
+  const [suggestions, setSuggestions] = useState<{
+    tags: string[];
+    whatsIncluded: string[];
+    requirements: string[];
+  }>({ tags: [], whatsIncluded: [], requirements: [] });
+  const [showTagSuggestions, setShowTagSuggestions] = useState(false);
+  const [showIncludedSuggestions, setShowIncludedSuggestions] = useState(false);
+  const [showRequirementSuggestions, setShowRequirementSuggestions] = useState(false);
+
   // AI generation state
   const [aiGenerating, setAiGenerating] = useState<string | null>(null);
 
@@ -234,8 +244,20 @@ export default function NewProductPage() {
       }
     };
 
+    const fetchSuggestions = async () => {
+      try {
+        const response = await productsAPI.getSuggestions();
+        if (response.data?.success && response.data?.data) {
+          setSuggestions(response.data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch suggestions:', error);
+      }
+    };
+
     fetchCategories();
     fetchAttributes();
+    fetchSuggestions();
   }, []);
 
   const handleImageUpload = (files: File[]) => {
@@ -300,39 +322,67 @@ export default function NewProductPage() {
     });
   };
 
-  // Array management functions
-  const addTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData({ ...formData, tags: [...formData.tags, newTag.trim()] });
-      setNewTag("");
+  // Array management functions - support comma-separated input
+  const addTag = (tagInput?: string) => {
+    const input = tagInput || newTag;
+    if (!input.trim()) return;
+    // Split by comma and add each unique tag
+    const newTags = input.split(',').map(t => t.trim()).filter(t => t && !formData.tags.includes(t));
+    if (newTags.length > 0) {
+      setFormData({ ...formData, tags: [...formData.tags, ...newTags] });
     }
+    setNewTag("");
+    setShowTagSuggestions(false);
   };
 
   const removeTag = (index: number) => {
     setFormData({ ...formData, tags: formData.tags.filter((_, i) => i !== index) });
   };
 
-  const addIncluded = () => {
-    if (newIncluded.trim()) {
-      setFormData({ ...formData, whatsIncluded: [...formData.whatsIncluded, newIncluded.trim()] });
-      setNewIncluded("");
+  const addIncluded = (includedInput?: string) => {
+    const input = includedInput || newIncluded;
+    if (!input.trim()) return;
+    // Split by comma and add each unique item
+    const newItems = input.split(',').map(t => t.trim()).filter(t => t && !formData.whatsIncluded.includes(t));
+    if (newItems.length > 0) {
+      setFormData({ ...formData, whatsIncluded: [...formData.whatsIncluded, ...newItems] });
     }
+    setNewIncluded("");
+    setShowIncludedSuggestions(false);
   };
 
   const removeIncluded = (index: number) => {
     setFormData({ ...formData, whatsIncluded: formData.whatsIncluded.filter((_, i) => i !== index) });
   };
 
-  const addRequirement = () => {
-    if (newRequirement.trim()) {
-      setFormData({ ...formData, requirements: [...formData.requirements, newRequirement.trim()] });
-      setNewRequirement("");
+  const addRequirement = (reqInput?: string) => {
+    const input = reqInput || newRequirement;
+    if (!input.trim()) return;
+    // Split by comma and add each unique requirement
+    const newReqs = input.split(',').map(t => t.trim()).filter(t => t && !formData.requirements.includes(t));
+    if (newReqs.length > 0) {
+      setFormData({ ...formData, requirements: [...formData.requirements, ...newReqs] });
     }
+    setNewRequirement("");
+    setShowRequirementSuggestions(false);
   };
 
   const removeRequirement = (index: number) => {
     setFormData({ ...formData, requirements: formData.requirements.filter((_, i) => i !== index) });
   };
+
+  // Filter suggestions based on input
+  const filteredTagSuggestions = suggestions.tags.filter(
+    t => t.toLowerCase().includes(newTag.toLowerCase()) && !formData.tags.includes(t)
+  ).slice(0, 10);
+
+  const filteredIncludedSuggestions = suggestions.whatsIncluded.filter(
+    t => t.toLowerCase().includes(newIncluded.toLowerCase()) && !formData.whatsIncluded.includes(t)
+  ).slice(0, 10);
+
+  const filteredRequirementSuggestions = suggestions.requirements.filter(
+    t => t.toLowerCase().includes(newRequirement.toLowerCase()) && !formData.requirements.includes(t)
+  ).slice(0, 10);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -835,36 +885,38 @@ export default function NewProductPage() {
                 </button>
               </div>
               <div className="space-y-3">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="Add a tag (press Enter)"
-                  />
-                  <button
-                    type="button"
-                    onClick={addTag}
-                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+                <div className="relative">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newTag}
+                      onChange={(e) => { setNewTag(e.target.value); setShowTagSuggestions(true); }}
+                      onFocus={() => setShowTagSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowTagSuggestions(false), 200)}
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="Add tags (comma-separated)"
+                    />
+                    <button type="button" onClick={() => addTag()} className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                  {showTagSuggestions && filteredTagSuggestions.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      {filteredTagSuggestions.map((tag, idx) => (
+                        <button key={idx} type="button" onClick={() => addTag(tag)} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors">
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 {formData.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {formData.tags.map((tag, index) => (
-                      <div
-                        key={index}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-lg"
-                      >
+                      <div key={index} className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-lg">
                         <span className="text-sm font-medium">{tag}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeTag(index)}
-                          className="text-primary hover:text-primary/70 transition-colors"
-                        >
+                        <button type="button" onClick={() => removeTag(index)} className="text-primary hover:text-primary/70 transition-colors">
                           <X className="w-3 h-3" />
                         </button>
                       </div>
@@ -879,33 +931,38 @@ export default function NewProductPage() {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">What's Included</h2>
               <div className="space-y-3">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newIncluded}
-                    onChange={(e) => setNewIncluded(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addIncluded())}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="e.g., PDF eBook (press Enter)"
-                  />
-                  <button
-                    type="button"
-                    onClick={addIncluded}
-                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+                <div className="relative">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newIncluded}
+                      onChange={(e) => { setNewIncluded(e.target.value); setShowIncludedSuggestions(true); }}
+                      onFocus={() => setShowIncludedSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowIncludedSuggestions(false), 200)}
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addIncluded())}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="e.g., PDF eBook (comma-separated)"
+                    />
+                    <button type="button" onClick={() => addIncluded()} className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                  {showIncludedSuggestions && filteredIncludedSuggestions.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      {filteredIncludedSuggestions.map((item, idx) => (
+                        <button key={idx} type="button" onClick={() => addIncluded(item)} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors">
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 {formData.whatsIncluded.length > 0 && (
                   <ul className="space-y-2">
                     {formData.whatsIncluded.map((item, index) => (
                       <li key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                         <span className="text-sm text-gray-700">✓ {item}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeIncluded(index)}
-                          className="text-red-600 hover:text-red-700"
-                        >
+                        <button type="button" onClick={() => removeIncluded(index)} className="text-red-600 hover:text-red-700">
                           <X className="w-4 h-4" />
                         </button>
                       </li>
@@ -920,33 +977,38 @@ export default function NewProductPage() {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Requirements</h2>
               <div className="space-y-3">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newRequirement}
-                    onChange={(e) => setNewRequirement(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addRequirement())}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="e.g., PDF Reader (press Enter)"
-                  />
-                  <button
-                    type="button"
-                    onClick={addRequirement}
-                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+                <div className="relative">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newRequirement}
+                      onChange={(e) => { setNewRequirement(e.target.value); setShowRequirementSuggestions(true); }}
+                      onFocus={() => setShowRequirementSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowRequirementSuggestions(false), 200)}
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addRequirement())}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="e.g., PDF Reader (comma-separated)"
+                    />
+                    <button type="button" onClick={() => addRequirement()} className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                  {showRequirementSuggestions && filteredRequirementSuggestions.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      {filteredRequirementSuggestions.map((item, idx) => (
+                        <button key={idx} type="button" onClick={() => addRequirement(item)} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors">
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 {formData.requirements.length > 0 && (
                   <ul className="space-y-2">
                     {formData.requirements.map((item, index) => (
                       <li key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                         <span className="text-sm text-gray-700">• {item}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeRequirement(index)}
-                          className="text-red-600 hover:text-red-700"
-                        >
+                        <button type="button" onClick={() => removeRequirement(index)} className="text-red-600 hover:text-red-700">
                           <X className="w-4 h-4" />
                         </button>
                       </li>

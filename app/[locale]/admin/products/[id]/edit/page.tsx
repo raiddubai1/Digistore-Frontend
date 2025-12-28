@@ -98,6 +98,16 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   const [newTag, setNewTag] = useState("");
   const [newIncluded, setNewIncluded] = useState("");
   const [newRequirement, setNewRequirement] = useState("");
+
+  // Suggestions from existing products
+  const [suggestions, setSuggestions] = useState<{
+    tags: string[];
+    whatsIncluded: string[];
+    requirements: string[];
+  }>({ tags: [], whatsIncluded: [], requirements: [] });
+  const [showTagSuggestions, setShowTagSuggestions] = useState(false);
+  const [showIncludedSuggestions, setShowIncludedSuggestions] = useState(false);
+  const [showRequirementSuggestions, setShowRequirementSuggestions] = useState(false);
   const [productFiles, setProductFiles] = useState<ProductFile[]>([]);
   const [newFileUrl, setNewFileUrl] = useState("");
   const [newFileName, setNewFileName] = useState("");
@@ -278,6 +288,12 @@ export default function EditProductPage({ params }: EditProductPageProps) {
         } else {
           toast.error("Product not found");
         }
+
+        // Fetch suggestions
+        const suggestionsResponse = await productsAPI.getSuggestions();
+        if (suggestionsResponse.data?.success && suggestionsResponse.data?.data) {
+          setSuggestions(suggestionsResponse.data.data);
+        }
       } catch (error) {
         console.error("Error fetching product:", error);
         toast.error("Failed to load product");
@@ -288,38 +304,64 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     fetchData();
   }, [id]);
 
-  const addTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData({ ...formData, tags: [...formData.tags, newTag.trim()] });
-      setNewTag("");
+  // Array management functions - support comma-separated input
+  const addTag = (tagInput?: string) => {
+    const input = tagInput || newTag;
+    if (!input.trim()) return;
+    const newTags = input.split(',').map(t => t.trim()).filter(t => t && !formData.tags.includes(t));
+    if (newTags.length > 0) {
+      setFormData({ ...formData, tags: [...formData.tags, ...newTags] });
     }
+    setNewTag("");
+    setShowTagSuggestions(false);
   };
 
   const removeTag = (tag: string) => {
     setFormData({ ...formData, tags: formData.tags.filter(t => t !== tag) });
   };
 
-  const addIncluded = () => {
-    if (newIncluded.trim()) {
-      setFormData({ ...formData, whatsIncluded: [...formData.whatsIncluded, newIncluded.trim()] });
-      setNewIncluded("");
+  const addIncluded = (includedInput?: string) => {
+    const input = includedInput || newIncluded;
+    if (!input.trim()) return;
+    const newItems = input.split(',').map(t => t.trim()).filter(t => t && !formData.whatsIncluded.includes(t));
+    if (newItems.length > 0) {
+      setFormData({ ...formData, whatsIncluded: [...formData.whatsIncluded, ...newItems] });
     }
+    setNewIncluded("");
+    setShowIncludedSuggestions(false);
   };
 
   const removeIncluded = (item: string) => {
     setFormData({ ...formData, whatsIncluded: formData.whatsIncluded.filter(i => i !== item) });
   };
 
-  const addRequirement = () => {
-    if (newRequirement.trim()) {
-      setFormData({ ...formData, requirements: [...formData.requirements, newRequirement.trim()] });
-      setNewRequirement("");
+  const addRequirement = (reqInput?: string) => {
+    const input = reqInput || newRequirement;
+    if (!input.trim()) return;
+    const newReqs = input.split(',').map(t => t.trim()).filter(t => t && !formData.requirements.includes(t));
+    if (newReqs.length > 0) {
+      setFormData({ ...formData, requirements: [...formData.requirements, ...newReqs] });
     }
+    setNewRequirement("");
+    setShowRequirementSuggestions(false);
   };
 
   const removeRequirement = (item: string) => {
     setFormData({ ...formData, requirements: formData.requirements.filter(r => r !== item) });
   };
+
+  // Filter suggestions based on input
+  const filteredTagSuggestions = suggestions.tags.filter(
+    t => t.toLowerCase().includes(newTag.toLowerCase()) && !formData.tags.includes(t)
+  ).slice(0, 10);
+
+  const filteredIncludedSuggestions = suggestions.whatsIncluded.filter(
+    t => t.toLowerCase().includes(newIncluded.toLowerCase()) && !formData.whatsIncluded.includes(t)
+  ).slice(0, 10);
+
+  const filteredRequirementSuggestions = suggestions.requirements.filter(
+    t => t.toLowerCase().includes(newRequirement.toLowerCase()) && !formData.requirements.includes(t)
+  ).slice(0, 10);
 
   const addProductFile = () => {
     if (newFileUrl.trim() && newFileName.trim()) {
@@ -692,13 +734,27 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             {/* Tags */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <h2 className="text-lg font-bold mb-4">Tags</h2>
-              <div className="flex gap-2 mb-3">
-                <input type="text" value={newTag} onChange={(e) => setNewTag(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                  placeholder="Add a tag..." />
-                <button type="button" onClick={addTag}
-                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark"><Plus className="w-5 h-5" /></button>
+              <div className="relative mb-3">
+                <div className="flex gap-2">
+                  <input type="text" value={newTag}
+                    onChange={(e) => { setNewTag(e.target.value); setShowTagSuggestions(true); }}
+                    onFocus={() => setShowTagSuggestions(true)}
+                    onBlur={() => setTimeout(() => setShowTagSuggestions(false), 200)}
+                    onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                    placeholder="Add tags (comma-separated)" />
+                  <button type="button" onClick={() => addTag()}
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark"><Plus className="w-5 h-5" /></button>
+                </div>
+                {showTagSuggestions && filteredTagSuggestions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                    {filteredTagSuggestions.map((tag, idx) => (
+                      <button key={idx} type="button" onClick={() => addTag(tag)} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors">
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="flex flex-wrap gap-2">
                 {formData.tags.map((tag, i) => (
@@ -713,13 +769,27 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             {/* What's Included */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <h2 className="text-lg font-bold mb-4">What&apos;s Included</h2>
-              <div className="flex gap-2 mb-3">
-                <input type="text" value={newIncluded} onChange={(e) => setNewIncluded(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addIncluded())}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                  placeholder="Add item..." />
-                <button type="button" onClick={addIncluded}
-                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark"><Plus className="w-5 h-5" /></button>
+              <div className="relative mb-3">
+                <div className="flex gap-2">
+                  <input type="text" value={newIncluded}
+                    onChange={(e) => { setNewIncluded(e.target.value); setShowIncludedSuggestions(true); }}
+                    onFocus={() => setShowIncludedSuggestions(true)}
+                    onBlur={() => setTimeout(() => setShowIncludedSuggestions(false), 200)}
+                    onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addIncluded())}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                    placeholder="Add items (comma-separated)" />
+                  <button type="button" onClick={() => addIncluded()}
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark"><Plus className="w-5 h-5" /></button>
+                </div>
+                {showIncludedSuggestions && filteredIncludedSuggestions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                    {filteredIncludedSuggestions.map((item, idx) => (
+                      <button key={idx} type="button" onClick={() => addIncluded(item)} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors">
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <ul className="space-y-2">
                 {formData.whatsIncluded.map((item, i) => (
@@ -734,13 +804,27 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             {/* Requirements */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <h2 className="text-lg font-bold mb-4">Requirements</h2>
-              <div className="flex gap-2 mb-3">
-                <input type="text" value={newRequirement} onChange={(e) => setNewRequirement(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addRequirement())}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                  placeholder="Add requirement..." />
-                <button type="button" onClick={addRequirement}
-                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark"><Plus className="w-5 h-5" /></button>
+              <div className="relative mb-3">
+                <div className="flex gap-2">
+                  <input type="text" value={newRequirement}
+                    onChange={(e) => { setNewRequirement(e.target.value); setShowRequirementSuggestions(true); }}
+                    onFocus={() => setShowRequirementSuggestions(true)}
+                    onBlur={() => setTimeout(() => setShowRequirementSuggestions(false), 200)}
+                    onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addRequirement())}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                    placeholder="Add requirements (comma-separated)" />
+                  <button type="button" onClick={() => addRequirement()}
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark"><Plus className="w-5 h-5" /></button>
+                </div>
+                {showRequirementSuggestions && filteredRequirementSuggestions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                    {filteredRequirementSuggestions.map((item, idx) => (
+                      <button key={idx} type="button" onClick={() => addRequirement(item)} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors">
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <ul className="space-y-2">
                 {formData.requirements.map((item, i) => (
