@@ -6,7 +6,7 @@ import { Save, ArrowLeft, Plus, X, Upload, FileText, Loader2, Sparkles, Wand2, C
 import toast from "react-hot-toast";
 import ImageUpload from "@/components/ImageUpload";
 import Link from "next/link";
-import { categoriesAPI, productsAPI, aiAPI, uploadAPI } from "@/lib/api";
+import { categoriesAPI, productsAPI, aiAPI, uploadAPI, attributesAPI } from "@/lib/api";
 
 interface Attribute {
   id: string;
@@ -220,14 +220,22 @@ export default function NewProductPage() {
       }
     };
 
-    fetchCategories();
+    const fetchAttributes = async () => {
+      try {
+        const response = await attributesAPI.getAll();
+        if (response.data?.success && response.data?.data) {
+          setAttributes(response.data.data);
+        } else {
+          setAttributes([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch attributes:', error);
+        setAttributes([]);
+      }
+    };
 
-    // Default attributes - could also be fetched from API
-    setAttributes([
-      { id: "1", name: "File Format", slug: "file-format", type: "SELECT", options: ["PDF", "DOCX", "XLSX", "MP4", "ZIP"], required: true },
-      { id: "2", name: "Language", slug: "language", type: "MULTISELECT", options: ["English", "Arabic", "Spanish", "French"], required: true },
-      { id: "3", name: "License Type", slug: "license-type", type: "SELECT", options: ["Personal", "Commercial"], required: false },
-    ]);
+    fetchCategories();
+    fetchAttributes();
   }, []);
 
   const handleImageUpload = (files: File[]) => {
