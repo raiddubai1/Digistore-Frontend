@@ -72,6 +72,7 @@ interface Product {
   files?: ProductFile[];
   canvaTemplateLink?: string;
   canvaInstructions?: string;
+  youtubeVideoUrl?: string;
 }
 
 interface EditProductPageProps {
@@ -190,6 +191,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     requirements: [] as string[],
     canvaTemplateLink: "",
     canvaInstructions: "",
+    youtubeVideoUrl: "",
     featured: false,
     bestseller: false,
     newArrival: false,
@@ -240,6 +242,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             newArrival: p.newArrival || false,
             canvaTemplateLink: p.canvaTemplateLink || "",
             canvaInstructions: p.canvaInstructions || "",
+            youtubeVideoUrl: p.youtubeVideoUrl || "",
           });
 
           // Initialize product files from product data or legacy single file
@@ -465,6 +468,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
         // Canva template fields
         canvaTemplateLink: formData.canvaTemplateLink || null,
         canvaInstructions: formData.canvaInstructions || null,
+        // YouTube video
+        youtubeVideoUrl: formData.youtubeVideoUrl || null,
         // Images
         thumbnailUrl: allImageUrls[0] || formData.thumbnailUrl,
         previewImages: allImageUrls.length > 1 ? allImageUrls.slice(1) : (formData.previewImages || []),
@@ -926,6 +931,47 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                     </svg>
                     <span className="text-sm text-[#00C4CC] font-medium">
                       This product will be delivered as a Canva template
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* YouTube Video */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+                  <svg className="w-6 h-6 text-red-600" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">YouTube Video (Optional)</h2>
+                  <p className="text-xs text-gray-500">Add a product video to showcase on the product page</p>
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                  YouTube Video URL
+                </label>
+                <input
+                  type="url"
+                  value={formData.youtubeVideoUrl}
+                  onChange={(e) => setFormData({ ...formData, youtubeVideoUrl: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  placeholder="https://www.youtube.com/watch?v=..."
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Paste a YouTube video link. The video will be embedded on the product page.
+                </p>
+                {formData.youtubeVideoUrl && (
+                  <div className="mt-3 flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-lg">
+                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm text-red-700 font-medium">
+                      Video will be displayed on the product page
                     </span>
                   </div>
                 )}

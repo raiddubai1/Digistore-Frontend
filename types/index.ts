@@ -33,6 +33,8 @@ export interface Product {
   // Canva Template Delivery
   canvaTemplateLink?: string;
   canvaInstructions?: string;
+  // YouTube Video
+  youtubeVideoUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
