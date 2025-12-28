@@ -15,7 +15,17 @@ import { Product } from "@/types";
 import SortBottomSheet from "@/components/SortBottomSheet";
 import FilterBottomSheet from "@/components/FilterBottomSheet";
 import CategoryFilter from "@/components/shop/CategoryFilter";
-import { productsAPI, categoriesAPI } from "@/lib/api";
+import { productsAPI, categoriesAPI, attributesAPI } from "@/lib/api";
+
+// Attribute type
+interface Attribute {
+  id: string;
+  name: string;
+  slug: string;
+  type: string;
+  options: string[];
+  active: boolean;
+}
 
 // Category icon mapping
 const categoryConfig: { [key: string]: { emoji: string; bgColor: string } } = {
@@ -82,6 +92,10 @@ export default function ProductsClient() {
   const [sortBy, setSortBy] = useState<string>("popular");
   const hasFetched = useRef(false);
 
+  // Attributes state
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string[]>>({});  // {attributeSlug: [values]}
+
   // File type options
   const fileTypeOptions = [
     { value: "pdf", label: "PDF", icon: "📄" },
@@ -108,9 +122,10 @@ export default function ProductsClient() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const [productsRes, categoriesRes] = await Promise.all([
+        const [productsRes, categoriesRes, attributesRes] = await Promise.all([
           productsAPI.getAll({ limit: 500 }),
           categoriesAPI.getAll(),
+          attributesAPI.getAll(),
         ]);
 
         if (productsRes.data?.success && productsRes.data?.data?.products?.length > 0) {
@@ -137,6 +152,11 @@ export default function ProductsClient() {
 
         if (categoriesRes.data?.success && categoriesRes.data?.data?.categories?.length > 0) {
           setCategories(categoriesRes.data.data.categories);
+        }
+
+        // Set attributes
+        if (attributesRes.data?.success && attributesRes.data?.data?.length > 0) {
+          setAttributes(attributesRes.data.data.filter((a: Attribute) => a.active));
         }
       } catch (error) {
         console.error('Failed to fetch products:', error);
@@ -368,6 +388,23 @@ export default function ProductsClient() {
     setIsLoadMore(false);
   };
 
+  const toggleAttribute = (attributeSlug: string, value: string) => {
+    setSelectedAttributes((prev) => {
+      const current = prev[attributeSlug] || [];
+      const newValues = current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value];
+
+      if (newValues.length === 0) {
+        const { [attributeSlug]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [attributeSlug]: newValues };
+    });
+    setPage(1);
+    setIsLoadMore(false);
+  };
+
   const clearAllFilters = () => {
     setSelectedCategories([]);
     setSelectedSubcategories([]);
@@ -376,6 +413,7 @@ export default function ProductsClient() {
     setSelectedPriceRanges([]);
     setSelectedRatings([]);
     setSelectedFileTypes([]);
+    setSelectedAttributes({});
     setPage(1);
     setIsLoadMore(false);
   };
@@ -389,7 +427,7 @@ export default function ProductsClient() {
   };
 
   const hasActiveFilters =
-    selectedCategories.length > 0 || selectedSubcategories.length > 0 || selectedLevel3.length > 0 || selectedTags.length > 0 || selectedPriceRanges.length > 0 || selectedRatings.length > 0 || selectedFileTypes.length > 0;
+    selectedCategories.length > 0 || selectedSubcategories.length > 0 || selectedLevel3.length > 0 || selectedTags.length > 0 || selectedPriceRanges.length > 0 || selectedRatings.length > 0 || selectedFileTypes.length > 0 || Object.keys(selectedAttributes).length > 0;
 
   // Infinite scroll handler
   const loadMoreProducts = useCallback(() => {
@@ -863,6 +901,26 @@ export default function ProductsClient() {
                   </label>
                 </div>
               </div>
+
+              {/* Product Attributes */}
+              {attributes.map((attr) => (
+                <div key={attr.id} className="mb-6">
+                  <h3 className="font-semibold text-sm text-gray-700 mb-3">{attr.name}</h3>
+                  <div className="space-y-2">
+                    {attr.options.map((option) => (
+                      <label key={option} className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={(selectedAttributes[attr.slug] || []).includes(option)}
+                          onChange={() => toggleAttribute(attr.slug, option)}
+                          className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                        />
+                        <span className="text-sm">{option}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </aside>
 
