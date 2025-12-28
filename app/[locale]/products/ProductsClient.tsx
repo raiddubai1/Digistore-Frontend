@@ -902,8 +902,10 @@ export default function ProductsClient() {
                 </div>
               </div>
 
-              {/* Product Attributes */}
-              {attributes.map((attr) => (
+              {/* Product Attributes - Only show attributes with options (SELECT/MULTISELECT) */}
+              {attributes
+                .filter((attr) => attr.options && attr.options.length > 0)
+                .map((attr) => (
                 <div key={attr.id} className="mb-6">
                   <h3 className="font-semibold text-sm text-gray-700 mb-3">{attr.name}</h3>
                   <div className="space-y-2">
