@@ -1,36 +1,87 @@
 'use client';
 
-import { Package, Tag, ChevronRight, ChevronLeft, ShoppingCart, Check } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Package, Tag, ChevronLeft, ShoppingCart, Check, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useBundleStore, demoBundles, calculateSavings } from '@/store/bundleStore';
 import { useCartStore } from '@/store/cartStore';
+import { bundlesAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 
+interface BundleProduct {
+  id: string;
+  productId: string;
+  order: number;
+  product: {
+    id: string;
+    title: string;
+    slug: string;
+    price: number;
+    thumbnailUrl: string;
+  };
+}
+
+interface Bundle {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  bundlePrice: number;
+  originalPrice: number;
+  discount: number;
+  image?: string;
+  featured: boolean;
+  active: boolean;
+  products: BundleProduct[];
+}
+
 export default function BundlesPage() {
-  const { bundles } = useBundleStore();
+  const [bundles, setBundles] = useState<Bundle[]>([]);
+  const [loading, setLoading] = useState(true);
   const { addItem } = useCartStore();
 
-  const handleAddBundle = (bundle: typeof demoBundles[0]) => {
+  useEffect(() => {
+    fetchBundles();
+  }, []);
+
+  const fetchBundles = async () => {
+    try {
+      setLoading(true);
+      const response = await bundlesAPI.getAll();
+      if (response.data?.success && response.data?.data?.bundles) {
+        setBundles(response.data.data.bundles);
+      }
+    } catch (error) {
+      console.error('Failed to fetch bundles:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateSavings = (original: number, bundlePrice: number) => {
+    return original - bundlePrice;
+  };
+
+  const handleAddBundle = (bundle: Bundle) => {
     // Add bundle as a single item with bundle price
     addItem({
       id: `bundle-${bundle.id}`,
       title: bundle.name,
       slug: bundle.slug,
-      description: bundle.description,
-      price: bundle.bundlePrice,
-      originalPrice: bundle.originalPrice,
+      description: bundle.description || '',
+      price: Number(bundle.bundlePrice),
+      originalPrice: Number(bundle.originalPrice),
       discount: bundle.discount,
       category: 'Bundles',
       tags: ['bundle', 'deal'],
       fileType: 'bundle',
       fileUrl: '',
-      previewImages: [bundle.image],
-      thumbnailUrl: bundle.image,
+      previewImages: bundle.image ? [bundle.image] : [],
+      thumbnailUrl: bundle.image || '',
       rating: 5,
       reviewCount: 0,
       downloadCount: 0,
       license: 'personal',
-      whatsIncluded: bundle.products.map(p => p.title),
+      whatsIncluded: bundle.products.map(p => p.product.title),
       featured: bundle.featured,
       bestseller: false,
       newArrival: false,
@@ -42,6 +93,14 @@ export default function BundlesPage() {
 
   const featuredBundles = bundles.filter((b) => b.featured);
   const otherBundles = bundles.filter((b) => !b.featured);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#ff6f61]" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24 lg:pb-12">
@@ -96,13 +155,13 @@ export default function BundlesPage() {
                   <div className="p-4">
                     <p className="text-gray-600 text-sm mb-4">{bundle.description}</p>
                     <div className="space-y-2 mb-4">
-                      {bundle.products.map((product) => (
-                        <div key={product.id} className="flex items-center justify-between text-sm">
+                      {bundle.products.map((bp) => (
+                        <div key={bp.id} className="flex items-center justify-between text-sm">
                           <div className="flex items-center gap-2">
                             <Check className="w-4 h-4 text-green-500" />
-                            <span>{product.title}</span>
+                            <span>{bp.product.title}</span>
                           </div>
-                          <span className="text-gray-400 line-through">${product.price.toFixed(2)}</span>
+                          <span className="text-gray-400 line-through">${Number(bp.product.price).toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
@@ -112,12 +171,12 @@ export default function BundlesPage() {
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <span className="text-gray-400 line-through text-sm">
-                            ${bundle.originalPrice.toFixed(2)}
+                            ${Number(bundle.originalPrice).toFixed(2)}
                           </span>
-                          <span className="text-2xl font-bold ml-2">${bundle.bundlePrice.toFixed(2)}</span>
+                          <span className="text-2xl font-bold ml-2">${Number(bundle.bundlePrice).toFixed(2)}</span>
                         </div>
                         <span className="text-green-600 font-medium">
-                          Save ${calculateSavings(bundle.originalPrice, bundle.bundlePrice).toFixed(2)}
+                          Save ${calculateSavings(Number(bundle.originalPrice), Number(bundle.bundlePrice)).toFixed(2)}
                         </span>
                       </div>
                       <button
@@ -155,9 +214,9 @@ export default function BundlesPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-gray-400 line-through text-sm">
-                        ${bundle.originalPrice.toFixed(2)}
+                        ${Number(bundle.originalPrice).toFixed(2)}
                       </span>
-                      <span className="font-bold ml-1">${bundle.bundlePrice.toFixed(2)}</span>
+                      <span className="font-bold ml-1">${Number(bundle.bundlePrice).toFixed(2)}</span>
                     </div>
                     <button
                       onClick={() => handleAddBundle(bundle)}

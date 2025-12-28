@@ -270,22 +270,55 @@ export default function ProductDetailClient({
           </div>
 
           {/* File Details */}
-          <div className="flex gap-3 mb-4">
-            <div className="flex-1 bg-gray-50 rounded-xl p-3 text-center">
-              <div className="text-xs text-gray-500 mb-0.5">Format</div>
-              <div className="text-sm font-bold text-gray-900 uppercase">{product.fileType}</div>
-            </div>
-            {product.fileSize && (
-              <div className="flex-1 bg-gray-50 rounded-xl p-3 text-center">
-                <div className="text-xs text-gray-500 mb-0.5">Size</div>
-                <div className="text-sm font-bold text-gray-900">{product.fileSize}</div>
+          {product.canvaTemplateLink ? (
+            <>
+              {/* Canva Product Badge */}
+              <div className="bg-gradient-to-r from-[#00C4CC]/10 to-[#7B2FF7]/10 border border-[#00C4CC]/20 rounded-xl p-4 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#00C4CC] to-[#7B2FF7] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-gray-900">Canva Template</div>
+                    <div className="text-xs text-gray-500">Opens directly in Canva after purchase</div>
+                  </div>
+                </div>
               </div>
-            )}
-            <div className="flex-1 bg-gray-50 rounded-xl p-3 text-center">
-              <div className="text-xs text-gray-500 mb-0.5">License</div>
-              <div className="text-sm font-bold text-gray-900 capitalize">{product.license}</div>
+              <div className="flex gap-3 mb-4">
+                <div className="flex-1 bg-gray-50 rounded-xl p-3 text-center">
+                  <div className="text-xs text-gray-500 mb-0.5">Format</div>
+                  <div className="text-sm font-bold text-[#00C4CC]">CANVA</div>
+                </div>
+                <div className="flex-1 bg-gray-50 rounded-xl p-3 text-center">
+                  <div className="text-xs text-gray-500 mb-0.5">Delivery</div>
+                  <div className="text-sm font-bold text-gray-900">Instant</div>
+                </div>
+                <div className="flex-1 bg-gray-50 rounded-xl p-3 text-center">
+                  <div className="text-xs text-gray-500 mb-0.5">License</div>
+                  <div className="text-sm font-bold text-gray-900 capitalize">{product.license}</div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex gap-3 mb-4">
+              <div className="flex-1 bg-gray-50 rounded-xl p-3 text-center">
+                <div className="text-xs text-gray-500 mb-0.5">Format</div>
+                <div className="text-sm font-bold text-gray-900 uppercase">{product.fileType}</div>
+              </div>
+              {product.fileSize && (
+                <div className="flex-1 bg-gray-50 rounded-xl p-3 text-center">
+                  <div className="text-xs text-gray-500 mb-0.5">Size</div>
+                  <div className="text-sm font-bold text-gray-900">{product.fileSize}</div>
+                </div>
+              )}
+              <div className="flex-1 bg-gray-50 rounded-xl p-3 text-center">
+                <div className="text-xs text-gray-500 mb-0.5">License</div>
+                <div className="text-sm font-bold text-gray-900 capitalize">{product.license}</div>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Divider */}
           <div className="border-t border-gray-100 my-4" />
@@ -307,6 +340,26 @@ export default function ProductDetailClient({
               </button>
             )}
           </div>
+
+          {/* Canva Instructions - Only show for Canva products */}
+          {product.canvaTemplateLink && product.canvaInstructions && (
+            <>
+              <div className="border-t border-gray-100 my-4" />
+              <div className="mb-4">
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-[#00C4CC]" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                  </svg>
+                  How to Use This Template
+                </h3>
+                <div className="bg-gradient-to-r from-[#00C4CC]/5 to-[#7B2FF7]/5 border border-[#00C4CC]/20 rounded-xl p-4">
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                    {product.canvaInstructions}
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Divider */}
           <div className="border-t border-gray-100 my-4" />
@@ -566,22 +619,55 @@ export default function ProductDetailClient({
               </div>
 
               {/* File Details */}
-              <div className="grid grid-cols-3 gap-4 mb-8">
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <div className="text-sm text-gray-500 mb-1">File Type</div>
-                  <div className="font-semibold text-gray-900 uppercase">{product.fileType}</div>
-                </div>
-                {product.fileSize && (
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <div className="text-sm text-gray-500 mb-1">File Size</div>
-                    <div className="font-semibold text-gray-900">{product.fileSize}</div>
+              {product.canvaTemplateLink ? (
+                <>
+                  {/* Canva Product Badge */}
+                  <div className="bg-gradient-to-r from-[#00C4CC]/10 to-[#7B2FF7]/10 border border-[#00C4CC]/20 rounded-xl p-5 mb-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-[#00C4CC] to-[#7B2FF7] rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="font-bold text-gray-900">Canva Template</div>
+                        <div className="text-sm text-gray-500">Opens directly in Canva after purchase - Edit and customize instantly</div>
+                      </div>
+                    </div>
                   </div>
-                )}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <div className="text-sm text-gray-500 mb-1">License</div>
-                  <div className="font-semibold text-gray-900 capitalize">{product.license}</div>
+                  <div className="grid grid-cols-3 gap-4 mb-8">
+                    <div className="bg-gradient-to-br from-[#00C4CC]/5 to-[#7B2FF7]/5 rounded-xl p-4 border border-[#00C4CC]/10">
+                      <div className="text-sm text-gray-500 mb-1">Format</div>
+                      <div className="font-semibold text-[#00C4CC]">CANVA</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <div className="text-sm text-gray-500 mb-1">Delivery</div>
+                      <div className="font-semibold text-gray-900">Instant Access</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <div className="text-sm text-gray-500 mb-1">License</div>
+                      <div className="font-semibold text-gray-900 capitalize">{product.license}</div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="grid grid-cols-3 gap-4 mb-8">
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <div className="text-sm text-gray-500 mb-1">File Type</div>
+                    <div className="font-semibold text-gray-900 uppercase">{product.fileType}</div>
+                  </div>
+                  {product.fileSize && (
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <div className="text-sm text-gray-500 mb-1">File Size</div>
+                      <div className="font-semibold text-gray-900">{product.fileSize}</div>
+                    </div>
+                  )}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <div className="text-sm text-gray-500 mb-1">License</div>
+                    <div className="font-semibold text-gray-900 capitalize">{product.license}</div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
@@ -590,6 +676,34 @@ export default function ProductDetailClient({
             <h2 className="text-2xl font-bold mb-4">Description</h2>
             <p className="text-gray-700 leading-relaxed">{product.description}</p>
           </div>
+
+          {/* Canva Instructions Section - Only show for Canva products */}
+          {product.canvaTemplateLink && product.canvaInstructions && (
+            <div className="mt-16 max-w-4xl">
+              <h2 className="text-2xl font-bold mb-4 flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#00C4CC] to-[#7B2FF7] rounded-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                  </svg>
+                </div>
+                How to Use This Template
+              </h2>
+              <div className="bg-gradient-to-r from-[#00C4CC]/10 to-[#7B2FF7]/10 border border-[#00C4CC]/20 rounded-2xl p-6">
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {product.canvaInstructions}
+                </p>
+                <div className="mt-6 pt-4 border-t border-[#00C4CC]/20">
+                  <p className="text-sm text-gray-500 mb-3">After purchase, you'll receive a link to open this template directly in Canva.</p>
+                  <div className="flex items-center gap-2 text-sm text-[#00C4CC] font-medium">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                    </svg>
+                    Requires a free Canva account
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Reviews Section */}
           <div id="reviews" className="mt-16">

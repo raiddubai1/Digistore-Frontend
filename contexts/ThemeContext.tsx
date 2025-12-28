@@ -84,11 +84,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setTheme(newTheme);
   };
 
-  // Prevent flash of wrong theme
-  if (!mounted) {
-    return null;
-  }
-
+  // Render children even before mount, but with default theme
+  // This prevents the app from being completely blocked
   return (
     <ThemeContext.Provider
       value={{ theme, resolvedTheme, setTheme, toggleTheme }}

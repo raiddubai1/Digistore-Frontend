@@ -30,6 +30,9 @@ export interface Product {
   featured: boolean;
   bestseller: boolean;
   newArrival: boolean;
+  // Canva Template Delivery
+  canvaTemplateLink?: string;
+  canvaInstructions?: string;
   createdAt: Date;
   updatedAt: Date;
 }

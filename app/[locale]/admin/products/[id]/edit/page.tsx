@@ -70,6 +70,8 @@ interface Product {
   bestseller?: boolean;
   newArrival?: boolean;
   files?: ProductFile[];
+  canvaTemplateLink?: string;
+  canvaInstructions?: string;
 }
 
 interface EditProductPageProps {
@@ -186,6 +188,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     previewImages: [] as string[],
     whatsIncluded: [] as string[],
     requirements: [] as string[],
+    canvaTemplateLink: "",
+    canvaInstructions: "",
     featured: false,
     bestseller: false,
     newArrival: false,
@@ -234,6 +238,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             featured: p.featured || false,
             bestseller: p.bestseller || false,
             newArrival: p.newArrival || false,
+            canvaTemplateLink: p.canvaTemplateLink || "",
+            canvaInstructions: p.canvaInstructions || "",
           });
 
           // Initialize product files from product data or legacy single file
@@ -456,6 +462,9 @@ export default function EditProductPage({ params }: EditProductPageProps) {
         newArrival: formData.newArrival || false,
         whatsIncluded: formData.whatsIncluded || [],
         requirements: formData.requirements || [],
+        // Canva template fields
+        canvaTemplateLink: formData.canvaTemplateLink || null,
+        canvaInstructions: formData.canvaInstructions || null,
         // Images
         thumbnailUrl: allImageUrls[0] || formData.thumbnailUrl,
         previewImages: allImageUrls.length > 1 ? allImageUrls.slice(1) : (formData.previewImages || []),
@@ -863,6 +872,63 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                 <input type="hidden" value={formData.fileUrl} />
                 <input type="hidden" value={formData.fileName} />
                 <input type="hidden" value={formData.fileType} />
+              </div>
+            </div>
+
+            {/* Canva Template (Alternative Delivery) */}
+            <div className="bg-gradient-to-br from-[#00C4CC]/5 to-[#7B2FF7]/5 rounded-2xl p-6 shadow-sm border border-[#00C4CC]/20">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#00C4CC] to-[#7B2FF7] rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Canva Template (Optional)</h2>
+                  <p className="text-xs text-gray-500">For products that open in Canva instead of downloading</p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                    Canva Template Link
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.canvaTemplateLink}
+                    onChange={(e) => setFormData({ ...formData, canvaTemplateLink: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00C4CC] focus:border-transparent"
+                    placeholder="https://www.canva.com/design/..."
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Paste the shareable Canva template link. If provided, buyers will access this instead of downloading files.
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                    Instructions (Optional)
+                  </label>
+                  <textarea
+                    value={formData.canvaInstructions}
+                    onChange={(e) => setFormData({ ...formData, canvaInstructions: e.target.value })}
+                    rows={4}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00C4CC] focus:border-transparent resize-none"
+                    placeholder="1. Click the Canva link after purchase&#10;2. Log in to your Canva account&#10;3. Click 'Use Template'&#10;4. Edit and customize as needed&#10;5. Download or share your design"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Custom instructions shown to buyers on how to use the Canva template.
+                  </p>
+                </div>
+                {formData.canvaTemplateLink && (
+                  <div className="flex items-center gap-2 p-3 bg-[#00C4CC]/10 border border-[#00C4CC]/20 rounded-lg">
+                    <svg className="w-5 h-5 text-[#00C4CC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm text-[#00C4CC] font-medium">
+                      This product will be delivered as a Canva template
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 

@@ -42,6 +42,9 @@ interface DownloadItem {
     id: string;
     title: string;
     thumbnail: string;
+    thumbnailUrl?: string;
+    canvaTemplateLink?: string;
+    canvaInstructions?: string;
   };
 }
 
@@ -188,38 +191,65 @@ function AccountContent() {
                   <Link href="/products" className="text-red-600 text-sm hover:underline">Browse products</Link>
                 </div>
               ) : (
-                downloads.map((download) => (
-                  <div key={download.id} className="bg-white rounded-xl p-4 shadow-sm">
-                    <div className="flex items-start gap-3">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                        {download.product.thumbnail ? (
-                          <img src={download.product.thumbnail} alt="" className="w-full h-full object-cover" />
-                        ) : (
-                          <Download className="w-6 h-6 text-gray-600 m-3" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-sm line-clamp-2">{download.product.title}</h3>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {download.downloadCount}/{download.maxDownloads} downloads •
-                          {isExpired(download.expiresAt) ? (
-                            <span className="text-red-500"> Expired</span>
+                downloads.map((download) => {
+                  const isCanvaProduct = !!download.product.canvaTemplateLink;
+                  const thumbnailSrc = download.product.thumbnail || download.product.thumbnailUrl;
+
+                  return (
+                    <div key={download.id} className={`bg-white rounded-xl p-4 shadow-sm ${isCanvaProduct ? 'border-l-4 border-[#00C4CC]' : ''}`}>
+                      <div className="flex items-start gap-3">
+                        <div className={`w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 ${isCanvaProduct ? 'bg-gradient-to-br from-[#00C4CC]/20 to-[#7B2FF7]/20' : 'bg-gray-100'}`}>
+                          {thumbnailSrc ? (
+                            <img src={thumbnailSrc} alt="" className="w-full h-full object-cover" />
+                          ) : isCanvaProduct ? (
+                            <svg className="w-6 h-6 text-[#00C4CC] m-3" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                            </svg>
                           ) : (
-                            <span> Expires {formatDate(download.expiresAt)}</span>
+                            <Download className="w-6 h-6 text-gray-600 m-3" />
                           )}
-                        </p>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm line-clamp-2">{download.product.title}</h3>
+                          {isCanvaProduct ? (
+                            <p className="text-xs text-[#00C4CC] mt-1 font-medium">Canva Template</p>
+                          ) : (
+                            <p className="text-xs text-gray-500 mt-1">
+                              {download.downloadCount}/{download.maxDownloads} downloads •
+                              {isExpired(download.expiresAt) ? (
+                                <span className="text-red-500"> Expired</span>
+                              ) : (
+                                <span> Expires {formatDate(download.expiresAt)}</span>
+                              )}
+                            </p>
+                          )}
+                        </div>
                       </div>
+                      {isCanvaProduct ? (
+                        <a
+                          href={download.product.canvaTemplateLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full mt-3 py-2.5 bg-gradient-to-r from-[#00C4CC] to-[#7B2FF7] text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+                        >
+                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                          </svg>
+                          Open in Canva
+                        </a>
+                      ) : (
+                        <button
+                          onClick={() => handleDownload(download.downloadToken)}
+                          disabled={isExpired(download.expiresAt) || download.downloadCount >= download.maxDownloads}
+                          className="w-full mt-3 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Download className="w-4 h-4" />
+                          {isExpired(download.expiresAt) ? 'Expired' : download.downloadCount >= download.maxDownloads ? 'Limit Reached' : 'Download'}
+                        </button>
+                      )}
                     </div>
-                    <button
-                      onClick={() => handleDownload(download.downloadToken)}
-                      disabled={isExpired(download.expiresAt) || download.downloadCount >= download.maxDownloads}
-                      className="w-full mt-3 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Download className="w-4 h-4" />
-                      {isExpired(download.expiresAt) ? 'Expired' : download.downloadCount >= download.maxDownloads ? 'Limit Reached' : 'Download'}
-                    </button>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}
@@ -384,33 +414,81 @@ function AccountContent() {
                       </Link>
                     </div>
                   ) : (
-                    downloads.map((download) => (
-                      <div
-                        key={download.id}
-                        className="flex items-center gap-4 p-4 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-[#FF6B35] transition-colors"
-                      >
-                        <div className="w-16 h-16 bg-gradient-to-br from-[#FF6B35]/10 to-orange-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Download className="w-8 h-8 text-[#FF6B35]" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold mb-1 dark:text-white">{download.product.title}</h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {download.downloadCount}/{download.maxDownloads} downloads used
-                          </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500">
-                            Expires: {isExpired(download.expiresAt) ? 'Expired' : formatDate(download.expiresAt)}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => handleDownload(download.downloadToken)}
-                          disabled={isExpired(download.expiresAt) || download.downloadCount >= download.maxDownloads}
-                          className="px-6 py-3 bg-gradient-to-r from-[#FF6B35] to-[#ff6f61] text-white rounded-full font-semibold hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    downloads.map((download) => {
+                      const isCanvaProduct = !!download.product.canvaTemplateLink;
+                      const thumbnailSrc = download.product.thumbnail || download.product.thumbnailUrl;
+
+                      return (
+                        <div
+                          key={download.id}
+                          className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${
+                            isCanvaProduct
+                              ? 'border-[#00C4CC]/30 hover:border-[#00C4CC] bg-gradient-to-r from-[#00C4CC]/5 to-[#7B2FF7]/5'
+                              : 'border-gray-200 dark:border-slate-700 hover:border-[#FF6B35]'
+                          }`}
                         >
-                          <Download className="w-4 h-4" />
-                          Download
-                        </button>
-                      </div>
-                    ))
+                          <div className={`w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden ${
+                            isCanvaProduct
+                              ? 'bg-gradient-to-br from-[#00C4CC]/20 to-[#7B2FF7]/20'
+                              : 'bg-gradient-to-br from-[#FF6B35]/10 to-orange-500/10'
+                          }`}>
+                            {thumbnailSrc ? (
+                              <img src={thumbnailSrc} alt="" className="w-full h-full object-cover" />
+                            ) : isCanvaProduct ? (
+                              <svg className="w-8 h-8 text-[#00C4CC]" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                              </svg>
+                            ) : (
+                              <Download className="w-8 h-8 text-[#FF6B35]" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold mb-1 dark:text-white">{download.product.title}</h3>
+                            {isCanvaProduct ? (
+                              <>
+                                <p className="text-sm text-[#00C4CC] font-medium">Canva Template • Never expires</p>
+                                {download.product.canvaInstructions && (
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
+                                    {download.product.canvaInstructions}
+                                  </p>
+                                )}
+                              </>
+                            ) : (
+                              <>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                  {download.downloadCount}/{download.maxDownloads} downloads used
+                                </p>
+                                <p className="text-xs text-gray-400 dark:text-gray-500">
+                                  Expires: {isExpired(download.expiresAt) ? 'Expired' : formatDate(download.expiresAt)}
+                                </p>
+                              </>
+                            )}
+                          </div>
+                          {isCanvaProduct ? (
+                            <a
+                              href={download.product.canvaTemplateLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-6 py-3 bg-gradient-to-r from-[#00C4CC] to-[#7B2FF7] text-white rounded-full font-semibold hover:shadow-lg transition-all flex items-center gap-2"
+                            >
+                              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                              </svg>
+                              Open in Canva
+                            </a>
+                          ) : (
+                            <button
+                              onClick={() => handleDownload(download.downloadToken)}
+                              disabled={isExpired(download.expiresAt) || download.downloadCount >= download.maxDownloads}
+                              className="px-6 py-3 bg-gradient-to-r from-[#FF6B35] to-[#ff6f61] text-white rounded-full font-semibold hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <Download className="w-4 h-4" />
+                              Download
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </div>

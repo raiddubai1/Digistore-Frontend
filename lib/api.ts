@@ -415,5 +415,49 @@ export const newsletterAPI = {
     api.post('/newsletter/send-promotion', data),
 };
 
+// ============================================
+// BUNDLES API
+// ============================================
+
+export const bundlesAPI = {
+  // Get all active bundles (public)
+  getAll: () => api.get('/bundles'),
+
+  // Get bundle by slug (public)
+  getBySlug: (slug: string) => api.get(`/bundles/${slug}`),
+
+  // Get all bundles for admin (includes inactive)
+  getAllAdmin: () => api.get('/bundles/admin/all'),
+
+  // Create bundle (admin only)
+  create: (data: {
+    name: string;
+    description?: string;
+    bundlePrice: number;
+    image?: string;
+    featured?: boolean;
+    active?: boolean;
+    startsAt?: string;
+    expiresAt?: string;
+    productIds?: string[];
+  }) => api.post('/bundles', data),
+
+  // Update bundle (admin only)
+  update: (id: string, data: {
+    name?: string;
+    description?: string;
+    bundlePrice?: number;
+    image?: string;
+    featured?: boolean;
+    active?: boolean;
+    startsAt?: string;
+    expiresAt?: string;
+    productIds?: string[];
+  }) => api.put(`/bundles/${id}`, data),
+
+  // Delete bundle (admin only)
+  delete: (id: string) => api.delete(`/bundles/${id}`),
+};
+
 export default api;
 

@@ -2,12 +2,60 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, Download, Mail, ArrowRight } from "lucide-react";
-import { Suspense } from "react";
+import { CheckCircle, Download, Mail, ArrowRight, ExternalLink } from "lucide-react";
+import { Suspense, useEffect, useState } from "react";
+
+interface OrderItem {
+  id: string;
+  product: {
+    id: string;
+    title: string;
+    thumbnailUrl?: string;
+    canvaTemplateLink?: string;
+    canvaInstructions?: string;
+  };
+}
+
+interface OrderData {
+  id: string;
+  orderNumber: string;
+  orderItems: OrderItem[];
+}
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId") || "N/A";
+  const [orderData, setOrderData] = useState<OrderData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrderData = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_URL}/orders/${orderId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setOrderData(data.data?.order || null);
+        }
+      } catch (error) {
+        console.error('Failed to fetch order:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (orderId !== 'N/A') {
+      fetchOrderData();
+    } else {
+      setLoading(false);
+    }
+  }, [orderId]);
+
+  const canvaItems = orderData?.orderItems?.filter(item => item.product?.canvaTemplateLink) || [];
+  const downloadableItems = orderData?.orderItems?.filter(item => !item.product?.canvaTemplateLink) || [];
+  const hasCanvaProducts = canvaItems.length > 0;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -28,7 +76,7 @@ function SuccessContent() {
           <div className="border-b border-gray-200 pb-6 mb-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-gray-600">Order Number</span>
-              <span className="font-mono font-semibold">{orderId}</span>
+              <span className="font-mono font-semibold">{orderData?.orderNumber || orderId}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Order Date</span>
@@ -41,6 +89,40 @@ function SuccessContent() {
               </span>
             </div>
           </div>
+
+          {/* Canva Products Section */}
+          {hasCanvaProducts && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-[#00C4CC]/10 to-[#7B2FF7]/10 border border-[#00C4CC]/20 rounded-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#00C4CC] to-[#7B2FF7] rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900">Canva Templates Ready!</h3>
+                  <p className="text-sm text-gray-600">Open directly in Canva to start editing</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {canvaItems.map((item) => (
+                  <a
+                    key={item.id}
+                    href={item.product.canvaTemplateLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-3 bg-white rounded-lg hover:shadow-md transition-shadow"
+                  >
+                    <span className="font-medium text-gray-900">{item.product.title}</span>
+                    <span className="flex items-center gap-2 text-[#00C4CC] font-semibold">
+                      Open in Canva
+                      <ExternalLink className="w-4 h-4" />
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* What's Next */}
           <div className="space-y-4">
@@ -55,26 +137,47 @@ function SuccessContent() {
               <div>
                 <h3 className="font-semibold mb-1">Check Your Email</h3>
                 <p className="text-sm text-gray-600">
-                  We've sent your download links and order confirmation to your email address.
-                  The download links will be valid for 7 days.
+                  We've sent your {hasCanvaProducts ? 'Canva template links and ' : ''}order confirmation to your email address.
+                  {downloadableItems.length > 0 && ' Download links will be valid for 7 days.'}
                 </p>
               </div>
             </div>
 
-            <div className="flex gap-4 p-4 bg-secondary/5 rounded-xl">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center">
-                  <Download className="w-5 h-5 text-secondary" />
+            {downloadableItems.length > 0 && (
+              <div className="flex gap-4 p-4 bg-secondary/5 rounded-xl">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center">
+                    <Download className="w-5 h-5 text-secondary" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">Download Your Products</h3>
+                  <p className="text-sm text-gray-600">
+                    You can download your products immediately from your account dashboard.
+                    Your purchases are saved and accessible anytime.
+                  </p>
                 </div>
               </div>
-              <div>
-                <h3 className="font-semibold mb-1">Download Your Products</h3>
-                <p className="text-sm text-gray-600">
-                  You can download your products immediately from your account dashboard.
-                  Your purchases are saved and accessible anytime.
-                </p>
+            )}
+
+            {hasCanvaProducts && (
+              <div className="flex gap-4 p-4 bg-gradient-to-r from-[#00C4CC]/5 to-[#7B2FF7]/5 rounded-xl border border-[#00C4CC]/10">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#00C4CC]/20 to-[#7B2FF7]/20 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-[#00C4CC]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                    </svg>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">Edit in Canva</h3>
+                  <p className="text-sm text-gray-600">
+                    Your Canva templates are ready! Click the links above to open them directly in Canva.
+                    You'll need a free Canva account to edit the templates.
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -115,16 +218,32 @@ function SuccessContent() {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Digital Products</span>
-              <span className="font-semibold">Instant Download</span>
+              <span className="font-semibold">
+                {hasCanvaProducts && downloadableItems.length > 0
+                  ? 'Canva Templates + Downloads'
+                  : hasCanvaProducts
+                    ? 'Canva Templates'
+                    : 'Instant Download'}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Delivery Method</span>
-              <span className="font-semibold">Email + Account Access</span>
+              <span className="font-semibold">
+                {hasCanvaProducts ? 'Canva Link + ' : ''}Email + Account Access
+              </span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Download Limit</span>
-              <span className="font-semibold">Unlimited (from account)</span>
-            </div>
+            {downloadableItems.length > 0 && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">Download Limit</span>
+                <span className="font-semibold">Unlimited (from account)</span>
+              </div>
+            )}
+            {hasCanvaProducts && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">Canva Access</span>
+                <span className="font-semibold text-[#00C4CC]">Never Expires</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-gray-600">License</span>
               <span className="font-semibold">As per product selection</span>

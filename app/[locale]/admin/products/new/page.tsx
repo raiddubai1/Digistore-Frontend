@@ -129,6 +129,8 @@ export default function NewProductPage() {
     bestseller: false,
     newArrival: true,
     status: "DRAFT" as "DRAFT" | "PENDING" | "APPROVED" | "REJECTED",
+    canvaTemplateLink: "", // Optional: Canva template URL for Canva-based products
+    canvaInstructions: "", // Optional: Custom instructions for using the Canva template
   });
 
   // Temporary inputs for arrays
@@ -343,8 +345,10 @@ export default function NewProductPage() {
       return;
     }
 
-    if (productFiles.length === 0) {
-      toast.error("Please upload at least one product file");
+    // Require either product files OR a Canva template link
+    const hasCanvaLink = formData.canvaTemplateLink && formData.canvaTemplateLink.trim() !== "";
+    if (productFiles.length === 0 && !hasCanvaLink) {
+      toast.error("Please upload product files OR provide a Canva template link");
       return;
     }
 
@@ -377,26 +381,34 @@ export default function NewProductPage() {
         throw new Error(imgError.response?.data?.message || 'Failed to upload images to cloud storage');
       }
 
-      // Step 2: Upload product files to S3
-      setUploadProgress("Uploading product files...");
+      // Step 2: Upload product files to S3 (skip if Canva-only product)
       let uploadedFileData: Array<{ url: string; key: string; fileName: string; fileSize: number; fileType: string }> = [];
-      try {
-        const fileResponse = await uploadAPI.uploadProductFiles(productFiles);
-        if (fileResponse.data?.success && fileResponse.data?.data?.files) {
-          uploadedFileData = fileResponse.data.data.files;
-        } else {
-          throw new Error('Failed to upload product files');
+      const isCanvaProduct = formData.canvaTemplateLink && formData.canvaTemplateLink.trim() !== "";
+
+      if (productFiles.length > 0) {
+        setUploadProgress("Uploading product files...");
+        try {
+          const fileResponse = await uploadAPI.uploadProductFiles(productFiles);
+          if (fileResponse.data?.success && fileResponse.data?.data?.files) {
+            uploadedFileData = fileResponse.data.data.files;
+          } else {
+            throw new Error('Failed to upload product files');
+          }
+        } catch (fileError: any) {
+          console.error('File upload error:', fileError);
+          throw new Error(fileError.response?.data?.message || 'Failed to upload product files to cloud storage');
         }
-      } catch (fileError: any) {
-        console.error('File upload error:', fileError);
-        throw new Error(fileError.response?.data?.message || 'Failed to upload product files to cloud storage');
       }
 
       // Step 3: Create product with uploaded URLs
       setUploadProgress("Creating product...");
       const primaryFile = uploadedFileData[0];
-      const fileTypes = [...new Set(uploadedFileData.map(f => f.fileType.split('/').pop() || ''))].join(', ');
-      const fileNames = uploadedFileData.map(f => f.fileName).join(', ');
+      const fileTypes = uploadedFileData.length > 0
+        ? [...new Set(uploadedFileData.map(f => f.fileType.split('/').pop() || ''))].join(', ')
+        : (isCanvaProduct ? 'canva' : 'pdf');
+      const fileNames = uploadedFileData.length > 0
+        ? uploadedFileData.map(f => f.fileName).join(', ')
+        : (isCanvaProduct ? 'Canva Template' : '');
 
       const productData = {
         title: formData.title,
@@ -407,15 +419,18 @@ export default function NewProductPage() {
         categoryId: formData.categoryId,
         subcategory: formData.subcategory || null,
         tags: formData.tags,
-        fileType: fileTypes || 'pdf',
-        fileName: fileNames || primaryFile.fileName,
-        fileUrl: primaryFile.url,
+        fileType: fileTypes,
+        fileName: fileNames || primaryFile?.fileName || 'Canva Template',
+        fileUrl: primaryFile?.url || formData.canvaTemplateLink || '',
         thumbnailUrl: imageUrls[0] || 'https://via.placeholder.com/400x300',
         thumbnailAlt: imageAltTexts[0] || formData.title,
         previewImages: imageUrls.slice(1),
         previewImageAlts: imageAltTexts.slice(1),
         whatsIncluded: formData.whatsIncluded,
         requirements: formData.requirements,
+        // Canva template fields
+        canvaTemplateLink: formData.canvaTemplateLink || null,
+        canvaInstructions: formData.canvaInstructions || null,
         // Include files metadata for multiple files support
         files: uploadedFileData.map((f, idx) => ({
           fileName: f.fileName,
@@ -691,6 +706,63 @@ export default function NewProductPage() {
                         </button>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Canva Template (Alternative Delivery) */}
+            <div className="bg-gradient-to-br from-[#00C4CC]/5 to-[#7B2FF7]/5 rounded-2xl p-6 shadow-sm border border-[#00C4CC]/20">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#00C4CC] to-[#7B2FF7] rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Canva Template (Optional)</h2>
+                  <p className="text-xs text-gray-500">For products that open in Canva instead of downloading</p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                    Canva Template Link
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.canvaTemplateLink}
+                    onChange={(e) => setFormData({ ...formData, canvaTemplateLink: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00C4CC] focus:border-transparent"
+                    placeholder="https://www.canva.com/design/..."
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Paste the shareable Canva template link. If provided, buyers will access this instead of downloading files.
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                    Instructions (Optional)
+                  </label>
+                  <textarea
+                    value={formData.canvaInstructions}
+                    onChange={(e) => setFormData({ ...formData, canvaInstructions: e.target.value })}
+                    rows={4}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00C4CC] focus:border-transparent resize-none"
+                    placeholder="1. Click the Canva link after purchase&#10;2. Log in to your Canva account&#10;3. Click 'Use Template'&#10;4. Edit and customize as needed&#10;5. Download or share your design"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Custom instructions shown to buyers on how to use the Canva template.
+                  </p>
+                </div>
+                {formData.canvaTemplateLink && (
+                  <div className="flex items-center gap-2 p-3 bg-[#00C4CC]/10 border border-[#00C4CC]/20 rounded-lg">
+                    <svg className="w-5 h-5 text-[#00C4CC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm text-[#00C4CC] font-medium">
+                      This product will be delivered as a Canva template
+                    </span>
                   </div>
                 )}
               </div>

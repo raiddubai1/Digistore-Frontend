@@ -20,6 +20,7 @@ import {
   MoreHorizontal,
   Search,
   Mail,
+  Layers,
 } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,6 +29,7 @@ const getNavigation = (basePath: string) => [
   { name: "Dashboard", href: `${basePath}/admin`, icon: LayoutDashboard },
   { name: "Products", href: `${basePath}/admin/products`, icon: Package },
   { name: "Categories", href: `${basePath}/admin/categories`, icon: FolderTree },
+  { name: "Bundles", href: `${basePath}/admin/bundles`, icon: Layers },
   { name: "Attributes", href: `${basePath}/admin/attributes`, icon: Tag },
   { name: "Tags", href: `${basePath}/admin/tags`, icon: Tags },
   { name: "Orders", href: `${basePath}/admin/orders`, icon: ShoppingCart },
