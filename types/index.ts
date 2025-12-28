@@ -1,3 +1,13 @@
+// Product Attribute
+export interface ProductAttribute {
+  attribute: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  value: string;
+}
+
 // Product Types
 export interface Product {
   id: string;
@@ -35,6 +45,8 @@ export interface Product {
   canvaInstructions?: string;
   // YouTube Video
   youtubeVideoUrl?: string;
+  // Product Attributes
+  attributes?: ProductAttribute[];
   createdAt: Date;
   updatedAt: Date;
 }

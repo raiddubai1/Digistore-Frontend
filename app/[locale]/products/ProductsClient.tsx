@@ -217,10 +217,11 @@ export default function ProductsClient() {
         const price = product.price;
         return selectedPriceRanges.some(range => {
           if (range === "free") return price === 0;
-          if (range === "under-10") return price > 0 && price < 10;
-          if (range === "10-25") return price >= 10 && price <= 25;
-          if (range === "25-50") return price > 25 && price <= 50;
-          if (range === "over-50") return price > 50;
+          if (range === "0-2.99") return price > 0 && price <= 2.99;
+          if (range === "3-4.99") return price >= 3 && price <= 4.99;
+          if (range === "5-6.99") return price >= 5 && price <= 6.99;
+          if (range === "7-9.99") return price >= 7 && price <= 9.99;
+          if (range === "10+") return price >= 10;
           return false;
         });
       });
@@ -633,9 +634,12 @@ export default function ProductsClient() {
                   onClick={() => togglePriceRange(range)}
                   className="flex items-center gap-1 px-2.5 py-1 bg-gray-900 text-white rounded-full text-xs font-medium"
                 >
-                  {range === "under-20" && "Under $20"}
-                  {range === "20-50" && "$20-$50"}
-                  {range === "over-50" && "Over $50"}
+                  {range === "free" && "Free"}
+                  {range === "0-2.99" && "$0 - $2.99"}
+                  {range === "3-4.99" && "$3 - $4.99"}
+                  {range === "5-6.99" && "$5 - $6.99"}
+                  {range === "7-9.99" && "$7 - $9.99"}
+                  {range === "10+" && "$10+"}
                   <X className="w-3 h-3" />
                 </button>
               ))}
@@ -790,38 +794,47 @@ export default function ProductsClient() {
                   <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
                     <input
                       type="checkbox"
-                      checked={selectedPriceRanges.includes("under-10")}
-                      onChange={() => togglePriceRange("under-10")}
+                      checked={selectedPriceRanges.includes("0-2.99")}
+                      onChange={() => togglePriceRange("0-2.99")}
                       className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
-                    <span className="text-sm">Under $10</span>
+                    <span className="text-sm">$0 - $2.99</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
                     <input
                       type="checkbox"
-                      checked={selectedPriceRanges.includes("10-25")}
-                      onChange={() => togglePriceRange("10-25")}
+                      checked={selectedPriceRanges.includes("3-4.99")}
+                      onChange={() => togglePriceRange("3-4.99")}
                       className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
-                    <span className="text-sm">$10 - $25</span>
+                    <span className="text-sm">$3 - $4.99</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
                     <input
                       type="checkbox"
-                      checked={selectedPriceRanges.includes("25-50")}
-                      onChange={() => togglePriceRange("25-50")}
+                      checked={selectedPriceRanges.includes("5-6.99")}
+                      onChange={() => togglePriceRange("5-6.99")}
                       className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
-                    <span className="text-sm">$25 - $50</span>
+                    <span className="text-sm">$5 - $6.99</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
                     <input
                       type="checkbox"
-                      checked={selectedPriceRanges.includes("over-50")}
-                      onChange={() => togglePriceRange("over-50")}
+                      checked={selectedPriceRanges.includes("7-9.99")}
+                      onChange={() => togglePriceRange("7-9.99")}
                       className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
-                    <span className="text-sm">Over $50</span>
+                    <span className="text-sm">$7 - $9.99</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={selectedPriceRanges.includes("10+")}
+                      onChange={() => togglePriceRange("10+")}
+                      className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <span className="text-sm">$10+</span>
                   </label>
                 </div>
               </div>
@@ -921,9 +934,12 @@ export default function ProductsClient() {
                     onClick={() => togglePriceRange(range)}
                     className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium hover:bg-primary/20"
                   >
-                    {range === "under-20" && "Under $20"}
-                    {range === "20-50" && "$20-$50"}
-                    {range === "over-50" && "Over $50"}
+                    {range === "free" && "Free"}
+                    {range === "0-2.99" && "$0 - $2.99"}
+                    {range === "3-4.99" && "$3 - $4.99"}
+                    {range === "5-6.99" && "$5 - $6.99"}
+                    {range === "7-9.99" && "$7 - $9.99"}
+                    {range === "10+" && "$10+"}
                     <X className="w-3 h-3" />
                   </button>
                 ))}

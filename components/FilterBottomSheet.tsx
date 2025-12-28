@@ -35,10 +35,11 @@ interface FilterBottomSheetProps {
 
 const priceRanges = [
   { value: "free", label: "Free", icon: "🆓" },
-  { value: "under-10", label: "Under $10", icon: "💵" },
-  { value: "10-25", label: "$10 - $25", icon: "💰" },
-  { value: "25-50", label: "$25 - $50", icon: "💎" },
-  { value: "over-50", label: "Over $50", icon: "👑" },
+  { value: "0-2.99", label: "$0 - $2.99", icon: "💵" },
+  { value: "3-4.99", label: "$3 - $4.99", icon: "💰" },
+  { value: "5-6.99", label: "$5 - $6.99", icon: "💵" },
+  { value: "7-9.99", label: "$7 - $9.99", icon: "💰" },
+  { value: "10+", label: "$10+", icon: "💎" },
 ];
 
 const ratings = [

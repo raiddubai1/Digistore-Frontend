@@ -282,6 +282,23 @@ export default function ProductDetailClient({
             </ul>
           </div>
 
+          {/* Product Attributes */}
+          {product.attributes && product.attributes.length > 0 && (
+            <div className="mb-4">
+              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">
+                Product Details
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {product.attributes.map((attr, index) => (
+                  <div key={index} className="bg-gray-50 rounded-lg p-2.5">
+                    <div className="text-xs text-gray-500">{attr.attribute.name}</div>
+                    <div className="text-sm font-semibold text-gray-900">{attr.value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* File Details */}
           {product.canvaTemplateLink ? (
             <>
@@ -654,6 +671,21 @@ export default function ProductDetailClient({
                   ))}
                 </ul>
               </div>
+
+              {/* Product Attributes */}
+              {product.attributes && product.attributes.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-lg font-bold mb-4">Product Details</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {product.attributes.map((attr, index) => (
+                      <div key={index} className="bg-gray-50 rounded-xl p-4">
+                        <div className="text-sm text-gray-500 mb-1">{attr.attribute.name}</div>
+                        <div className="font-semibold text-gray-900">{attr.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* File Details */}
               {product.canvaTemplateLink ? (
