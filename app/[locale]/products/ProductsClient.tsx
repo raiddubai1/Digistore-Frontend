@@ -268,6 +268,21 @@ export default function ProductsClient() {
       });
     }
 
+    // Filter by attributes
+    if (Object.keys(selectedAttributes).length > 0) {
+      filtered = filtered.filter(product => {
+        const productAttrs = product.attributes || [];
+        // Check if product matches ALL selected attribute filters
+        return Object.entries(selectedAttributes).every(([attrSlug, selectedValues]) => {
+          // Find product's value for this attribute
+          const productAttr = productAttrs.find((pa: any) => pa.attribute?.slug === attrSlug);
+          if (!productAttr) return false;
+          // Check if product's value is in selected values
+          return selectedValues.includes(productAttr.value);
+        });
+      });
+    }
+
     // Sort products
     if (sortBy === "price-low") {
       filtered.sort((a, b) => a.price - b.price);
@@ -297,7 +312,7 @@ export default function ProductsClient() {
     }
 
     setTotal(filtered.length);
-  }, [page, isLoadMore, selectedCategories, selectedSubcategories, selectedLevel3, selectedTags, selectedPriceRanges, selectedRatings, selectedFileTypes, sortBy, allProducts, categories]);
+  }, [page, isLoadMore, selectedCategories, selectedSubcategories, selectedLevel3, selectedTags, selectedPriceRanges, selectedRatings, selectedFileTypes, selectedAttributes, sortBy, allProducts, categories]);
 
   const toggleCategory = (categorySlug: string) => {
     setSelectedCategories((prev) => {
