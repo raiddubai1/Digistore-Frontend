@@ -2,7 +2,7 @@
 
 import { useCartStore } from "@/store/cartStore";
 import { X, ShoppingBag, Trash2, Plus, Minus, Tag, Check } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getThumbnailUrl } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -83,7 +83,7 @@ export default function Cart() {
                     <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
                       {item.product.thumbnailUrl ? (
                         <img
-                          src={item.product.thumbnailUrl}
+                          src={getThumbnailUrl(item.product.thumbnailUrl)}
                           alt={item.product.title}
                           className="w-full h-full object-cover"
                         />

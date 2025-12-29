@@ -12,6 +12,7 @@ import { useRecentlyViewedStore } from "@/store/recentlyViewedStore";
 import ProductJsonLd from "@/components/ProductJsonLd";
 import { Product, Review } from "@/types";
 import toast from "react-hot-toast";
+import { getProductImageUrl, getThumbnailUrl } from "@/lib/utils";
 
 interface ProductDetailClientProps {
   product: Product;
@@ -135,7 +136,7 @@ export default function ProductDetailClient({
         <div className="relative">
           <div className="aspect-[4/3] bg-gray-100">
             <img
-              src={images[currentImageIndex]}
+              src={getProductImageUrl(images[currentImageIndex])}
               alt={product.title}
               className="w-full h-full object-cover"
             />
@@ -542,7 +543,7 @@ export default function ProductDetailClient({
                 {/* Main Image */}
                 <div className="aspect-[4/3] bg-gray-100 rounded-2xl overflow-hidden mb-4">
                   <img
-                    src={images[currentImageIndex]}
+                    src={getProductImageUrl(images[currentImageIndex])}
                     alt={product.title}
                     className="w-full h-full object-cover"
                   />
@@ -559,7 +560,7 @@ export default function ProductDetailClient({
                           idx === currentImageIndex ? 'border-gray-900' : 'border-transparent'
                         }`}
                       >
-                        <img src={img} alt="" className="w-full h-full object-cover" />
+                        <img src={getThumbnailUrl(img)} alt="" className="w-full h-full object-cover" />
                       </button>
                     ))}
                   </div>

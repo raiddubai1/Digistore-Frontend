@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ProductCard from "./ProductCard";
 import { Product, Category } from "@/types";
+import { getThumbnailUrl } from "@/lib/utils";
 
 interface MobileHomeProps {
   featuredProducts: Product[];
@@ -293,7 +294,7 @@ function MiniProductCard({ product, priority = false }: { product: Product; prio
         <div className="relative aspect-square bg-gray-50 dark:bg-slate-700 p-2">
           <div className="relative w-full h-full">
             <Image
-              src={product.thumbnailUrl || '/placeholder-product.png'}
+              src={getThumbnailUrl(product.thumbnailUrl) || '/placeholder-product.png'}
               alt={product.title}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"

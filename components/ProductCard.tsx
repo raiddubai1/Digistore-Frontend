@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/types";
 import { Heart, ShoppingCart, Star, Download, GitCompare } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getThumbnailUrl } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
@@ -69,7 +69,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
           {/* Product Image */}
           {product.thumbnailUrl ? (
             <Image
-              src={product.thumbnailUrl}
+              src={getThumbnailUrl(product.thumbnailUrl)}
               alt={product.title}
               fill
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"

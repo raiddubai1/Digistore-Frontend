@@ -5,7 +5,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft, X, ShoppingCart, Star, Download, Check, Minus } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getThumbnailUrl } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 export default function ComparePage() {
@@ -86,7 +86,7 @@ export default function ComparePage() {
                     <X className="w-4 h-4" />
                   </button>
                   <img
-                    src={product.thumbnailUrl}
+                    src={getThumbnailUrl(product.thumbnailUrl)}
                     alt={product.title}
                     className="w-full aspect-square object-cover rounded-lg mb-3"
                   />

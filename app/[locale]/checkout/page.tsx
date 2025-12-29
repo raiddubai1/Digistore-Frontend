@@ -1,7 +1,7 @@
 "use client";
 
 import { useCartStore } from "@/store/cartStore";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getThumbnailUrl } from "@/lib/utils";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Mail, User, Tag, Check, X, ChevronLeft, ChevronDown, ChevronUp } from "lucide-react";
@@ -251,7 +251,7 @@ export default function CheckoutPage() {
           <div key={`${item.product.id}-${item.license}`} className="flex gap-3">
             <div className="w-12 h-12 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
               {item.product.thumbnailUrl && (
-                <img src={item.product.thumbnailUrl} alt="" className="w-full h-full object-cover" />
+                <img src={getThumbnailUrl(item.product.thumbnailUrl)} alt="" className="w-full h-full object-cover" />
               )}
             </div>
             <div className="flex-1 min-w-0">

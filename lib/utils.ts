@@ -101,3 +101,79 @@ export function slugify(text: string): string {
     .trim();
 }
 
+/**
+ * Optimize Cloudinary image URL with automatic format and quality
+ * Adds f_auto (auto format - WebP, AVIF based on browser) and q_auto (auto quality)
+ * @param url - Original Cloudinary URL
+ * @param options - Optional transformation options
+ * @returns Optimized URL
+ */
+export function optimizeCloudinaryUrl(
+  url: string | undefined | null,
+  options?: {
+    width?: number;
+    height?: number;
+    quality?: 'auto' | 'auto:low' | 'auto:eco' | 'auto:good' | 'auto:best';
+    crop?: 'fill' | 'fit' | 'scale' | 'thumb' | 'crop';
+  }
+): string {
+  if (!url) return '';
+
+  // Only process Cloudinary URLs
+  if (!url.includes('res.cloudinary.com')) {
+    return url;
+  }
+
+  // Check if transformations already exist
+  const uploadIndex = url.indexOf('/upload/');
+  if (uploadIndex === -1) return url;
+
+  // Build transformation string
+  const transforms: string[] = ['f_auto', `q_${options?.quality || 'auto'}`];
+
+  if (options?.width) {
+    transforms.push(`w_${options.width}`);
+  }
+  if (options?.height) {
+    transforms.push(`h_${options.height}`);
+  }
+  if (options?.crop) {
+    transforms.push(`c_${options.crop}`);
+  }
+
+  const transformString = transforms.join(',');
+
+  // Check if there are already transformations after /upload/
+  const afterUpload = url.substring(uploadIndex + 8);
+  const hasExistingTransforms = afterUpload.startsWith('v') === false && !afterUpload.match(/^[a-z]/);
+
+  if (hasExistingTransforms) {
+    // Insert our transforms before existing ones
+    return url.slice(0, uploadIndex + 8) + transformString + '/' + afterUpload;
+  } else {
+    // No existing transforms, add ours
+    return url.slice(0, uploadIndex + 8) + transformString + '/' + afterUpload;
+  }
+}
+
+/**
+ * Get optimized thumbnail URL (small size for cards)
+ */
+export function getThumbnailUrl(url: string | undefined | null): string {
+  return optimizeCloudinaryUrl(url, { width: 400, height: 400, crop: 'fill' });
+}
+
+/**
+ * Get optimized product image URL (medium size for product pages)
+ */
+export function getProductImageUrl(url: string | undefined | null): string {
+  return optimizeCloudinaryUrl(url, { width: 800 });
+}
+
+/**
+ * Get optimized hero/banner image URL (large size)
+ */
+export function getHeroImageUrl(url: string | undefined | null): string {
+  return optimizeCloudinaryUrl(url, { width: 1200 });
+}
+

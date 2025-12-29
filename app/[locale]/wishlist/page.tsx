@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Heart, ShoppingCart, Trash2, ChevronLeft } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
+import { getThumbnailUrl } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 export default function WishlistPage() {
@@ -71,7 +72,7 @@ export default function WishlistPage() {
                 <Link href={`/products/${wishlistItem.product.slug}`} className="flex-shrink-0">
                   <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
                     {wishlistItem.product.thumbnailUrl ? (
-                      <img src={wishlistItem.product.thumbnailUrl} alt={wishlistItem.product.title} className="w-full h-full object-cover" />
+                      <img src={getThumbnailUrl(wishlistItem.product.thumbnailUrl)} alt={wishlistItem.product.title} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-2xl">📦</div>
                     )}
@@ -129,7 +130,7 @@ export default function WishlistPage() {
                   <Link href={`/products/${wishlistItem.product.slug}`}>
                     <div className="aspect-[4/3] bg-gray-100 overflow-hidden">
                       {wishlistItem.product.thumbnailUrl ? (
-                        <img src={wishlistItem.product.thumbnailUrl} alt={wishlistItem.product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                        <img src={getThumbnailUrl(wishlistItem.product.thumbnailUrl)} alt={wishlistItem.product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-4xl">📦</div>
                       )}
