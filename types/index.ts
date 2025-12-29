@@ -42,6 +42,7 @@ export interface Product {
   newArrival: boolean;
   // Canva Template Delivery
   canvaTemplateLink?: string;
+  canvaTemplateLinks?: Array<{ name: string; url: string }>;
   canvaInstructions?: string;
   // YouTube Video
   youtubeVideoUrl?: string;

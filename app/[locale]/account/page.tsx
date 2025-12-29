@@ -44,6 +44,7 @@ interface DownloadItem {
     thumbnail: string;
     thumbnailUrl?: string;
     canvaTemplateLink?: string;
+    canvaTemplateLinks?: Array<{ name: string; url: string }>;
     canvaInstructions?: string;
   };
 }
@@ -192,7 +193,8 @@ function AccountContent() {
                 </div>
               ) : (
                 downloads.map((download) => {
-                  const isCanvaProduct = !!download.product.canvaTemplateLink;
+                  const canvaLinks = download.product.canvaTemplateLinks || (download.product.canvaTemplateLink ? [{ name: 'Open Template', url: download.product.canvaTemplateLink }] : []);
+                  const isCanvaProduct = canvaLinks.length > 0;
                   const thumbnailSrc = download.product.thumbnail || download.product.thumbnailUrl;
 
                   return (
@@ -212,7 +214,7 @@ function AccountContent() {
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-sm line-clamp-2">{download.product.title}</h3>
                           {isCanvaProduct ? (
-                            <p className="text-xs text-[#00C4CC] mt-1 font-medium">Canva Template</p>
+                            <p className="text-xs text-[#00C4CC] mt-1 font-medium">{canvaLinks.length} Canva Template{canvaLinks.length > 1 ? 's' : ''}</p>
                           ) : (
                             <p className="text-xs text-gray-500 mt-1">
                               {download.downloadCount}/{download.maxDownloads} downloads •
@@ -226,17 +228,22 @@ function AccountContent() {
                         </div>
                       </div>
                       {isCanvaProduct ? (
-                        <a
-                          href={download.product.canvaTemplateLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full mt-3 py-2.5 bg-gradient-to-r from-[#00C4CC] to-[#7B2FF7] text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
-                        >
-                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                          </svg>
-                          Open in Canva
-                        </a>
+                        <div className="mt-3 space-y-2">
+                          {canvaLinks.map((link, idx) => (
+                            <a
+                              key={idx}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-full py-2 bg-gradient-to-r from-[#00C4CC] to-[#7B2FF7] text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+                            >
+                              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                              </svg>
+                              {link.name}
+                            </a>
+                          ))}
+                        </div>
                       ) : (
                         <button
                           onClick={() => handleDownload(download.downloadToken)}
@@ -415,7 +422,8 @@ function AccountContent() {
                     </div>
                   ) : (
                     downloads.map((download) => {
-                      const isCanvaProduct = !!download.product.canvaTemplateLink;
+                      const canvaLinks = download.product.canvaTemplateLinks || (download.product.canvaTemplateLink ? [{ name: 'Open Template', url: download.product.canvaTemplateLink }] : []);
+                      const isCanvaProduct = canvaLinks.length > 0;
                       const thumbnailSrc = download.product.thumbnail || download.product.thumbnailUrl;
 
                       return (
@@ -446,7 +454,7 @@ function AccountContent() {
                             <h3 className="font-semibold mb-1 dark:text-white">{download.product.title}</h3>
                             {isCanvaProduct ? (
                               <>
-                                <p className="text-sm text-[#00C4CC] font-medium">Canva Template • Never expires</p>
+                                <p className="text-sm text-[#00C4CC] font-medium">{canvaLinks.length} Canva Template{canvaLinks.length > 1 ? 's' : ''} • Never expires</p>
                                 {download.product.canvaInstructions && (
                                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
                                     {download.product.canvaInstructions}
@@ -465,17 +473,22 @@ function AccountContent() {
                             )}
                           </div>
                           {isCanvaProduct ? (
-                            <a
-                              href={download.product.canvaTemplateLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="px-6 py-3 bg-gradient-to-r from-[#00C4CC] to-[#7B2FF7] text-white rounded-full font-semibold hover:shadow-lg transition-all flex items-center gap-2"
-                            >
-                              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                              </svg>
-                              Open in Canva
-                            </a>
+                            <div className="flex flex-wrap gap-2">
+                              {canvaLinks.map((link, idx) => (
+                                <a
+                                  key={idx}
+                                  href={link.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-4 py-2 bg-gradient-to-r from-[#00C4CC] to-[#7B2FF7] text-white rounded-full font-semibold hover:shadow-lg transition-all flex items-center gap-2 text-sm"
+                                >
+                                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                                  </svg>
+                                  {link.name}
+                                </a>
+                              ))}
+                            </div>
                           ) : (
                             <button
                               onClick={() => handleDownload(download.downloadToken)}

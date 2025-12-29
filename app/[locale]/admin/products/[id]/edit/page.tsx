@@ -71,6 +71,7 @@ interface Product {
   newArrival?: boolean;
   files?: ProductFile[];
   canvaTemplateLink?: string;
+  canvaTemplateLinks?: Array<{ name: string; url: string }>;
   canvaInstructions?: string;
   youtubeVideoUrl?: string;
 }
@@ -200,12 +201,15 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     whatsIncluded: [] as string[],
     requirements: [] as string[],
     canvaTemplateLink: "",
+    canvaTemplateLinks: [] as Array<{ name: string; url: string }>,
     canvaInstructions: "",
     youtubeVideoUrl: "",
     featured: false,
     bestseller: false,
     newArrival: false,
   });
+
+  const [newCanvaLink, setNewCanvaLink] = useState({ name: "", url: "" });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -251,6 +255,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             bestseller: p.bestseller || false,
             newArrival: p.newArrival || false,
             canvaTemplateLink: p.canvaTemplateLink || "",
+            canvaTemplateLinks: (p.canvaTemplateLinks as Array<{ name: string; url: string }>) || [],
             canvaInstructions: p.canvaInstructions || "",
             youtubeVideoUrl: p.youtubeVideoUrl || "",
           });
@@ -508,7 +513,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
         whatsIncluded: formData.whatsIncluded || [],
         requirements: formData.requirements || [],
         // Canva template fields
-        canvaTemplateLink: formData.canvaTemplateLink || null,
+        canvaTemplateLink: formData.canvaTemplateLinks.length > 0 ? formData.canvaTemplateLinks[0].url : (formData.canvaTemplateLink || null),
+        canvaTemplateLinks: formData.canvaTemplateLinks.length > 0 ? formData.canvaTemplateLinks : null,
         canvaInstructions: formData.canvaInstructions || null,
         // YouTube video
         youtubeVideoUrl: formData.youtubeVideoUrl || null,
@@ -973,26 +979,85 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Canva Template (Optional)</h2>
-                  <p className="text-xs text-gray-500">For products that open in Canva instead of downloading</p>
+                  <h2 className="text-lg font-semibold text-gray-900">Canva Templates (Optional)</h2>
+                  <p className="text-xs text-gray-500">Add multiple Canva links for products with multiple templates</p>
                 </div>
               </div>
               <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                    Canva Template Link
+                {/* Add new Canva link */}
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-gray-700 block">
+                    Add Canva Template Link
                   </label>
-                  <input
-                    type="url"
-                    value={formData.canvaTemplateLink}
-                    onChange={(e) => setFormData({ ...formData, canvaTemplateLink: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00C4CC] focus:border-transparent"
-                    placeholder="https://www.canva.com/design/..."
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Paste the shareable Canva template link. If provided, buyers will access this instead of downloading files.
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newCanvaLink.name}
+                      onChange={(e) => setNewCanvaLink({ ...newCanvaLink, name: e.target.value })}
+                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00C4CC] focus:border-transparent"
+                      placeholder="Link name (e.g., Instagram Post)"
+                    />
+                    <input
+                      type="url"
+                      value={newCanvaLink.url}
+                      onChange={(e) => setNewCanvaLink({ ...newCanvaLink, url: e.target.value })}
+                      className="flex-[2] px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00C4CC] focus:border-transparent"
+                      placeholder="https://www.canva.com/design/..."
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (newCanvaLink.name.trim() && newCanvaLink.url.trim()) {
+                          setFormData({
+                            ...formData,
+                            canvaTemplateLinks: [...formData.canvaTemplateLinks, { name: newCanvaLink.name.trim(), url: newCanvaLink.url.trim() }]
+                          });
+                          setNewCanvaLink({ name: "", url: "" });
+                        }
+                      }}
+                      className="px-4 py-2.5 bg-gradient-to-r from-[#00C4CC] to-[#7B2FF7] text-white rounded-lg hover:opacity-90 transition-opacity font-medium"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Add multiple Canva template links. Each link can have a name to help buyers identify which template to use.
                   </p>
                 </div>
+
+                {/* List of added Canva links */}
+                {formData.canvaTemplateLinks.length > 0 && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700 block">
+                      Added Templates ({formData.canvaTemplateLinks.length})
+                    </label>
+                    {formData.canvaTemplateLinks.map((link, index) => (
+                      <div key={index} className="flex items-center gap-2 p-3 bg-white border border-[#00C4CC]/30 rounded-lg">
+                        <div className="w-8 h-8 bg-gradient-to-br from-[#00C4CC] to-[#7B2FF7] rounded-lg flex items-center justify-center text-white text-sm font-bold">
+                          {index + 1}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 truncate">{link.name}</p>
+                          <p className="text-xs text-gray-500 truncate">{link.url}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              canvaTemplateLinks: formData.canvaTemplateLinks.filter((_, i) => i !== index)
+                            });
+                          }}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Instructions */}
                 <div>
                   <label className="text-sm font-semibold text-gray-700 mb-2 block">
                     Instructions (Optional)
@@ -1005,16 +1070,17 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                     placeholder="1. Click the Canva link after purchase&#10;2. Log in to your Canva account&#10;3. Click 'Use Template'&#10;4. Edit and customize as needed&#10;5. Download or share your design"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Custom instructions shown to buyers on how to use the Canva template.
+                    Custom instructions shown to buyers on how to use the Canva templates.
                   </p>
                 </div>
-                {formData.canvaTemplateLink && (
+
+                {formData.canvaTemplateLinks.length > 0 && (
                   <div className="flex items-center gap-2 p-3 bg-[#00C4CC]/10 border border-[#00C4CC]/20 rounded-lg">
                     <svg className="w-5 h-5 text-[#00C4CC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="text-sm text-[#00C4CC] font-medium">
-                      This product will be delivered as a Canva template
+                      This product includes {formData.canvaTemplateLinks.length} Canva template{formData.canvaTemplateLinks.length > 1 ? 's' : ''}
                     </span>
                   </div>
                 )}

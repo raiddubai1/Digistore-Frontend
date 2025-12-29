@@ -12,6 +12,7 @@ interface OrderItem {
     title: string;
     thumbnailUrl?: string;
     canvaTemplateLink?: string;
+    canvaTemplateLinks?: Array<{ name: string; url: string }>;
     canvaInstructions?: string;
   };
 }
@@ -53,8 +54,12 @@ function SuccessContent() {
     }
   }, [orderId]);
 
-  const canvaItems = orderData?.orderItems?.filter(item => item.product?.canvaTemplateLink) || [];
-  const downloadableItems = orderData?.orderItems?.filter(item => !item.product?.canvaTemplateLink) || [];
+  const canvaItems = orderData?.orderItems?.filter(item =>
+    item.product?.canvaTemplateLink || (item.product?.canvaTemplateLinks && item.product.canvaTemplateLinks.length > 0)
+  ) || [];
+  const downloadableItems = orderData?.orderItems?.filter(item =>
+    !item.product?.canvaTemplateLink && (!item.product?.canvaTemplateLinks || item.product.canvaTemplateLinks.length === 0)
+  ) || [];
   const hasCanvaProducts = canvaItems.length > 0;
 
   return (
@@ -104,22 +109,29 @@ function SuccessContent() {
                   <p className="text-sm text-gray-600">Open directly in Canva to start editing</p>
                 </div>
               </div>
-              <div className="space-y-2">
-                {canvaItems.map((item) => (
-                  <a
-                    key={item.id}
-                    href={item.product.canvaTemplateLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 bg-white rounded-lg hover:shadow-md transition-shadow"
-                  >
-                    <span className="font-medium text-gray-900">{item.product.title}</span>
-                    <span className="flex items-center gap-2 text-[#00C4CC] font-semibold">
-                      Open in Canva
-                      <ExternalLink className="w-4 h-4" />
-                    </span>
-                  </a>
-                ))}
+              <div className="space-y-3">
+                {canvaItems.map((item) => {
+                  const links = item.product.canvaTemplateLinks || (item.product.canvaTemplateLink ? [{ name: 'Open Template', url: item.product.canvaTemplateLink }] : []);
+                  return (
+                    <div key={item.id} className="p-3 bg-white rounded-lg">
+                      <p className="font-medium text-gray-900 mb-2">{item.product.title}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {links.map((link, idx) => (
+                          <a
+                            key={idx}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#00C4CC] to-[#7B2FF7] text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                          >
+                            {link.name}
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
