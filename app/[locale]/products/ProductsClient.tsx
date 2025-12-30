@@ -246,39 +246,66 @@ export default function ProductsClient() {
     }
   };
 
+  // Helper: Get all category slugs a product belongs to (from categoryIds)
+  const getProductCategorySlugs = (product: Product): string[] => {
+    const slugs: string[] = [];
+    // Add primary category slug
+    if (product.category) slugs.push(product.category);
+    // Add slugs for all categoryIds
+    if (product.categoryIds && Array.isArray(product.categoryIds)) {
+      product.categoryIds.forEach(catId => {
+        const cat = categories.find(c => c.id === catId);
+        if (cat && !slugs.includes(cat.slug)) {
+          slugs.push(cat.slug);
+        }
+      });
+    }
+    return slugs;
+  };
+
   // Filter products based on selected filters
   useEffect(() => {
     let filtered = [...(allProducts || [])];
 
-    // Filter by parent category (using slug)
+    // Filter by parent category (using slug) - now checks all categoryIds
     if (selectedCategories.length > 0) {
       filtered = filtered.filter(product => {
-        const productCatSlug = product.category;
-        // Check if product is in selected category or its subcategory
-        const productCategory = categories.find(c => c.slug === productCatSlug);
-        if (!productCategory) return selectedCategories.includes(productCatSlug);
+        const productCatSlugs = getProductCategorySlugs(product);
 
-        // Check if parent category is selected
-        if (productCategory.parentId) {
-          const parentCategory = categories.find(c => c.id === productCategory.parentId);
-          return parentCategory && selectedCategories.includes(parentCategory.slug);
-        }
-        return selectedCategories.includes(productCatSlug);
+        // Check if any of the product's categories match selected parent categories
+        return productCatSlugs.some(catSlug => {
+          const productCategory = categories.find(c => c.slug === catSlug);
+          if (!productCategory) return selectedCategories.includes(catSlug);
+
+          // Check if this category or its parent is selected
+          if (productCategory.parentId) {
+            const parentCategory = categories.find(c => c.id === productCategory.parentId);
+            if (parentCategory && selectedCategories.includes(parentCategory.slug)) return true;
+            // Also check grandparent
+            if (parentCategory?.parentId) {
+              const grandparent = categories.find(c => c.id === parentCategory.parentId);
+              if (grandparent && selectedCategories.includes(grandparent.slug)) return true;
+            }
+          }
+          return selectedCategories.includes(catSlug);
+        });
       });
     }
 
-    // Filter by subcategory (Level 2) if any selected
+    // Filter by subcategory (Level 2) if any selected - now checks all categoryIds
     if (selectedSubcategories.length > 0) {
-      filtered = filtered.filter(product =>
-        selectedSubcategories.includes(product.category)
-      );
+      filtered = filtered.filter(product => {
+        const productCatSlugs = getProductCategorySlugs(product);
+        return selectedSubcategories.some(subSlug => productCatSlugs.includes(subSlug));
+      });
     }
 
-    // Filter by Level 3 category if any selected
+    // Filter by Level 3 category if any selected - now checks all categoryIds
     if (selectedLevel3.length > 0) {
-      filtered = filtered.filter(product =>
-        selectedLevel3.includes(product.category)
-      );
+      filtered = filtered.filter(product => {
+        const productCatSlugs = getProductCategorySlugs(product);
+        return selectedLevel3.some(l3Slug => productCatSlugs.includes(l3Slug));
+      });
     }
 
     // Filter by tags
@@ -541,18 +568,27 @@ export default function ProductsClient() {
   }, [selectedCategories, selectedSubcategories, selectedLevel3, selectedTags, selectedPriceRanges, selectedRatings, selectedFileTypes, setFilterCount]);
 
   // Compute categories with product counts (only categories that have products)
+  // Now considers categoryIds for multi-category support
   const categoriesWithCounts = categories.map(cat => {
-    // Count products in this category
+    // Count products in this category (checking both primary category and categoryIds)
     const count = allProducts.filter(p => {
+      const productCatSlugs = getProductCategorySlugs(p);
+
       if (cat.parentId) {
-        // This is a subcategory - direct match
-        return p.category === cat.slug;
+        // This is a subcategory - direct match in any of product's categories
+        return productCatSlugs.includes(cat.slug);
       } else {
         // This is a parent category - count products in this category or its subcategories
         const subcategorySlugs = categories
           .filter(c => c.parentId === cat.id)
           .map(c => c.slug);
-        return p.category === cat.slug || subcategorySlugs.includes(p.category);
+        // Also get level 3 categories (children of subcategories)
+        const level3Slugs = subcategorySlugs.flatMap(subSlug => {
+          const sub = categories.find(c => c.slug === subSlug);
+          return sub ? categories.filter(c => c.parentId === sub.id).map(c => c.slug) : [];
+        });
+        const allRelatedSlugs = [cat.slug, ...subcategorySlugs, ...level3Slugs];
+        return productCatSlugs.some(slug => allRelatedSlugs.includes(slug));
       }
     }).length;
     return { ...cat, productCount: count };
@@ -562,24 +598,28 @@ export default function ProductsClient() {
   const availableTags = (() => {
     let relevantProducts = allProducts;
 
-    // Filter by selected categories if any
+    // Filter by selected categories if any - now uses categoryIds
     if (selectedCategories.length > 0) {
       relevantProducts = allProducts.filter(p => {
-        const productCategory = categories.find(c => c.slug === p.category);
-        if (!productCategory) return selectedCategories.includes(p.category);
-        if (productCategory.parentId) {
-          const parentCategory = categories.find(c => c.id === productCategory.parentId);
-          return parentCategory && selectedCategories.includes(parentCategory.slug);
-        }
-        return selectedCategories.includes(p.category);
+        const productCatSlugs = getProductCategorySlugs(p);
+        return productCatSlugs.some(catSlug => {
+          const productCategory = categories.find(c => c.slug === catSlug);
+          if (!productCategory) return selectedCategories.includes(catSlug);
+          if (productCategory.parentId) {
+            const parentCategory = categories.find(c => c.id === productCategory.parentId);
+            return parentCategory && selectedCategories.includes(parentCategory.slug);
+          }
+          return selectedCategories.includes(catSlug);
+        });
       });
     }
 
-    // Further filter by subcategories if any
+    // Further filter by subcategories if any - now uses categoryIds
     if (selectedSubcategories.length > 0) {
-      relevantProducts = relevantProducts.filter(p =>
-        selectedSubcategories.includes(p.category)
-      );
+      relevantProducts = relevantProducts.filter(p => {
+        const productCatSlugs = getProductCategorySlugs(p);
+        return selectedSubcategories.some(subSlug => productCatSlugs.includes(subSlug));
+      });
     }
 
     // Collect all tags from relevant products

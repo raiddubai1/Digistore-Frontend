@@ -24,6 +24,8 @@ export interface Product {
   originalPrice?: number;
   discount?: number;
   category: string;
+  categoryIds?: string[]; // All category IDs (up to 3)
+  categoryName?: string;
   subcategory?: string;
   tags: string[];
   fileType: string; // pdf, xlsx, zip, etc.
