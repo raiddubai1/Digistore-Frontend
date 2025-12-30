@@ -11,9 +11,15 @@ interface DealsPageProps {
 
 async function getHotDeals(): Promise<Product[]> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/hot-deals?limit=12`, {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://digistore1-backend.onrender.com/api';
+    const response = await fetch(`${apiUrl}/products/hot-deals?limit=12`, {
       next: { revalidate: 60 },
+      cache: 'no-store',
     });
+    if (!response.ok) {
+      console.error('Hot deals API returned:', response.status);
+      return [];
+    }
     const data = await response.json();
     return data.data?.products || [];
   } catch (error) {
@@ -24,9 +30,15 @@ async function getHotDeals(): Promise<Product[]> {
 
 async function getBestsellers(): Promise<Product[]> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/bestsellers`, {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://digistore1-backend.onrender.com/api';
+    const response = await fetch(`${apiUrl}/products/bestsellers`, {
       next: { revalidate: 60 },
+      cache: 'no-store',
     });
+    if (!response.ok) {
+      console.error('Bestsellers API returned:', response.status);
+      return [];
+    }
     const data = await response.json();
     return data.data?.products || [];
   } catch (error) {
@@ -39,10 +51,17 @@ export default async function DealsPage({ params }: DealsPageProps) {
   const { locale } = await params;
 
   // Fetch hot deals and bestsellers from API
-  const [hotDeals, bestSellers] = await Promise.all([
-    getHotDeals(),
-    getBestsellers()
-  ]);
+  let hotDeals: Product[] = [];
+  let bestSellers: Product[] = [];
+
+  try {
+    [hotDeals, bestSellers] = await Promise.all([
+      getHotDeals(),
+      getBestsellers()
+    ]);
+  } catch (error) {
+    console.error('Error loading deals page data:', error);
+  }
 
   // Calculate time left for flash sale (mock data)
   const flashSaleEnd = new Date();
@@ -85,22 +104,33 @@ export default async function DealsPage({ params }: DealsPageProps) {
         {/* Hot Deals Products */}
         <div className="p-4">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">🔥 Hot Deals</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {hotDeals.slice(0, 6).map((product, index) => (
-              <ProductCard key={product.id} product={product} priority={index < 2} />
-            ))}
-          </div>
+          {hotDeals.length > 0 ? (
+            <div className="grid grid-cols-2 gap-3">
+              {hotDeals.slice(0, 6).map((product, index) => (
+                <ProductCard key={product.id} product={product} priority={index < 2} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <p>No hot deals available right now.</p>
+              <Link href={`/${locale}/products`} className="text-[#FF6B35] font-semibold mt-2 inline-block">
+                Browse all products →
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Best Sellers Section */}
-        <div className="p-4 mt-4">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Best Sellers</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {bestSellers.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+        {bestSellers.length > 0 && (
+          <div className="p-4 mt-4">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Best Sellers</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {bestSellers.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Desktop Layout */}
@@ -169,11 +199,21 @@ export default async function DealsPage({ params }: DealsPageProps) {
                 View All <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
-            <div className="grid grid-cols-4 gap-6">
-              {hotDeals.slice(0, 8).map((product, index) => (
-                <ProductCard key={product.id} product={product} priority={index < 4} />
-              ))}
-            </div>
+            {hotDeals.length > 0 ? (
+              <div className="grid grid-cols-4 gap-6">
+                {hotDeals.slice(0, 8).map((product, index) => (
+                  <ProductCard key={product.id} product={product} priority={index < 4} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-2xl">
+                <p className="text-gray-500 text-lg">No hot deals available right now.</p>
+                <p className="text-gray-400 mt-2">Check back soon for amazing deals!</p>
+                <Link href={`/${locale}/products`} className="inline-flex items-center gap-2 mt-4 px-6 py-3 bg-[#FF6B35] text-white rounded-full font-semibold hover:bg-[#E55A2B] transition-colors">
+                  Browse All Products <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Best Sellers */}
