@@ -838,7 +838,7 @@ export default function ProductsClient() {
 
           <div className="flex gap-8">
             {/* Sidebar */}
-            <aside className="w-64 flex-shrink-0">
+            <aside className="w-72 flex-shrink-0">
               <div className="bg-white rounded-2xl border border-gray-200 p-6 sticky top-24">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-bold text-lg flex items-center gap-2">
