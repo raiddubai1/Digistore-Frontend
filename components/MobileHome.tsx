@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Search, ChevronRight, TrendingUp, Sparkles, Star, Clock, Gift } from "lucide-react";
+import { Search, ChevronRight, TrendingUp, Sparkles, Star, Clock } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ProductCard from "./ProductCard";
@@ -141,10 +141,10 @@ export default function MobileHome({
       </div>
 
       {/* First Purchase Promo Banner */}
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-b border-green-200 dark:border-green-700 px-4 py-2.5">
+      <div className="bg-gradient-to-r from-[#FF6B35] to-[#ff8a5c] px-4 py-2.5">
         <div className="flex items-center justify-center gap-2">
-          <Gift className="w-4 h-4 text-green-600 dark:text-green-400" />
-          <span className="text-sm font-bold text-green-700 dark:text-green-300">
+          <Sparkles className="w-4 h-4 text-white" />
+          <span className="text-sm font-bold text-white">
             🎉 New here? Get 30% OFF your first purchase!
           </span>
         </div>
