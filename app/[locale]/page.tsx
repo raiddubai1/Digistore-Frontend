@@ -466,7 +466,7 @@ export default async function Home({ params }: HomeProps) {
                 Ready to Transform Your Digital Journey?
               </h2>
               <p className="text-lg text-gray-100">
-                Join thousands of satisfied customers and download your first digital product today. Check out our exclusive deals!
+                Join thousands of satisfied customers and download your first digital product today. <span className="font-bold">Get 30% OFF on your first purchase!</span>
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">

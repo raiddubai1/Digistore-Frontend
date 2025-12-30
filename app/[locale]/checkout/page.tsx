@@ -4,11 +4,17 @@ import { useCartStore } from "@/store/cartStore";
 import { formatPrice, getThumbnailUrl } from "@/lib/utils";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, User, Tag, Check, X, ChevronLeft, ChevronDown, ChevronUp } from "lucide-react";
+import { Lock, Mail, User, Tag, Check, X, ChevronLeft, ChevronDown, ChevronUp, Gift, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { paymentsAPI } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+
+interface FirstPurchaseDiscount {
+  isFirstPurchase: boolean;
+  discountPercent: number;
+  message: string | null;
+}
 
 // PayPal icon component
 const PayPalIcon = () => (
@@ -20,7 +26,7 @@ const PayPalIcon = () => (
 export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { items, total, subtotal, discount, clearCart, coupon, applyCoupon, removeCoupon } = useCartStore();
+  const { items, subtotal, discount, clearCart, coupon, applyCoupon, removeCoupon } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [couponInput, setCouponInput] = useState("");
@@ -50,9 +56,32 @@ export default function CheckoutPage() {
 
   const [orderCompleted, setOrderCompleted] = useState(false);
 
+  // First purchase discount state
+  const [firstPurchaseDiscount, setFirstPurchaseDiscount] = useState<FirstPurchaseDiscount | null>(null);
+
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Check for first-purchase discount eligibility
+  useEffect(() => {
+    const checkFirstPurchase = async () => {
+      try {
+        const email = formData.email || undefined;
+        const response = await paymentsAPI.checkFirstPurchaseDiscount(email);
+        if (response.data?.data) {
+          setFirstPurchaseDiscount(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error checking first purchase discount:', error);
+        setFirstPurchaseDiscount(null);
+      }
+    };
+
+    if (mounted) {
+      checkFirstPurchase();
+    }
+  }, [mounted, user, formData.email]);
 
   useEffect(() => {
     // Don't redirect if order was just completed
@@ -82,8 +111,19 @@ export default function CheckoutPage() {
     }
   }, [mounted, paypalLoaded]);
 
+  // Calculate first purchase discount amount
+  const firstPurchaseDiscountAmount = firstPurchaseDiscount?.isFirstPurchase
+    ? (subtotal() * (firstPurchaseDiscount.discountPercent / 100))
+    : 0;
+
+  // Total discount (coupon + first purchase)
+  const totalDiscount = discount() + firstPurchaseDiscountAmount;
+
+  // Final total after all discounts
+  const finalTotal = Math.max(0, subtotal() - totalDiscount);
+
   // Check if order is free
-  const isFreeOrder = total() === 0;
+  const isFreeOrder = finalTotal === 0;
 
   // Initialize PayPal buttons for both desktop and mobile
   const initPayPalButton = useCallback(() => {
@@ -110,7 +150,7 @@ export default function CheckoutPage() {
 
           const response = await paymentsAPI.createPayPalOrder({
             items: orderItems,
-            totalAmount: total(),
+            totalAmount: finalTotal,
             currency: 'USD',
             couponCode: coupon?.code,
           });
@@ -176,7 +216,7 @@ export default function CheckoutPage() {
     if (mobileContainer && !mobileContainer.hasChildNodes()) {
       (window as any).paypal.Buttons(buttonConfig).render('#paypal-button-container-mobile');
     }
-  }, [paypalLoaded, items, total, coupon, formData, clearCart, router, isFreeOrder]);
+  }, [paypalLoaded, items, finalTotal, coupon, formData, clearCart, router, isFreeOrder]);
 
   useEffect(() => {
     if (paypalLoaded && !isFreeOrder) {
@@ -313,6 +353,16 @@ export default function CheckoutPage() {
         )}
       </div>
 
+      {/* First Purchase Welcome Banner */}
+      {firstPurchaseDiscount?.isFirstPurchase && (
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 mb-3">
+          <div className="flex items-center gap-2 text-green-700">
+            <Gift className="w-4 h-4" />
+            <span className="text-xs font-bold">🎉 Welcome! {firstPurchaseDiscount.discountPercent}% OFF applied!</span>
+          </div>
+        </div>
+      )}
+
       {/* Totals */}
       <div className="border-t border-gray-100 pt-3 space-y-2">
         <div className="flex justify-between text-sm">
@@ -321,13 +371,19 @@ export default function CheckoutPage() {
         </div>
         {discount() > 0 && (
           <div className="flex justify-between text-sm text-green-600">
-            <span>Discount</span>
+            <span>Coupon ({coupon?.code})</span>
             <span>-{formatPrice(discount())}</span>
+          </div>
+        )}
+        {firstPurchaseDiscountAmount > 0 && (
+          <div className="flex justify-between text-sm text-green-600">
+            <span>Welcome Discount</span>
+            <span>-{formatPrice(firstPurchaseDiscountAmount)}</span>
           </div>
         )}
         <div className="flex justify-between font-bold pt-2 border-t border-gray-100">
           <span>Total</span>
-          <span>{formatPrice(total())}</span>
+          <span>{formatPrice(finalTotal)}</span>
         </div>
       </div>
     </>
@@ -358,7 +414,7 @@ export default function CheckoutPage() {
               <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">{items.length}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold">{formatPrice(total())}</span>
+              <span className="font-bold">{formatPrice(finalTotal)}</span>
               {showOrderSummary ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
             </div>
           </button>
@@ -685,6 +741,23 @@ export default function CheckoutPage() {
                 )}
               </div>
 
+              {/* First Purchase Welcome Banner */}
+              {firstPurchaseDiscount?.isFirstPurchase && (
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-green-800">🎉 Welcome to Digistore1!</p>
+                      <p className="text-sm text-green-700">
+                        Enjoy <span className="font-bold">{firstPurchaseDiscount.discountPercent}% OFF</span> on your first purchase!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Totals */}
               <div className="border-t border-gray-200 pt-4 space-y-2">
                 <div className="flex justify-between text-sm">
@@ -693,8 +766,17 @@ export default function CheckoutPage() {
                 </div>
                 {discount() > 0 && (
                   <div className="flex justify-between text-sm text-green-600">
-                    <span>Discount ({coupon?.code})</span>
+                    <span>Coupon ({coupon?.code})</span>
                     <span>-{formatPrice(discount())}</span>
+                  </div>
+                )}
+                {firstPurchaseDiscountAmount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span className="flex items-center gap-1">
+                      <Gift className="w-3 h-3" />
+                      Welcome Discount ({firstPurchaseDiscount?.discountPercent}%)
+                    </span>
+                    <span>-{formatPrice(firstPurchaseDiscountAmount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
@@ -703,7 +785,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between text-lg font-bold border-t border-gray-200 pt-2">
                   <span>Total</span>
-                  <span className="text-gray-900">{formatPrice(total())}</span>
+                  <span className="text-gray-900">{formatPrice(finalTotal)}</span>
                 </div>
               </div>
             </div>

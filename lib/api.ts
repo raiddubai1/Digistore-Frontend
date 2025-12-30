@@ -299,6 +299,10 @@ export const paymentsAPI = {
 
   // Get available payment methods
   getMethods: () => api.get('/payments/methods'),
+
+  // Check first purchase discount eligibility
+  checkFirstPurchaseDiscount: (email?: string) =>
+    api.get(`/payments/first-purchase-discount${email ? `?email=${encodeURIComponent(email)}` : ''}`),
 };
 
 // ============================================
