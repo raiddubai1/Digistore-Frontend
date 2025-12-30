@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Facebook, Twitter, Instagram, Youtube, Mail, Send, Heart, Sparkles, Gift, Package, Users, Check, Loader2 } from "lucide-react";
+import { Instagram, Youtube, Mail, Send, Heart, Sparkles, Package, Check, Loader2 } from "lucide-react";
 import Logo from "./Logo";
 import toast from "react-hot-toast";
 
@@ -146,22 +146,10 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Features Column */}
+            {/* Support Column */}
             <div>
-              <h3 className="text-lg font-bold mb-6 text-white">Features</h3>
+              <h3 className="text-lg font-bold mb-6 text-white">Support</h3>
               <ul className="space-y-3">
-                <li>
-                  <Link href="/gift-cards" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
-                    <Gift className="w-3.5 h-3.5 text-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity" />
-                    Gift Cards
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/account/referrals" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
-                    <Users className="w-3.5 h-3.5 text-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity" />
-                    Referral Program
-                  </Link>
-                </li>
                 <li>
                   <Link href="/help" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
@@ -170,7 +158,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link href="/contact" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <Mail className="w-3.5 h-3.5 text-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity" />
                     Contact Us
                   </Link>
                 </li>
@@ -179,6 +167,12 @@ export default function Footer() {
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     FAQ
                   </Link>
+                </li>
+                <li>
+                  <a href="mailto:info@digistore1.com" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    info@digistore1.com
+                  </a>
                 </li>
               </ul>
             </div>
@@ -190,19 +184,13 @@ export default function Footer() {
                 <li>
                   <Link href="/terms" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    Terms of Service
+                    Terms & Conditions
                   </Link>
                 </li>
                 <li>
                   <Link href="/privacy" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/licenses" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    License Information
                   </Link>
                 </li>
                 <li>
