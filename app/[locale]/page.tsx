@@ -77,6 +77,16 @@ export default async function Home({ params }: HomeProps) {
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
               {/* Left Column - Content */}
               <div className="text-center lg:text-left space-y-6 lg:space-y-[50px] lg:pt-8">
+              {/* First Purchase Promo Badge */}
+              <div className="flex justify-center lg:justify-start">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border border-green-200 dark:border-green-700 rounded-full shadow-sm animate-pulse">
+                  <Gift className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  <span className="text-sm font-bold text-green-700 dark:text-green-300">
+                    🎉 New here? Get 30% OFF your first purchase!
+                  </span>
+                </div>
+              </div>
+
               {/* Main Heading */}
               <div className="space-y-3 lg:space-y-4">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
