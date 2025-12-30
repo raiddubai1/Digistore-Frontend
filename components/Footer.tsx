@@ -110,7 +110,7 @@ export default function Footer() {
             </div>
 
             {/* Shop Column */}
-            <div>
+            <div className="text-left">
               <h3 className="text-lg font-bold mb-6 text-white">Shop</h3>
               <ul className="space-y-3">
                 <li>
@@ -147,7 +147,7 @@ export default function Footer() {
             </div>
 
             {/* Support Column */}
-            <div>
+            <div className="text-left">
               <h3 className="text-lg font-bold mb-6 text-white">Support</h3>
               <ul className="space-y-3">
                 <li>
@@ -178,7 +178,7 @@ export default function Footer() {
             </div>
 
             {/* Legal Column */}
-            <div>
+            <div className="text-left">
               <h3 className="text-lg font-bold mb-6 text-white">Legal</h3>
               <ul className="space-y-3">
                 <li>
