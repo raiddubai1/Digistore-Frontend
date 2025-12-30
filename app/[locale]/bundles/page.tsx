@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Package, Tag, ChevronLeft, ShoppingCart, Check, Loader2, Sparkles, Zap, Gift, Star } from 'lucide-react';
+import { Package, ChevronLeft, ShoppingCart, Check, Loader2, Sparkles, Zap, Gift, Star, Award } from 'lucide-react';
 import Link from 'next/link';
 import { useCartStore } from '@/store/cartStore';
 import { bundlesAPI } from '@/lib/api';
@@ -138,81 +138,91 @@ export default function BundlesPage() {
               </div>
               <h2 className="text-2xl font-bold text-gray-900">Featured Bundles</h2>
             </div>
-            <div className="grid lg:grid-cols-2 gap-8">
+            <div className="grid lg:grid-cols-1 gap-6">
               {featuredBundles.map((bundle) => (
                 <div
                   key={bundle.id}
-                  className="group bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100"
+                  className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100"
                 >
-                  {/* Bundle Image & Header */}
-                  <div className="relative">
-                    {bundle.image ? (
-                      <div className="aspect-[16/9] overflow-hidden">
-                        <img
-                          src={bundle.image}
-                          alt={bundle.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                      </div>
-                    ) : (
-                      <div className="aspect-[16/9] bg-gradient-to-br from-[#FF6B35] to-[#ff8a7a] flex items-center justify-center">
-                        <Package className="w-16 h-16 text-white/50" />
-                      </div>
-                    )}
-                    <div className="absolute top-4 right-4 bg-white text-[#FF6B35] px-4 py-2 rounded-full text-sm font-bold shadow-lg">
-                      Save {bundle.discount}%
-                    </div>
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="font-bold text-2xl text-white drop-shadow-lg">{bundle.name}</h3>
-                      <p className="text-white/80 text-sm mt-1">{bundle.products.length} premium products</p>
-                    </div>
-                  </div>
-
-                  {/* Bundle Content */}
-                  <div className="p-6">
-                    {bundle.description && (
-                      <p className="text-gray-600 mb-5">{bundle.description}</p>
-                    )}
-
-                    {/* Products Preview */}
-                    <div className="mb-5">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">What&apos;s Included:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {bundle.products.slice(0, 4).map((bp) => (
-                          <div key={bp.id} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
-                            {bp.product.thumbnailUrl && (
-                              <img src={bp.product.thumbnailUrl} alt="" className="w-8 h-8 rounded object-cover" />
-                            )}
-                            <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">{bp.product.title}</span>
-                          </div>
-                        ))}
-                        {bundle.products.length > 4 && (
-                          <div className="flex items-center justify-center bg-gray-100 rounded-lg px-3 py-2">
-                            <span className="text-sm font-medium text-gray-500">+{bundle.products.length - 4} more</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Pricing & CTA */}
-                    <div className="flex items-center justify-between pt-5 border-t border-gray-100">
-                      <div>
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-3xl font-bold text-gray-900">${Number(bundle.bundlePrice).toFixed(2)}</span>
-                          <span className="text-lg text-gray-400 line-through">${Number(bundle.originalPrice).toFixed(2)}</span>
+                  <div className="flex flex-col md:flex-row">
+                    {/* Left: Image */}
+                    <div className="relative md:w-[45%] flex-shrink-0">
+                      {bundle.image ? (
+                        <div className="aspect-[4/3] md:aspect-auto md:h-full overflow-hidden">
+                          <img
+                            src={bundle.image}
+                            alt={bundle.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
                         </div>
-                        <p className="text-green-600 text-sm font-medium mt-1">
-                          You save ${calculateSavings(Number(bundle.originalPrice), Number(bundle.bundlePrice)).toFixed(2)}
+                      ) : (
+                        <div className="aspect-[4/3] md:aspect-auto md:h-full bg-gradient-to-br from-[#FF6B35] to-[#ff8a7a] flex items-center justify-center min-h-[200px]">
+                          <Package className="w-16 h-16 text-white/50" />
+                        </div>
+                      )}
+                      {/* Best Value Badge */}
+                      <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-gradient-to-r from-[#FF6B35] to-[#ff6f61] text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
+                        <Award className="w-3.5 h-3.5" />
+                        Best Value
+                      </div>
+                      {/* Discount Badge */}
+                      <div className="absolute top-3 right-3 bg-white text-[#FF6B35] px-3 py-1.5 rounded-full text-sm font-bold shadow-lg">
+                        Save {bundle.discount}%
+                      </div>
+                    </div>
+
+                    {/* Right: Content */}
+                    <div className="flex-1 p-5 md:p-6 flex flex-col justify-between">
+                      {/* Title & Subtitle */}
+                      <div className="mb-4">
+                        <h3 className="font-bold text-xl md:text-2xl text-gray-900 mb-1">{bundle.name}</h3>
+                        <p className="text-[#FF6B35] font-medium text-sm">
+                          {bundle.products.reduce((total, bp) => {
+                            const match = bp.product.title.match(/(\d+)/);
+                            return total + (match ? parseInt(match[1]) : 150);
+                          }, 0).toLocaleString()}+ Editable Templates
                         </p>
                       </div>
-                      <button
-                        onClick={() => handleAddBundle(bundle)}
-                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#FF6B35] to-[#ff6f61] text-white font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
-                      >
-                        <ShoppingCart className="w-5 h-5" />
-                        Add to Cart
-                      </button>
+
+                      {/* Key Highlights */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 mb-5">
+                        <div className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span className="text-sm text-gray-600">{bundle.products.length} template packs</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span className="text-sm text-gray-600">Editable in Canva</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span className="text-sm text-gray-600">Square & portrait sizes</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span className="text-sm text-gray-600">Instant digital download</span>
+                        </div>
+                      </div>
+
+                      {/* Pricing & CTA */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-gray-100">
+                        <div>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-3xl font-bold text-gray-900">${Number(bundle.bundlePrice).toFixed(2)}</span>
+                            <span className="text-lg text-gray-400 line-through">${Number(bundle.originalPrice).toFixed(2)}</span>
+                          </div>
+                          <p className="text-green-600 text-sm font-semibold">
+                            You save ${calculateSavings(Number(bundle.originalPrice), Number(bundle.bundlePrice)).toFixed(2)}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleAddBundle(bundle)}
+                          className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-[#FF6B35] to-[#ff6f61] text-white font-bold rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+                        >
+                          <ShoppingCart className="w-5 h-5" />
+                          Add to Cart
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
