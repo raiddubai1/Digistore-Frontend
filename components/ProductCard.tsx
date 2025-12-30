@@ -138,7 +138,9 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
         <div className="p-4 lg:p-5 flex flex-col flex-1">
           {/* Category */}
           <div className="text-[10px] lg:text-xs text-gray-600 dark:text-gray-400 font-bold mb-2 uppercase tracking-wider">
-            {product.category}
+            {typeof product.category === 'object' && product.category !== null
+              ? (product.category as { name?: string }).name || 'Uncategorized'
+              : product.category || 'Uncategorized'}
           </div>
 
           {/* Title - Larger on Mobile */}
