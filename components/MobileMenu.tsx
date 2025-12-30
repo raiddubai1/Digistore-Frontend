@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { X, ChevronDown, ChevronRight, Briefcase, Sparkles, Code, Heart, Palette, DollarSign, Flame, Zap, Tag, Globe, Check, LucideIcon, Home, Search, Gift, Package, Users, ExternalLink } from "lucide-react";
+import { X, ChevronDown, Briefcase, Sparkles, Code, Heart, Palette, DollarSign, Flame, Zap, Tag, Globe, Check, LucideIcon, Home, Search, Package, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCategories } from "@/hooks/useCategories";
 import { useMenuItems } from "@/hooks/useMenuItems";
@@ -118,24 +118,6 @@ const demoCategories = [
   },
 ];
 
-const featuredSections = [
-  {
-    title: "Trending Now",
-    icon: Flame,
-    items: ["AI Prompt Engineering", "ChatGPT Mastery", "Passive Income 2024", "TikTok Marketing"],
-  },
-  {
-    title: "New Arrivals",
-    icon: Zap,
-    items: ["Instagram Reels Guide", "Notion Templates", "Canva Pro Designs", "Email Sequences"],
-  },
-  {
-    title: "Deals",
-    icon: Tag,
-    items: ["50% Off Bundles", "Black Friday Deals", "Exclusive Templates", "Premium Courses"],
-  },
-];
-
 const languages = [
   { code: "EN", name: "English", flag: "🇺🇸" },
   { code: "AR", name: "العربية", flag: "🇸🇦" },
@@ -157,7 +139,9 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { menuItems } = useMenuItems();
 
   // Use API categories if available, otherwise use demo categories
-  const categories = apiCategories.length > 0 ? apiCategories.map(cat => ({
+  // Filter to only show parent categories (those without parentId)
+  const parentCategories = apiCategories.filter(cat => !cat.parentId);
+  const categories = parentCategories.length > 0 ? parentCategories.map(cat => ({
     id: cat.slug,
     name: cat.name,
     icon: iconMap[cat.icon || 'briefcase'] || Briefcase,
@@ -342,83 +326,36 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           </div>
 
           {/* Special Features */}
-          <div className="space-y-2 border-t border-gray-200 pt-6 mb-6">
-            <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
+          <div className="space-y-2 border-t border-gray-200 dark:border-slate-700 pt-6 mb-6">
+            <h3 className="px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
               Special
             </h3>
             <Link
               href="/bundles"
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 active:bg-gray-100 dark:active:bg-slate-700 transition-colors"
             >
               <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#ff6f61] to-[#ff8a7a] flex items-center justify-center">
                 <Package className="w-5 h-5 text-white" />
               </div>
               <div>
-                <span className="text-base font-medium text-gray-900">Product Bundles</span>
-                <p className="text-xs text-gray-500">Save more when you buy together</p>
+                <span className="text-base font-medium text-gray-900 dark:text-white">Product Bundles</span>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Save more when you buy together</p>
               </div>
             </Link>
             <Link
-              href="/gift-cards"
+              href="/deals"
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 active:bg-gray-100 dark:active:bg-slate-700 transition-colors"
             >
               <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center">
-                <Gift className="w-5 h-5 text-white" />
+                <Tag className="w-5 h-5 text-white" />
               </div>
               <div>
-                <span className="text-base font-medium text-gray-900">Gift Cards</span>
-                <p className="text-xs text-gray-500">Give the gift of digital products</p>
+                <span className="text-base font-medium text-gray-900 dark:text-white">Hot Deals</span>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Special offers and discounts</p>
               </div>
             </Link>
-            <Link
-              href="/account/referrals"
-              onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors"
-            >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
-                <Users className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <span className="text-base font-medium text-gray-900">Referral Program</span>
-                <p className="text-xs text-gray-500">Earn 10% on every referral</p>
-              </div>
-            </Link>
-          </div>
-
-          {/* Featured Sections */}
-          <div className="space-y-6 border-t border-gray-200 pt-6">
-            <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-              Featured
-            </h3>
-            {featuredSections.map((section) => {
-              const SectionIcon = section.icon;
-              return (
-                <div key={section.title}>
-                  <h4 className="flex items-center gap-2 px-3 text-sm font-semibold text-[#0A3D62] mb-2">
-                    <SectionIcon className="w-4 h-4" strokeWidth={1.5} />
-                    {section.title}
-                  </h4>
-                  <ul className="space-y-1">
-                    {section.items.map((item) => (
-                      <li key={item}>
-                        <Link
-                          href={`/products?search=${item}`}
-                          onClick={onClose}
-                          className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors group"
-                        >
-                          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" />
-                          <span className="text-sm text-gray-700 group-hover:text-gray-900">
-                            {item}
-                          </span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
           </div>
 
           {/* Language Switcher - Dropdown */}
