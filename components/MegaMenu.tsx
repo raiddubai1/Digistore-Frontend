@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
-  ChevronDown, TrendingUp, Sparkles, Clock, Tag, Home, Briefcase, Code,
+  ChevronDown, Sparkles, Tag, Home, Briefcase, Code,
   Heart, Palette, DollarSign, ArrowRight, Flame, Zap, Menu,
-  LucideIcon, Star, Gift, Rocket, Package, Users, ExternalLink
+  LucideIcon, Star, Gift, Rocket, Package, Users
 } from "lucide-react";
 import { useCategories } from "@/hooks/useCategories";
 import { useMenuItems } from "@/hooks/useMenuItems";
@@ -22,102 +21,67 @@ const iconMap: Record<string, LucideIcon> = {
   user: Sparkles,
   'paw-print': Heart,
   home: Home,
+  gift: Gift,
+  star: Star,
+  rocket: Rocket,
+  package: Package,
+  users: Users,
+  flame: Flame,
+  zap: Zap,
+  tag: Tag,
 };
 
-const demoCategories = [
-  {
-    id: "business",
-    name: "Business & Marketing",
-    icon: Briefcase,
-    color: "bg-[#ff6f61]",
-    subcategories: [
-      { name: "Digital Marketing", count: 234 },
-      { name: "Social Media", count: 189 },
-      { name: "Email Marketing", count: 156 },
-      { name: "SEO & SEM", count: 142 },
-      { name: "Content Marketing", count: 128 },
-      { name: "E-commerce", count: 176 },
-    ],
-  },
-  {
-    id: "personal",
-    name: "Personal Development",
-    icon: Sparkles,
-    color: "bg-pink-500",
-    subcategories: [
-      { name: "Productivity", count: 167 },
-      { name: "Time Management", count: 134 },
-      { name: "Goal Setting", count: 112 },
-      { name: "Mindfulness", count: 98 },
-      { name: "Self-Improvement", count: 203 },
-      { name: "Leadership", count: 145 },
-    ],
-  },
-  {
-    id: "technology",
-    name: "Technology",
-    icon: Code,
-    color: "bg-emerald-500",
-    subcategories: [
-      { name: "Programming", count: 312 },
-      { name: "Web Development", count: 289 },
-      { name: "Mobile Apps", count: 178 },
-      { name: "Data Science", count: 156 },
-      { name: "AI & ML", count: 134 },
-      { name: "Cybersecurity", count: 98 },
-    ],
-  },
-  {
-    id: "health",
-    name: "Health & Fitness",
-    icon: Heart,
-    color: "bg-orange-500",
-    subcategories: [
-      { name: "Workout Plans", count: 198 },
-      { name: "Nutrition Guides", count: 167 },
-      { name: "Weight Loss", count: 234 },
-      { name: "Yoga & Meditation", count: 145 },
-      { name: "Mental Health", count: 178 },
-      { name: "Healthy Recipes", count: 203 },
-    ],
-  },
-  {
-    id: "creative",
-    name: "Creative Arts",
-    icon: Palette,
-    color: "bg-rose-500",
-    subcategories: [
-      { name: "Graphic Design", count: 245 },
-      { name: "Photography", count: 198 },
-      { name: "Video Editing", count: 167 },
-      { name: "Music Production", count: 134 },
-      { name: "Writing & Blogging", count: 289 },
-      { name: "UI/UX Design", count: 178 },
-    ],
-  },
-  {
-    id: "finance",
-    name: "Finance & Investing",
-    icon: DollarSign,
-    color: "bg-amber-500",
-    subcategories: [
-      { name: "Stock Trading", count: 189 },
-      { name: "Cryptocurrency", count: 234 },
-      { name: "Real Estate", count: 156 },
-      { name: "Personal Finance", count: 203 },
-      { name: "Budgeting", count: 145 },
-      { name: "Retirement Planning", count: 112 },
-    ],
-  },
+// Color palette for categories
+const categoryColors = [
+  "bg-[#ff6f61]",
+  "bg-pink-500",
+  "bg-emerald-500",
+  "bg-orange-500",
+  "bg-rose-500",
+  "bg-amber-500",
+  "bg-blue-500",
+  "bg-purple-500",
+  "bg-teal-500",
+  "bg-indigo-500",
 ];
 
+// Type for mega menu category display
+interface MegaMenuCategory {
+  id: string;
+  name: string;
+  slug: string;
+  icon: LucideIcon;
+  color: string;
+  subcategories: { name: string; slug: string; count: number }[];
+}
+
 export default function MegaMenu() {
-  const pathname = usePathname();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   // Fetch dynamic menu items from settings
   const { menuItems } = useMenuItems();
+
+  // Fetch categories from API
+  const { categories: apiCategories } = useCategories();
+
+  // Transform API categories to mega menu format
+  const categories: MegaMenuCategory[] = apiCategories
+    .filter(cat => !cat.parentId) // Only parent categories
+    .map((cat, index) => ({
+      id: cat.id,
+      name: cat.name,
+      slug: cat.slug,
+      icon: iconMap[cat.icon || 'briefcase'] || Briefcase,
+      color: categoryColors[index % categoryColors.length],
+      subcategories: apiCategories
+        .filter(child => child.parentId === cat.id)
+        .map(child => ({
+          name: child.name,
+          slug: child.slug,
+          count: child._count?.products || 0,
+        })),
+    }));
 
   const handleMouseEnter = (categoryId: string) => {
     setActiveCategory(categoryId);
@@ -129,7 +93,7 @@ export default function MegaMenu() {
     setIsOpen(false);
   };
 
-  const activeCategoryData = demoCategories.find(cat => cat.id === activeCategory);
+  const activeCategoryData = categories.find(cat => cat.id === activeCategory);
 
   return (
     <div
@@ -144,7 +108,7 @@ export default function MegaMenu() {
               {/* Categories Dropdown Trigger - First Item */}
               <div className="relative">
                 <button
-                  onMouseEnter={() => handleMouseEnter(demoCategories[0].id)}
+                  onMouseEnter={() => categories.length > 0 && handleMouseEnter(categories[0].id)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                     isOpen
                       ? 'bg-gray-100 text-gray-900'
@@ -211,7 +175,7 @@ export default function MegaMenu() {
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 px-3">
                   All Categories
                 </h3>
-                {demoCategories.map((category) => {
+                {categories.map((category) => {
                   const Icon = category.icon;
                   return (
                     <button
@@ -254,28 +218,35 @@ export default function MegaMenu() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4">
-                    {activeCategoryData.subcategories.map((sub) => (
-                      <Link
-                        key={sub.name}
-                        href={`/products?category=${activeCategoryData.id}&subcategory=${sub.name}`}
-                        className="group p-4 rounded-xl border-2 border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-all"
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-semibold text-gray-900 group-hover:text-gray-500">
-                            {sub.name}
-                          </h4>
-                          <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-500 group-hover:translate-x-1 transition-all" />
-                        </div>
-                        <p className="text-xs text-gray-500">{sub.count} products</p>
-                      </Link>
-                    ))}
-                  </div>
+                  {activeCategoryData.subcategories.length > 0 ? (
+                    <div className="grid grid-cols-3 gap-4">
+                      {activeCategoryData.subcategories.map((sub) => (
+                        <Link
+                          key={sub.slug}
+                          href={`/products?category=${sub.slug}`}
+                          className="group p-4 rounded-xl border-2 border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-all"
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="text-sm font-semibold text-gray-900 group-hover:text-gray-500">
+                              {sub.name}
+                            </h4>
+                            <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-500 group-hover:translate-x-1 transition-all" />
+                          </div>
+                          <p className="text-xs text-gray-500">{sub.count} products</p>
+                        </Link>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>No subcategories available</p>
+                      <p className="text-sm mt-1">Browse all products in this category</p>
+                    </div>
+                  )}
 
                   {/* View All Link */}
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <Link
-                      href={`/products?category=${activeCategoryData.id}`}
+                      href={`/products?category=${activeCategoryData.slug}`}
                       className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-gray-200 transition-all group"
                     >
                       View All {activeCategoryData.name}
