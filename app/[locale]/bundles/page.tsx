@@ -177,10 +177,7 @@ export default function BundlesPage() {
                       <div className="mb-4">
                         <h3 className="font-bold text-xl md:text-2xl text-gray-900 mb-1">{bundle.name}</h3>
                         <p className="text-[#FF6B35] font-medium text-sm">
-                          {bundle.products.reduce((total, bp) => {
-                            const match = bp.product.title.match(/(\d+)/);
-                            return total + (match ? parseInt(match[1]) : 150);
-                          }, 0).toLocaleString()}+ Editable Templates
+                          {(bundle.products.length * 150).toLocaleString()} Editable Templates
                         </p>
                       </div>
 
