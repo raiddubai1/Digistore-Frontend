@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { Clock, ArrowRight } from "lucide-react";
 
 export default function OfferOfTheDay() {
+  const params = useParams();
+  const locale = params?.locale || 'en';
   const [timeLeft, setTimeLeft] = useState({
     hours: 0,
     minutes: 0,
@@ -62,7 +65,7 @@ export default function OfferOfTheDay() {
               Get up to <span className="font-bold text-2xl">70% OFF</span> on selected digital products. Don't miss out!
             </p>
             <Link
-              href="/products?filter=deals"
+              href={`/${locale}/deals`}
               className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#ff6f61] rounded-full font-semibold hover:shadow-2xl transition-all hover:scale-105 text-base"
             >
               Shop Now

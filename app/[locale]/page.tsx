@@ -308,11 +308,11 @@ export default async function Home({ params }: HomeProps) {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="space-y-2">
-              <div className="text-4xl md:text-5xl font-black text-white">40K+</div>
-              <div className="text-gray-100 font-medium text-sm md:text-base">Digital Products</div>
+              <div className="text-4xl md:text-5xl font-black text-white">100%</div>
+              <div className="text-gray-100 font-medium text-sm md:text-base">Editable Templates</div>
             </div>
             <div className="space-y-2">
-              <div className="text-4xl md:text-5xl font-black text-white">50K+</div>
+              <div className="text-4xl md:text-5xl font-black text-white">5K+</div>
               <div className="text-gray-100 font-medium text-sm md:text-base">Happy Customers</div>
             </div>
             <div className="space-y-2">
@@ -351,7 +351,7 @@ export default async function Home({ params }: HomeProps) {
 
             {/* Products Grid */}
             <div className="grid grid-cols-3 gap-8 mb-12">
-              {featuredProducts.map((product) => (
+              {featuredProducts.slice(0, 6).map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
@@ -397,7 +397,7 @@ export default async function Home({ params }: HomeProps) {
 
             {/* Products Grid */}
             <div className="grid grid-cols-3 gap-8">
-              {bestsellerProducts.map((product) => (
+              {bestsellerProducts.slice(0, 6).map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
@@ -431,7 +431,7 @@ export default async function Home({ params }: HomeProps) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {newProducts.map((product) => (
+              {newProducts.slice(0, 6).map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
@@ -466,7 +466,7 @@ export default async function Home({ params }: HomeProps) {
                 Ready to Transform Your Digital Journey?
               </h2>
               <p className="text-lg text-gray-100">
-                Join thousands of satisfied customers and download your first digital product today. Get 30% OFF on your first purchase!
+                Join thousands of satisfied customers and download your first digital product today. Check out our exclusive deals!
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
