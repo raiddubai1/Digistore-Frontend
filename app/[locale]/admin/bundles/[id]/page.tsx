@@ -145,9 +145,11 @@ export default function EditBundlePage({ params }: { params: Promise<{ id: strin
     try {
       setUploadingImage(true);
       const response = await uploadAPI.uploadImage(file);
-      if (response.data?.success && response.data?.url) {
-        setFormData(prev => ({ ...prev, image: response.data.url }));
+      if (response.data?.success && response.data?.data?.url) {
+        setFormData(prev => ({ ...prev, image: response.data.data.url }));
         toast.success('Image uploaded!');
+      } else {
+        toast.error('Upload failed - no URL returned');
       }
     } catch (error) {
       toast.error('Failed to upload image');

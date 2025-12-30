@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Package, Tag, ChevronLeft, ShoppingCart, Check, Loader2 } from 'lucide-react';
+import { Package, Tag, ChevronLeft, ShoppingCart, Check, Loader2, Sparkles, Zap, Gift, Star } from 'lucide-react';
 import Link from 'next/link';
 import { useCartStore } from '@/store/cartStore';
 import { bundlesAPI } from '@/lib/api';
@@ -103,88 +103,115 @@ export default function BundlesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24 lg:pb-12">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-black to-gray-800 text-white">
-        <div className="max-w-6xl mx-auto px-4 py-8 lg:py-12">
-          <div className="flex items-center gap-3 lg:hidden mb-4">
-            <Link href="/" className="p-1">
-              <ChevronLeft className="w-6 h-6" />
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-24 lg:pb-12">
+      {/* Hero Header */}
+      <div className="relative bg-gradient-to-br from-[#FF6B35] via-[#ff6f61] to-[#ff8a7a] text-white overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, white 2px, transparent 2px), radial-gradient(circle at 75% 75%, white 2px, transparent 2px)', backgroundSize: '50px 50px' }}></div>
+        </div>
+        <div className="max-w-6xl mx-auto px-4 py-12 lg:py-16 relative">
+          <div className="flex items-center gap-3 lg:hidden mb-6">
+            <Link href="/" className="p-2 bg-white/20 rounded-full backdrop-blur-sm hover:bg-white/30 transition-colors">
+              <ChevronLeft className="w-5 h-5" />
             </Link>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-[#ff6f61] rounded-2xl flex items-center justify-center">
-              <Package className="w-8 h-8 text-white" />
+          <div className="text-center max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-medium">Save up to 50% on bundles</span>
             </div>
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-bold">Product Bundles</h1>
-              <p className="text-gray-300">Save more when you buy together</p>
-            </div>
+            <h1 className="text-3xl lg:text-5xl font-bold mb-4">Premium Product Bundles</h1>
+            <p className="text-white/90 text-lg">
+              Get more value with our carefully curated bundles. Save big when you buy together!
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-6 space-y-8">
+      <div className="max-w-6xl mx-auto px-4 py-8 space-y-12">
         {/* Featured Bundles */}
         {featuredBundles.length > 0 && (
           <section>
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Tag className="w-5 h-5 text-[#ff6f61]" />
-              Featured Bundles
-            </h2>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-gradient-to-br from-[#FF6B35] to-[#ff6f61] rounded-xl">
+                <Star className="w-5 h-5 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">Featured Bundles</h2>
+            </div>
+            <div className="grid lg:grid-cols-2 gap-8">
               {featuredBundles.map((bundle) => (
                 <div
                   key={bundle.id}
-                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow"
+                  className="group bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100"
                 >
-                  {/* Bundle Header */}
-                  <div className="bg-gradient-to-r from-[#ff6f61] to-[#ff8a7a] p-4 text-white">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-bold text-lg">{bundle.name}</h3>
-                        <p className="text-white/80 text-sm mt-1">{bundle.products.length} products</p>
+                  {/* Bundle Image & Header */}
+                  <div className="relative">
+                    {bundle.image ? (
+                      <div className="aspect-[16/9] overflow-hidden">
+                        <img
+                          src={bundle.image}
+                          alt={bundle.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                       </div>
-                      <div className="bg-white text-[#ff6f61] px-3 py-1 rounded-full text-sm font-bold">
-                        Save {bundle.discount}%
+                    ) : (
+                      <div className="aspect-[16/9] bg-gradient-to-br from-[#FF6B35] to-[#ff8a7a] flex items-center justify-center">
+                        <Package className="w-16 h-16 text-white/50" />
                       </div>
+                    )}
+                    <div className="absolute top-4 right-4 bg-white text-[#FF6B35] px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+                      Save {bundle.discount}%
+                    </div>
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="font-bold text-2xl text-white drop-shadow-lg">{bundle.name}</h3>
+                      <p className="text-white/80 text-sm mt-1">{bundle.products.length} premium products</p>
                     </div>
                   </div>
 
-                  {/* Products List */}
-                  <div className="p-4">
-                    <p className="text-gray-600 text-sm mb-4">{bundle.description}</p>
-                    <div className="space-y-2 mb-4">
-                      {bundle.products.map((bp) => (
-                        <div key={bp.id} className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            <Check className="w-4 h-4 text-green-500" />
-                            <span>{bp.product.title}</span>
+                  {/* Bundle Content */}
+                  <div className="p-6">
+                    {bundle.description && (
+                      <p className="text-gray-600 mb-5">{bundle.description}</p>
+                    )}
+
+                    {/* Products Preview */}
+                    <div className="mb-5">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">What&apos;s Included:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {bundle.products.slice(0, 4).map((bp) => (
+                          <div key={bp.id} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                            {bp.product.thumbnailUrl && (
+                              <img src={bp.product.thumbnailUrl} alt="" className="w-8 h-8 rounded object-cover" />
+                            )}
+                            <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">{bp.product.title}</span>
                           </div>
-                          <span className="text-gray-400 line-through">${Number(bp.product.price).toFixed(2)}</span>
-                        </div>
-                      ))}
+                        ))}
+                        {bundle.products.length > 4 && (
+                          <div className="flex items-center justify-center bg-gray-100 rounded-lg px-3 py-2">
+                            <span className="text-sm font-medium text-gray-500">+{bundle.products.length - 4} more</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    {/* Pricing */}
-                    <div className="border-t border-gray-100 pt-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div>
-                          <span className="text-gray-400 line-through text-sm">
-                            ${Number(bundle.originalPrice).toFixed(2)}
-                          </span>
-                          <span className="text-2xl font-bold ml-2">${Number(bundle.bundlePrice).toFixed(2)}</span>
+                    {/* Pricing & CTA */}
+                    <div className="flex items-center justify-between pt-5 border-t border-gray-100">
+                      <div>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-3xl font-bold text-gray-900">${Number(bundle.bundlePrice).toFixed(2)}</span>
+                          <span className="text-lg text-gray-400 line-through">${Number(bundle.originalPrice).toFixed(2)}</span>
                         </div>
-                        <span className="text-green-600 font-medium">
-                          Save ${calculateSavings(Number(bundle.originalPrice), Number(bundle.bundlePrice)).toFixed(2)}
-                        </span>
+                        <p className="text-green-600 text-sm font-medium mt-1">
+                          You save ${calculateSavings(Number(bundle.originalPrice), Number(bundle.bundlePrice)).toFixed(2)}
+                        </p>
                       </div>
                       <button
                         onClick={() => handleAddBundle(bundle)}
-                        className="w-full py-3 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#FF6B35] to-[#ff6f61] text-white font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
                       >
                         <ShoppingCart className="w-5 h-5" />
-                        Add Bundle to Cart
+                        Add to Cart
                       </button>
                     </div>
                   </div>
@@ -197,33 +224,75 @@ export default function BundlesPage() {
         {/* Other Bundles */}
         {otherBundles.length > 0 && (
           <section>
-            <h2 className="text-xl font-bold mb-4">More Bundles</h2>
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-gray-100 rounded-xl">
+                <Gift className="w-5 h-5 text-gray-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">More Bundles</h2>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {otherBundles.map((bundle) => (
                 <div
                   key={bundle.id}
-                  className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
+                  className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-semibold">{bundle.name}</h3>
-                    <span className="bg-[#ff6f61]/10 text-[#ff6f61] px-2 py-0.5 rounded text-xs font-bold">
+                  {/* Image */}
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    {bundle.image ? (
+                      <img
+                        src={bundle.image}
+                        alt={bundle.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                        <Package className="w-12 h-12 text-gray-300" />
+                      </div>
+                    )}
+                    <div className="absolute top-3 right-3 bg-[#FF6B35] text-white px-3 py-1 rounded-full text-xs font-bold">
                       -{bundle.discount}%
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-500 mb-3">{bundle.products.length} products included</p>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-gray-400 line-through text-sm">
-                        ${Number(bundle.originalPrice).toFixed(2)}
-                      </span>
-                      <span className="font-bold ml-1">${Number(bundle.bundlePrice).toFixed(2)}</span>
                     </div>
-                    <button
-                      onClick={() => handleAddBundle(bundle)}
-                      className="p-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                    </button>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-5">
+                    <h3 className="font-bold text-lg text-gray-900 mb-1">{bundle.name}</h3>
+                    <p className="text-sm text-gray-500 mb-4">{bundle.products.length} products included</p>
+
+                    {/* Product thumbnails */}
+                    <div className="flex -space-x-2 mb-4">
+                      {bundle.products.slice(0, 4).map((bp, idx) => (
+                        <div
+                          key={bp.id}
+                          className="w-8 h-8 rounded-full border-2 border-white overflow-hidden bg-gray-100"
+                          style={{ zIndex: 4 - idx }}
+                        >
+                          {bp.product.thumbnailUrl ? (
+                            <img src={bp.product.thumbnailUrl} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full bg-gray-200" />
+                          )}
+                        </div>
+                      ))}
+                      {bundle.products.length > 4 && (
+                        <div className="w-8 h-8 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-500">
+                          +{bundle.products.length - 4}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-gray-400 line-through text-sm">${Number(bundle.originalPrice).toFixed(2)}</span>
+                        <span className="text-xl font-bold text-gray-900 ml-2">${Number(bundle.bundlePrice).toFixed(2)}</span>
+                      </div>
+                      <button
+                        onClick={() => handleAddBundle(bundle)}
+                        className="p-3 bg-gray-900 text-white rounded-xl hover:bg-[#FF6B35] transition-colors"
+                      >
+                        <ShoppingCart className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -233,31 +302,42 @@ export default function BundlesPage() {
 
         {/* Empty State */}
         {bundles.length === 0 && (
-          <div className="text-center py-12">
-            <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">No Bundles Available</h3>
-            <p className="text-gray-500">Check back later for special bundle deals!</p>
+          <div className="text-center py-16">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Package className="w-12 h-12 text-gray-300" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-700 mb-3">No Bundles Available</h3>
+            <p className="text-gray-500 max-w-md mx-auto">Check back later for amazing bundle deals and save big on curated product collections!</p>
           </div>
         )}
 
-        {/* Info Section */}
-        <div className="bg-gray-100 rounded-xl p-6">
-          <h3 className="font-semibold mb-3">Why Buy Bundles?</h3>
-          <div className="grid md:grid-cols-3 gap-4 text-sm">
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-              <span className="text-gray-600">Save up to 40% compared to buying individually</span>
+        {/* Benefits Section */}
+        <section className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 lg:p-12 text-white">
+          <h3 className="text-2xl font-bold mb-8 text-center">Why Buy Bundles?</h3>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-[#FF6B35] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-8 h-8" />
+              </div>
+              <h4 className="font-semibold text-lg mb-2">Save Up to 50%</h4>
+              <p className="text-gray-400">Massive discounts compared to buying products individually</p>
             </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-              <span className="text-gray-600">Curated collections for specific goals</span>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-[#FF6B35] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Gift className="w-8 h-8" />
+              </div>
+              <h4 className="font-semibold text-lg mb-2">Curated Collections</h4>
+              <p className="text-gray-400">Expertly selected products that work perfectly together</p>
             </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-              <span className="text-gray-600">Instant access to all products in the bundle</span>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-[#FF6B35] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="w-8 h-8" />
+              </div>
+              <h4 className="font-semibold text-lg mb-2">Instant Access</h4>
+              <p className="text-gray-400">Download all products immediately after purchase</p>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
