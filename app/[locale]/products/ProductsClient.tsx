@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
@@ -73,6 +73,13 @@ const categoryConfig: { [key: string]: { emoji: string; bgColor: string } } = {
 
 export default function ProductsClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Read URL parameters
+  const urlCategory = searchParams.get('category');
+  const urlSort = searchParams.get('sort');
+  const urlFilter = searchParams.get('filter');
+
   const [allProducts, setAllProducts] = useState<Product[]>(demoProducts || []);
   const [products, setProducts] = useState<Product[]>(demoProducts || []);
   const [categories, setCategories] = useState<any[]>(demoCategories || []);
@@ -91,6 +98,7 @@ export default function ProductsClient() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string>("popular");
   const hasFetched = useRef(false);
+  const hasAppliedUrlParams = useRef(false);
 
   // Attributes state
   const [attributes, setAttributes] = useState<Attribute[]>([]);
@@ -171,6 +179,56 @@ export default function ProductsClient() {
 
     fetchProducts();
   }, []);
+
+  // Apply URL parameters after data is loaded
+  useEffect(() => {
+    if (loading || hasAppliedUrlParams.current) return;
+    if (!urlCategory && !urlSort && !urlFilter) return;
+
+    hasAppliedUrlParams.current = true;
+
+    // Apply category filter from URL
+    if (urlCategory) {
+      // Check if it's a parent category or subcategory
+      const category = categories.find(c => c.slug === urlCategory);
+      if (category) {
+        if (category.parentId) {
+          // It's a subcategory - also select parent
+          const parent = categories.find(c => c.id === category.parentId);
+          if (parent) {
+            setSelectedCategories([parent.slug]);
+          }
+          setSelectedSubcategories([urlCategory]);
+        } else {
+          // It's a parent category
+          setSelectedCategories([urlCategory]);
+        }
+      }
+    }
+
+    // Apply sort from URL
+    if (urlSort) {
+      const sortMap: Record<string, string> = {
+        'newest': 'newest',
+        'bestselling': 'downloads',
+        'bestsellers': 'downloads',
+        'price-low': 'price-low',
+        'price-high': 'price-high',
+        'rating': 'rating',
+        'popular': 'popular',
+      };
+      setSortBy(sortMap[urlSort] || 'popular');
+    }
+
+    // Apply filter from URL (bestsellers, new, etc.)
+    if (urlFilter) {
+      if (urlFilter === 'bestsellers') {
+        setSortBy('downloads');
+      } else if (urlFilter === 'new') {
+        setSortBy('newest');
+      }
+    }
+  }, [loading, urlCategory, urlSort, urlFilter, categories]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
