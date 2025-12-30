@@ -55,6 +55,7 @@ interface Product {
   price: number;
   originalPrice?: number;
   categoryId?: string;
+  categoryIds?: string[];
   category?: { id: string; name: string; slug: string } | string;
   subcategory?: string;
   tags?: string[];
@@ -191,7 +192,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     shortDescription: "",
     price: 0,
     originalPrice: 0,
-    categoryId: "",
+    categoryIds: [] as string[], // Multiple categories (up to 3)
     subcategory: "",
     tags: [] as string[],
     fileType: "",
@@ -237,13 +238,18 @@ export default function EditProductPage({ params }: EditProductPageProps) {
         if (response.data?.success && response.data?.data) {
           const p = response.data.data.product || response.data.data;
           setProduct(p);
+          // Build categoryIds from existing data
+          const primaryCatId = p.categoryId || (typeof p.category === 'object' ? p.category?.id : "") || "";
+          const existingCategoryIds = p.categoryIds && p.categoryIds.length > 0
+            ? p.categoryIds
+            : (primaryCatId ? [primaryCatId] : []);
           setFormData({
             title: p.title || "",
             description: p.description || "",
             shortDescription: p.shortDescription || "",
             price: p.price || 0,
             originalPrice: p.originalPrice || 0,
-            categoryId: p.categoryId || (typeof p.category === 'object' ? p.category?.id : "") || "",
+            categoryIds: existingCategoryIds,
             subcategory: p.subcategory || "",
             tags: p.tags || [],
             fileType: p.fileType || "",
@@ -507,7 +513,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
         shortDescription: formData.shortDescription || null,
         price: formData.price,
         originalPrice: formData.originalPrice || null,
-        categoryId: formData.categoryId,
+        categoryId: formData.categoryIds[0], // Primary category
+        categoryIds: formData.categoryIds, // All selected categories
         subcategory: formData.subcategory || null,
         tags: formData.tags || [],
         featured: formData.featured || false,
@@ -851,25 +858,72 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           <div className="lg:col-span-1 space-y-6">
             {/* Category */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold mb-4">Category</h2>
+              <h2 className="text-lg font-bold mb-4">Categories <span className="text-sm font-normal text-gray-500">(up to 3)</span></h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                  <select value={formData.categoryId}
-                    onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary font-mono text-sm">
-                    <option value="">Select category...</option>
-                    {flatCategories.map((cat) => (
-                      <option
-                        key={cat.id}
-                        value={cat.id}
-                        className={cat.level === 0 ? 'font-bold' : ''}
-                        style={{ paddingLeft: cat.level * 12 }}
-                      >
-                        {cat.displayName}
-                      </option>
-                    ))}
-                  </select>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Select Categories</label>
+                  {/* Selected categories display */}
+                  {formData.categoryIds.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {formData.categoryIds.map((catId, index) => {
+                        const cat = flatCategories.find(c => c.id === catId);
+                        return (
+                          <span
+                            key={catId}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-sm"
+                          >
+                            {index === 0 && <span className="text-xs bg-primary text-white px-1.5 py-0.5 rounded mr-1">Primary</span>}
+                            {cat?.name || catId}
+                            <button
+                              type="button"
+                              onClick={() => setFormData({
+                                ...formData,
+                                categoryIds: formData.categoryIds.filter(id => id !== catId)
+                              })}
+                              className="ml-1 text-primary hover:text-primary/70"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+                  {/* Category selector */}
+                  {formData.categoryIds.length < 3 && (
+                    <select
+                      value=""
+                      onChange={(e) => {
+                        if (e.target.value && !formData.categoryIds.includes(e.target.value)) {
+                          setFormData({
+                            ...formData,
+                            categoryIds: [...formData.categoryIds, e.target.value]
+                          });
+                        }
+                      }}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary font-mono text-sm"
+                    >
+                      <option value="">{formData.categoryIds.length === 0 ? 'Select a category' : 'Add another category...'}</option>
+                      {flatCategories
+                        .filter(cat => !formData.categoryIds.includes(cat.id))
+                        .map((cat) => (
+                          <option
+                            key={cat.id}
+                            value={cat.id}
+                            className={cat.level === 0 ? 'font-bold' : ''}
+                            style={{ paddingLeft: cat.level * 12 }}
+                          >
+                            {cat.displayName}
+                          </option>
+                        ))}
+                    </select>
+                  )}
+                  {formData.categoryIds.length === 0 && (
+                    <p className="text-xs text-red-500 mt-1">At least one category is required</p>
+                  )}
+                  {formData.categoryIds.length === 3 && (
+                    <p className="text-xs text-gray-500 mt-1">Maximum 3 categories reached</p>
+                  )}
                 </div>
               </div>
             </div>
