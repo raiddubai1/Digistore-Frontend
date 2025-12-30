@@ -48,6 +48,7 @@ export default function ProductDetailClient({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showLightbox, setShowLightbox] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   const isWishlisted = mounted ? isInWishlist(product.id) : false;
@@ -134,7 +135,10 @@ export default function ProductDetailClient({
       <div className="lg:hidden min-h-screen bg-white pb-24">
         {/* Image Carousel - Full width, edge to edge, with overlaid buttons */}
         <div className="relative">
-          <div className="aspect-[4/3] bg-gray-100">
+          <div
+            className="aspect-[4/3] bg-gray-100 cursor-zoom-in"
+            onClick={() => setShowLightbox(true)}
+          >
             <img
               src={getProductImageUrl(images[currentImageIndex])}
               alt={product.title}
@@ -541,7 +545,10 @@ export default function ProductDetailClient({
             <div>
               <div className="sticky top-24">
                 {/* Main Image */}
-                <div className="aspect-[4/3] bg-gray-100 rounded-2xl overflow-hidden mb-4">
+                <div
+                  className="aspect-[4/3] bg-gray-100 rounded-2xl overflow-hidden mb-4 cursor-zoom-in"
+                  onClick={() => setShowLightbox(true)}
+                >
                   <img
                     src={getProductImageUrl(images[currentImageIndex])}
                     alt={product.title}
@@ -887,6 +894,65 @@ export default function ProductDetailClient({
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Image Lightbox Modal */}
+      {showLightbox && (
+        <div
+          className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center"
+          onClick={() => setShowLightbox(false)}
+        >
+          {/* Close Button */}
+          <button
+            onClick={() => setShowLightbox(false)}
+            className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
+
+          {/* Navigation Arrows */}
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+                }}
+                className="absolute left-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+              >
+                <ChevronLeft className="w-6 h-6 text-white" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+                }}
+                className="absolute right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+              >
+                <ChevronRight className="w-6 h-6 text-white" />
+              </button>
+            </>
+          )}
+
+          {/* Full Image */}
+          <div
+            className="max-w-[90vw] max-h-[90vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={images[currentImageIndex]}
+              alt={product.title}
+              className="max-w-full max-h-[90vh] object-contain"
+            />
+          </div>
+
+          {/* Image Counter */}
+          {images.length > 1 && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/50 px-4 py-2 rounded-full text-white text-sm">
+              {currentImageIndex + 1} / {images.length}
+            </div>
+          )}
         </div>
       )}
     </>
