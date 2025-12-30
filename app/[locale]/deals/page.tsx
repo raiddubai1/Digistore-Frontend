@@ -136,42 +136,10 @@ export default async function DealsPage({ params }: DealsPageProps) {
       {/* Desktop Layout */}
       <div className="hidden lg:block min-h-screen bg-gray-50 dark:bg-slate-900 py-12">
         <div className="max-w-7xl mx-auto px-8">
-          {/* Hero Banner */}
-          <div className="bg-gradient-to-r from-[#FF6B35] via-orange-500 to-red-500 rounded-3xl p-12 mb-12 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-10"></div>
-            <div className="relative z-10 flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <Zap className="w-8 h-8 text-yellow-300" />
-                  <span className="text-yellow-300 font-bold text-xl">FLASH SALE</span>
-                </div>
-                <h1 className="text-5xl font-bold text-white mb-4">Up to 50% OFF</h1>
-                <p className="text-white/80 text-xl mb-6">On Premium Digital Products</p>
-                <Link
-                  href={`/${locale}/products?sort=discount`}
-                  className="inline-flex items-center gap-2 bg-white text-[#FF6B35] px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition-colors"
-                >
-                  Shop Now <ArrowRight className="w-5 h-5" />
-                </Link>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
-                <p className="text-white/80 text-sm mb-3">Sale Ends In:</p>
-                <div className="flex gap-3">
-                  <div className="bg-white text-[#FF6B35] px-4 py-3 rounded-xl text-center min-w-[60px]">
-                    <span className="text-3xl font-bold">12</span>
-                    <p className="text-xs">Hours</p>
-                  </div>
-                  <div className="bg-white text-[#FF6B35] px-4 py-3 rounded-xl text-center min-w-[60px]">
-                    <span className="text-3xl font-bold">34</span>
-                    <p className="text-xs">Mins</p>
-                  </div>
-                  <div className="bg-white text-[#FF6B35] px-4 py-3 rounded-xl text-center min-w-[60px]">
-                    <span className="text-3xl font-bold">56</span>
-                    <p className="text-xs">Secs</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Page Title */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Hot Deals</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">Discover amazing discounts on premium digital products</p>
           </div>
 
           {/* Deal Categories */}
