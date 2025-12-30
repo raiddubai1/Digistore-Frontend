@@ -144,57 +144,57 @@ export default function MobileHome({
       <div className="bg-white dark:bg-slate-800 py-3 border-b border-gray-100 dark:border-slate-700">
         <div className="overflow-x-auto scrollbar-hide">
           <div className="flex gap-3 px-4">
-            {/* Banner 1 - Flash Sale */}
+            {/* Banner 1 - Bundles (Best Value First) */}
             <Link
-              href={`/${locale}/products?sort=discount`}
+              href={`/${locale}/bundles`}
               className="relative flex-shrink-0 w-[280px] h-[100px] rounded-2xl overflow-hidden active:scale-[0.98] transition-transform"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-[#ff6f61] via-[#ff8a7a] to-[#ffb347]" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#FF6B35] via-[#ff6f61] to-[#ff8a7a]" />
               <div className="absolute inset-0 flex items-center justify-between px-5">
                 <div>
-                  <p className="text-white/80 text-xs font-medium">Limited Time</p>
-                  <h3 className="text-white text-lg font-bold">Flash Sale 🔥</h3>
-                  <p className="text-white text-sm font-semibold">Up to 50% OFF</p>
+                  <p className="text-white/80 text-xs font-medium">Save Up To 70%</p>
+                  <h3 className="text-white text-lg font-bold">Mega Bundles 🎁</h3>
+                  <p className="text-white text-sm font-semibold">Best Value Deals</p>
                 </div>
-                <div className="text-4xl">⚡</div>
+                <div className="text-4xl">📦</div>
               </div>
             </Link>
 
-            {/* Banner 2 - Free eBooks */}
+            {/* Banner 2 - Instagram Post Templates */}
             <Link
-              href={`/${locale}/products?price=free`}
+              href={`/${locale}/products?category=instagram-templates`}
               className="relative flex-shrink-0 w-[280px] h-[100px] rounded-2xl overflow-hidden active:scale-[0.98] transition-transform"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-rose-500 to-red-500" />
               <div className="absolute inset-0 flex items-center justify-between px-5">
                 <div>
-                  <p className="text-white/80 text-xs font-medium">Browse Now</p>
-                  <h3 className="text-white text-lg font-bold">Free eBooks 📚</h3>
-                  <p className="text-white text-sm font-semibold">100+ Available</p>
+                  <p className="text-white/80 text-xs font-medium">Trending Now</p>
+                  <h3 className="text-white text-lg font-bold">Instagram Posts 📸</h3>
+                  <p className="text-white text-sm font-semibold">Canva Templates</p>
                 </div>
-                <div className="text-4xl">🎁</div>
+                <div className="text-4xl">✨</div>
               </div>
             </Link>
 
-            {/* Banner 3 - New Arrivals */}
+            {/* Banner 3 - Social Media Templates Category */}
             <Link
-              href={`/${locale}/products?sort=newest`}
+              href={`/${locale}/products?category=canva-templates`}
               className="relative flex-shrink-0 w-[280px] h-[100px] rounded-2xl overflow-hidden active:scale-[0.98] transition-transform"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500" />
+              <div className="absolute inset-0 bg-gradient-to-r from-violet-500 via-purple-500 to-indigo-500" />
               <div className="absolute inset-0 flex items-center justify-between px-5">
                 <div>
-                  <p className="text-white/80 text-xs font-medium">Just Added</p>
-                  <h3 className="text-white text-lg font-bold">New Arrivals ✨</h3>
-                  <p className="text-white text-sm font-semibold">Fresh Content</p>
+                  <p className="text-white/80 text-xs font-medium">All Platforms</p>
+                  <h3 className="text-white text-lg font-bold">Social Media 📱</h3>
+                  <p className="text-white text-sm font-semibold">Template Packs</p>
                 </div>
-                <div className="text-4xl">🆕</div>
+                <div className="text-4xl">🎨</div>
               </div>
             </Link>
 
             {/* Banner 4 - Best Sellers */}
             <Link
-              href={`/${locale}/products?sort=bestselling`}
+              href={`/${locale}/products?filter=bestsellers`}
               className="relative flex-shrink-0 w-[280px] h-[100px] rounded-2xl overflow-hidden active:scale-[0.98] transition-transform"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500" />
@@ -205,6 +205,22 @@ export default function MobileHome({
                   <p className="text-white text-sm font-semibold">Most Popular</p>
                 </div>
                 <div className="text-4xl">⭐</div>
+              </div>
+            </Link>
+
+            {/* Banner 5 - New Arrivals */}
+            <Link
+              href={`/${locale}/products?filter=new`}
+              className="relative flex-shrink-0 w-[280px] h-[100px] rounded-2xl overflow-hidden active:scale-[0.98] transition-transform"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
+              <div className="absolute inset-0 flex items-center justify-between px-5">
+                <div>
+                  <p className="text-white/80 text-xs font-medium">Just Added</p>
+                  <h3 className="text-white text-lg font-bold">New Arrivals ✨</h3>
+                  <p className="text-white text-sm font-semibold">Fresh Content</p>
+                </div>
+                <div className="text-4xl">🆕</div>
               </div>
             </Link>
           </div>
