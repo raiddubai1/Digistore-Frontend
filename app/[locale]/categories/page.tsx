@@ -24,6 +24,21 @@ const categoryEmojis: Record<string, string> = {
   "home-and-lifestyle": "🏠",
   "technology": "💻",
   "society-and-politics": "🌍",
+  // API categories
+  "ebooks": "📚",
+  "digital-marketing-business": "📱",
+  "canva-templates": "🎨",
+  "lightroom-presets": "📷",
+  "ebooks-guides": "📖",
+  "stock-media": "🎬",
+  "planners-printables": "📅",
+  "courses-training": "🎓",
+  "business-cards-templates": "💳",
+  "games-educational": "🎮",
+  "instagram-templates": "📸",
+  "facebook-templates": "👍",
+  "marketing": "📣",
+  "business": "💼",
 };
 
 interface CategoriesPageProps {
@@ -101,14 +116,14 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
       </div>
 
       {/* ===== DESKTOP LAYOUT ===== */}
-      <div className="hidden lg:block min-h-screen bg-gray-50">
+      <div className="hidden lg:block min-h-screen bg-gray-50 dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Page Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 dark:text-white">
               Browse by Category
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Explore our diverse collection of digital products organized by category
             </p>
           </div>
@@ -117,7 +132,8 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {categories.length > 0 ? (
             categories.map((category: any) => {
-              const IconComponent = categoryIcons[category.icon || "package"];
+              const IconComponent = categoryIcons[category.icon || "package"] || Package;
+              const emoji = categoryEmojis[category.slug] || "📦";
 
               return (
                 <Link
@@ -125,10 +141,10 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
                   href={`/${locale}/products?category=${category.slug}`}
                   className="group"
                 >
-                  <div className="bg-white rounded-2xl border-2 border-gray-200 hover:border-primary p-8 transition-all hover:shadow-xl">
+                  <div className="bg-white dark:bg-slate-800 rounded-2xl border-2 border-gray-200 dark:border-slate-700 hover:border-primary p-8 transition-all hover:shadow-xl">
                     {/* Icon */}
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                      <IconComponent className="w-8 h-8 text-primary" />
+                    <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform text-3xl">
+                      {emoji}
                     </div>
 
                     {/* Category Name */}
