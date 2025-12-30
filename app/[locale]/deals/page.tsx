@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { demoProducts } from "@/data/demo-products";
 import ProductCard from "@/components/ProductCard";
-import { Zap, Clock, Percent, Gift, ArrowRight, Star, Timer } from "lucide-react";
+import { Zap, Percent, Gift, ArrowRight, Star } from "lucide-react";
+import { Product } from "@/types";
 
 export const dynamic = 'force-dynamic';
 
@@ -9,12 +9,40 @@ interface DealsPageProps {
   params: Promise<{ locale: string }>;
 }
 
+async function getHotDeals(): Promise<Product[]> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/hot-deals?limit=12`, {
+      next: { revalidate: 60 },
+    });
+    const data = await response.json();
+    return data.data?.products || [];
+  } catch (error) {
+    console.error('Error fetching hot deals:', error);
+    return [];
+  }
+}
+
+async function getBestsellers(): Promise<Product[]> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/bestsellers`, {
+      next: { revalidate: 60 },
+    });
+    const data = await response.json();
+    return data.data?.products || [];
+  } catch (error) {
+    console.error('Error fetching bestsellers:', error);
+    return [];
+  }
+}
+
 export default async function DealsPage({ params }: DealsPageProps) {
   const { locale } = await params;
 
-  // Filter products with discounts
-  const discountedProducts = demoProducts.filter(p => p.discount && p.discount > 0);
-  const bestSellers = demoProducts.filter(p => p.bestseller).slice(0, 4);
+  // Fetch hot deals and bestsellers from API
+  const [hotDeals, bestSellers] = await Promise.all([
+    getHotDeals(),
+    getBestsellers()
+  ]);
 
   // Calculate time left for flash sale (mock data)
   const flashSaleEnd = new Date();
@@ -54,11 +82,11 @@ export default async function DealsPage({ params }: DealsPageProps) {
           </div>
         </div>
 
-        {/* Discounted Products */}
+        {/* Hot Deals Products */}
         <div className="p-4">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">On Sale Now</h2>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">🔥 Hot Deals</h2>
           <div className="grid grid-cols-2 gap-3">
-            {discountedProducts.slice(0, 6).map((product, index) => (
+            {hotDeals.slice(0, 6).map((product, index) => (
               <ProductCard key={product.id} product={product} priority={index < 2} />
             ))}
           </div>
@@ -133,20 +161,37 @@ export default async function DealsPage({ params }: DealsPageProps) {
             ))}
           </div>
 
-          {/* Discounted Products */}
+          {/* Hot Deals Products */}
           <div className="mb-12">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">On Sale Now</h2>
-              <Link href={`/${locale}/products?sort=discount`} className="text-[#FF6B35] font-semibold flex items-center gap-1">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">🔥 Hot Deals</h2>
+              <Link href={`/${locale}/products`} className="text-[#FF6B35] font-semibold flex items-center gap-1">
                 View All <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
             <div className="grid grid-cols-4 gap-6">
-              {discountedProducts.slice(0, 8).map((product, index) => (
+              {hotDeals.slice(0, 8).map((product, index) => (
                 <ProductCard key={product.id} product={product} priority={index < 4} />
               ))}
             </div>
           </div>
+
+          {/* Best Sellers */}
+          {bestSellers.length > 0 && (
+            <div className="mb-12">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Best Sellers</h2>
+                <Link href={`/${locale}/products?filter=bestsellers`} className="text-[#FF6B35] font-semibold flex items-center gap-1">
+                  View All <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-4 gap-6">
+                {bestSellers.slice(0, 4).map((product, index) => (
+                  <ProductCard key={product.id} product={product} priority={index < 4} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>

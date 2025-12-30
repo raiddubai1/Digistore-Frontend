@@ -69,6 +69,7 @@ interface Product {
   featured?: boolean;
   bestseller?: boolean;
   newArrival?: boolean;
+  hotDeal?: boolean;
   files?: ProductFile[];
   canvaTemplateLink?: string;
   canvaTemplateLinks?: Array<{ name: string; url: string }>;
@@ -207,6 +208,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     featured: false,
     bestseller: false,
     newArrival: false,
+    hotDeal: false,
   });
 
   const [newCanvaLink, setNewCanvaLink] = useState({ name: "", url: "" });
@@ -254,6 +256,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             featured: p.featured || false,
             bestseller: p.bestseller || false,
             newArrival: p.newArrival || false,
+            hotDeal: p.hotDeal || false,
             canvaTemplateLink: p.canvaTemplateLink || "",
             canvaTemplateLinks: (p.canvaTemplateLinks as Array<{ name: string; url: string }>) || [],
             canvaInstructions: p.canvaInstructions || "",
@@ -510,6 +513,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
         featured: formData.featured || false,
         bestseller: formData.bestseller || false,
         newArrival: formData.newArrival || false,
+        hotDeal: formData.hotDeal || false,
         whatsIncluded: formData.whatsIncluded || [],
         requirements: formData.requirements || [],
         // Canva template fields
@@ -1198,6 +1202,12 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                     onChange={(e) => setFormData({ ...formData, newArrival: e.target.checked })}
                     className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" />
                   <span className="text-sm">New Arrival</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={formData.hotDeal}
+                    onChange={(e) => setFormData({ ...formData, hotDeal: e.target.checked })}
+                    className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500" />
+                  <span className="text-sm">🔥 Hot Deal</span>
                 </label>
               </div>
             </div>

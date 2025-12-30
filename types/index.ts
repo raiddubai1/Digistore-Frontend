@@ -40,6 +40,7 @@ export interface Product {
   featured: boolean;
   bestseller: boolean;
   newArrival: boolean;
+  hotDeal?: boolean;
   // Canva Template Delivery
   canvaTemplateLink?: string;
   canvaTemplateLinks?: Array<{ name: string; url: string }>;
