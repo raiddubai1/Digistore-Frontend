@@ -24,6 +24,7 @@ interface Bundle {
   id: string;
   name: string;
   slug: string;
+  tagline?: string;
   description?: string;
   bundlePrice: number;
   originalPrice: number;
@@ -103,27 +104,15 @@ export default function BundlesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-24 lg:pb-12">
-      {/* Hero Header */}
-      <div className="relative bg-gradient-to-br from-[#FF6B35] via-[#ff6f61] to-[#ff8a7a] text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, white 2px, transparent 2px), radial-gradient(circle at 75% 75%, white 2px, transparent 2px)', backgroundSize: '50px 50px' }}></div>
-        </div>
-        <div className="max-w-6xl mx-auto px-4 py-12 lg:py-16 relative">
-          <div className="flex items-center gap-3 lg:hidden mb-6">
-            <Link href="/" className="p-2 bg-white/20 rounded-full backdrop-blur-sm hover:bg-white/30 transition-colors">
-              <ChevronLeft className="w-5 h-5" />
+    <div className="min-h-screen bg-gray-50 pb-24 lg:pb-12">
+      {/* Simple Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <div className="flex items-center gap-3">
+            <Link href="/" className="p-2 hover:bg-gray-100 rounded-full transition-colors lg:hidden">
+              <ChevronLeft className="w-5 h-5 text-gray-600" />
             </Link>
-          </div>
-          <div className="text-center max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-              <Sparkles className="w-4 h-4" />
-              <span className="text-sm font-medium">Save up to 50% on bundles</span>
-            </div>
-            <h1 className="text-3xl lg:text-5xl font-bold mb-4">Premium Product Bundles</h1>
-            <p className="text-white/90 text-lg">
-              Get more value with our carefully curated bundles. Save big when you buy together!
-            </p>
+            <h1 className="text-2xl font-bold text-gray-900">Bundles</h1>
           </div>
         </div>
       </div>
@@ -176,9 +165,9 @@ export default function BundlesPage() {
                       {/* Title & Subtitle */}
                       <div className="mb-4">
                         <h3 className="font-bold text-xl md:text-2xl text-gray-900 mb-1">{bundle.name}</h3>
-                        <p className="text-[#FF6B35] font-medium text-sm">
-                          {(bundle.products.length * 150).toLocaleString()} Editable Templates
-                        </p>
+                        {bundle.tagline && (
+                          <p className="text-[#FF6B35] font-medium text-sm">{bundle.tagline}</p>
+                        )}
                       </div>
 
                       {/* Key Highlights */}

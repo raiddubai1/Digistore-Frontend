@@ -434,6 +434,7 @@ export const bundlesAPI = {
   // Create bundle (admin only)
   create: (data: {
     name: string;
+    tagline?: string;
     description?: string;
     bundlePrice: number;
     image?: string;
@@ -447,6 +448,7 @@ export const bundlesAPI = {
   // Update bundle (admin only)
   update: (id: string, data: {
     name?: string;
+    tagline?: string;
     description?: string;
     bundlePrice?: number;
     image?: string;

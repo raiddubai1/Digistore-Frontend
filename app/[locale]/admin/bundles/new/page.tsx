@@ -33,6 +33,7 @@ export default function NewBundlePage() {
 
   const [formData, setFormData] = useState({
     name: '',
+    tagline: '',
     description: '',
     bundlePrice: '',
     image: '',
@@ -132,6 +133,7 @@ export default function NewBundlePage() {
       setLoading(true);
       const response = await bundlesAPI.create({
         name: formData.name,
+        tagline: formData.tagline || undefined,
         description: formData.description || undefined,
         bundlePrice: parseFloat(formData.bundlePrice),
         image: formData.image || undefined,
@@ -187,6 +189,17 @@ export default function NewBundlePage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   placeholder="e.g., Ultimate Canva Templates Pack"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tagline</label>
+                <input
+                  type="text"
+                  value={formData.tagline}
+                  onChange={(e) => setFormData(prev => ({ ...prev, tagline: e.target.value }))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="e.g., 1,800 Editable Templates"
+                />
+                <p className="text-xs text-gray-500 mt-1">Short subtitle shown below the bundle name</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
