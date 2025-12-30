@@ -225,7 +225,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           {/* Quick Action Buttons */}
           <div className="flex gap-2 px-4 pb-4">
             <Link
-              href="/products?filter=trending"
+              href="/products?filter=bestsellers"
               onClick={onClose}
               className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#ff6f61] to-gray-600 text-white rounded-full font-semibold text-sm shadow-lg active:scale-95 transition-transform"
             >
@@ -241,7 +241,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               New
             </Link>
             <Link
-              href="/products?filter=deals"
+              href="/deals"
               onClick={onClose}
               className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full font-semibold text-sm shadow-lg active:scale-95 transition-transform"
             >
