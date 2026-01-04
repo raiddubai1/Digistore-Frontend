@@ -101,7 +101,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
                 ✨ New
               </span>
             )}
-            {product.discount && product.discount > 0 && (
+            {product.discount !== undefined && product.discount > 0 && (
               <span className="px-2.5 py-1 bg-gradient-to-r from-[#FF6B35] to-red-500 text-white text-[10px] lg:text-xs font-bold rounded-full shadow-lg">
                 -{product.discount}% OFF
               </span>

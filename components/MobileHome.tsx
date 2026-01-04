@@ -329,17 +329,17 @@ function MiniProductCard({ product, priority = false }: { product: Product; prio
             />
           </div>
           {/* Badges */}
-          {product.discount && product.discount > 0 && (
+          {product.discount !== undefined && product.discount > 0 && (
             <span className="absolute top-3 left-3 px-2 py-0.5 bg-[#FF6B35] text-white text-[10px] font-bold rounded-md shadow-sm z-10">
               -{product.discount}%
             </span>
           )}
-          {product.bestseller && !product.discount && (
+          {product.bestseller && !(product.discount && product.discount > 0) && (
             <span className="absolute top-3 left-3 px-2 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded-md shadow-sm z-10">
               🔥 HOT
             </span>
           )}
-          {product.newArrival && !product.discount && !product.bestseller && (
+          {product.newArrival && !(product.discount && product.discount > 0) && !product.bestseller && (
             <span className="absolute top-3 left-3 px-2 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded-md shadow-sm z-10">
               ✨ NEW
             </span>

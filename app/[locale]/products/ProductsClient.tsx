@@ -648,17 +648,17 @@ export default function ProductsClient() {
             className="w-full h-full object-cover"
           />
           {/* Badges */}
-          {product.discount && product.discount > 0 && (
+          {product.discount !== undefined && product.discount > 0 && (
             <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-[#ff6f61] text-white text-[10px] font-bold rounded">
               -{product.discount}%
             </span>
           )}
-          {product.bestseller && !product.discount && (
+          {product.bestseller && !(product.discount && product.discount > 0) && (
             <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-orange-500 text-white text-[10px] font-bold rounded">
               🔥 HOT
             </span>
           )}
-          {product.newArrival && !product.discount && !product.bestseller && (
+          {product.newArrival && !(product.discount && product.discount > 0) && !product.bestseller && (
             <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded">
               ✨ NEW
             </span>
@@ -1272,7 +1272,7 @@ function ProductListCard({ product }: { product: Product }) {
                 ✨ New
               </span>
             )}
-            {product.discount && product.discount > 0 && (
+            {product.discount !== undefined && product.discount > 0 && (
               <span className="px-2 py-0.5 bg-[#ff6f61] text-white text-xs font-bold rounded-full">
                 -{product.discount}%
               </span>

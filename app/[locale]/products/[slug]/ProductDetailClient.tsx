@@ -262,7 +262,7 @@ export default function ProductDetailClient({
 
           {/* Badges - Bottom left of image */}
           <div className="absolute bottom-4 left-4 flex flex-col gap-2">
-            {product.discount && product.discount > 0 && (
+            {product.discount !== undefined && product.discount > 0 && (
               <span className="px-3 py-1 bg-[#ff6f61] text-white text-sm font-bold rounded-full shadow">
                 -{product.discount}% OFF
               </span>
