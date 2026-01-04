@@ -6,6 +6,8 @@ import Link from "next/link";
 import { ArrowLeft, Save, Loader2, Eye, FileText, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { blogApi } from "@/lib/api";
+import BlogImageUpload from "@/components/BlogImageUpload";
+import RichTextEditor from "@/components/RichTextEditor";
 
 export default function EditBlogPostPage() {
   const pathname = usePathname();
@@ -235,31 +237,20 @@ export default function EditBlogPostPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Content <span className="text-red-500">*</span>
             </label>
-            <textarea
+            <RichTextEditor
               value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              onChange={(content) => setFormData({ ...formData, content })}
               placeholder="Write your blog post content here..."
-              rows={15}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
             />
+            <p className="text-xs text-gray-500 mt-2">Click the image icon to upload images, video icon for YouTube embeds</p>
           </div>
 
           {/* Featured Image */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Featured Image URL</label>
-            <input
-              type="text"
-              value={formData.featuredImage}
-              onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })}
-              placeholder="https://..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-            />
-            {formData.featuredImage && (
-              <div className="mt-3">
-                <img src={formData.featuredImage} alt="Preview" className="w-full max-w-md h-48 object-cover rounded-lg" />
-              </div>
-            )}
-          </div>
+          <BlogImageUpload
+            value={formData.featuredImage}
+            onChange={(url) => setFormData({ ...formData, featuredImage: url })}
+            label="Featured Image"
+          />
         </div>
 
         {/* Settings Card */}
