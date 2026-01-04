@@ -426,8 +426,8 @@ export const newsletterAPI = {
 // ============================================
 
 export const bundlesAPI = {
-  // Get all active bundles (public)
-  getAll: () => api.get('/bundles'),
+  // Get all active bundles (public) - with cache buster to ensure fresh data
+  getAll: () => api.get(`/bundles?_t=${Date.now()}`),
 
   // Get bundle by slug (public)
   getBySlug: (slug: string) => api.get(`/bundles/${slug}`),

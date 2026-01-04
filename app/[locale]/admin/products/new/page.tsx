@@ -511,6 +511,25 @@ export default function NewProductPage() {
 
       // Handle different response structures
       if (response.data?.success || response.status === 201 || response.status === 200) {
+        // Get the created product ID
+        const createdProductId = response.data?.data?.product?.id;
+
+        // Save attributes if any were selected
+        if (createdProductId) {
+          const attributesToSave = Object.entries(selectedAttributes)
+            .filter(([_, value]) => value)
+            .map(([attributeId, value]) => ({ attributeId, value }));
+
+          if (attributesToSave.length > 0) {
+            try {
+              await attributesAPI.setProductAttributes(createdProductId, attributesToSave);
+            } catch (attrError) {
+              console.error('Failed to save attributes:', attrError);
+              // Don't fail the whole creation, just log the error
+            }
+          }
+        }
+
         toast.success("Product created successfully!");
         router.push(`${basePath}/admin/products`);
       } else {
