@@ -21,6 +21,7 @@ import {
   Search,
   Mail,
   Layers,
+  FileText,
 } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
@@ -35,6 +36,7 @@ const getNavigation = (basePath: string) => [
   { name: "Orders", href: `${basePath}/admin/orders`, icon: ShoppingCart },
   { name: "Customers", href: `${basePath}/admin/customers`, icon: Users },
   { name: "Reviews", href: `${basePath}/admin/reviews`, icon: Star },
+  { name: "Blog", href: `${basePath}/admin/blog`, icon: FileText },
   { name: "Newsletter", href: `${basePath}/admin/newsletter`, icon: Mail },
   { name: "SEO", href: `${basePath}/admin/seo`, icon: Search },
   { name: "Analytics", href: `${basePath}/admin/analytics`, icon: BarChart3 },

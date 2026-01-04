@@ -491,6 +491,9 @@ export const blogApi = {
     page?: number;
   }) => api.get('/blog/admin/all', { params }),
 
+  // Admin: Get single post by ID
+  getById: (id: string) => api.get(`/blog/admin/${id}`),
+
   // Admin: Create blog post
   create: (data: {
     slug: string;
