@@ -13,12 +13,14 @@ interface CouponCode {
   code: string;
   discount: number; // percentage
   type: 'percentage' | 'fixed';
+  isAutoApplied?: boolean; // For first-time buyer discount
 }
 
 interface CartStore {
   items: CartItem[];
   isOpen: boolean;
   coupon: CouponCode | null;
+  isFirstTimeBuyer: boolean;
 
   // Actions
   addItem: (product: Product, license?: "personal" | "commercial" | "extended") => void;
@@ -30,6 +32,8 @@ interface CartStore {
   closeCart: () => void;
   applyCoupon: (code: string) => { success: boolean; message: string };
   removeCoupon: () => void;
+  checkFirstTimeBuyer: () => void;
+  markAsReturningCustomer: () => void;
 
   // Computed values
   itemCount: () => number;
@@ -38,12 +42,33 @@ interface CartStore {
   total: () => number;
 }
 
-// Demo coupon codes
+// First-time buyer welcome coupon (30% off)
+const WELCOME_COUPON: CouponCode = {
+  code: 'WELCOME30',
+  discount: 30,
+  type: 'percentage',
+  isAutoApplied: true,
+};
+
+// Available coupon codes
 const validCoupons: Record<string, CouponCode> = {
   'SAVE10': { code: 'SAVE10', discount: 10, type: 'percentage' },
   'SAVE20': { code: 'SAVE20', discount: 20, type: 'percentage' },
-  'WELCOME': { code: 'WELCOME', discount: 15, type: 'percentage' },
+  'WELCOME30': WELCOME_COUPON,
   'FLAT5': { code: 'FLAT5', discount: 5, type: 'fixed' },
+};
+
+// Helper to check if user has made a purchase before
+const hasUserPurchasedBefore = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem('digistore1-has-purchased') === 'true';
+};
+
+// Helper to mark user as returning customer
+const markUserAsPurchased = (): void => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('digistore1-has-purchased', 'true');
+  }
 };
 
 export const useCartStore = create<CartStore>()(
@@ -52,6 +77,28 @@ export const useCartStore = create<CartStore>()(
       items: [],
       isOpen: false,
       coupon: null,
+      isFirstTimeBuyer: true, // Default to true, will be checked on mount
+
+      checkFirstTimeBuyer: () => {
+        const hasPurchased = hasUserPurchasedBefore();
+        const isFirstTime = !hasPurchased;
+        set({ isFirstTimeBuyer: isFirstTime });
+
+        // Auto-apply welcome discount for first-time buyers if no coupon applied
+        if (isFirstTime && !get().coupon) {
+          set({ coupon: WELCOME_COUPON });
+        }
+      },
+
+      markAsReturningCustomer: () => {
+        markUserAsPurchased();
+        set({ isFirstTimeBuyer: false });
+        // Remove auto-applied coupon if it was the welcome discount
+        const currentCoupon = get().coupon;
+        if (currentCoupon?.isAutoApplied) {
+          set({ coupon: null });
+        }
+      },
 
       addItem: (product, license = "personal") => {
         const items = get().items;
@@ -131,11 +178,17 @@ export const useCartStore = create<CartStore>()(
           return { success: false, message: 'Invalid coupon code' };
         }
 
+        // Check if WELCOME30 is being used by a returning customer
+        if (upperCode === 'WELCOME30' && hasUserPurchasedBefore()) {
+          return { success: false, message: 'This code is only valid for first-time buyers' };
+        }
+
         if (get().coupon?.code === upperCode) {
           return { success: false, message: 'Coupon already applied' };
         }
 
-        set({ coupon });
+        // Apply the new coupon (replaces any auto-applied coupon)
+        set({ coupon: { ...coupon, isAutoApplied: false } });
         return { success: true, message: `Coupon "${upperCode}" applied! ${coupon.type === 'percentage' ? `${coupon.discount}% off` : `$${coupon.discount} off`}` };
       },
 

@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Download, Mail, ArrowRight, ExternalLink } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
+import { useCartStore } from "@/store/cartStore";
 
 interface OrderItem {
   id: string;
@@ -28,8 +29,14 @@ function SuccessContent() {
   const orderId = searchParams.get("orderId") || "N/A";
   const [orderData, setOrderData] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { markAsReturningCustomer, clearCart } = useCartStore();
 
   useEffect(() => {
+    // Mark user as returning customer (they've completed a purchase)
+    // This prevents them from getting the first-time buyer discount again
+    markAsReturningCustomer();
+    clearCart();
+
     const fetchOrderData = async () => {
       try {
         const token = localStorage.getItem('accessToken');
@@ -52,7 +59,7 @@ function SuccessContent() {
     } else {
       setLoading(false);
     }
-  }, [orderId]);
+  }, [orderId, markAsReturningCustomer, clearCart]);
 
   const canvaItems = orderData?.orderItems?.filter(item =>
     item.product?.canvaTemplateLink || (item.product?.canvaTemplateLinks && item.product.canvaTemplateLinks.length > 0)

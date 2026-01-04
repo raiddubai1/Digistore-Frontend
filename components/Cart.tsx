@@ -1,23 +1,24 @@
 "use client";
 
 import { useCartStore } from "@/store/cartStore";
-import { X, ShoppingBag, Trash2, Plus, Minus, Tag, Check } from "lucide-react";
+import { X, ShoppingBag, Trash2, Plus, Minus, Tag, Check, Gift } from "lucide-react";
 import { formatPrice, getThumbnailUrl } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function Cart() {
-  const { items, isOpen, closeCart, removeItem, updateQuantity, itemCount, subtotal, discount, total, coupon, applyCoupon, removeCoupon } =
+  const { items, isOpen, closeCart, removeItem, updateQuantity, itemCount, subtotal, discount, total, coupon, applyCoupon, removeCoupon, checkFirstTimeBuyer, isFirstTimeBuyer } =
     useCartStore();
   const [mounted, setMounted] = useState(false);
   const [couponInput, setCouponInput] = useState("");
   const [showCouponInput, setShowCouponInput] = useState(false);
 
-  // Prevent hydration mismatch
+  // Prevent hydration mismatch and check first-time buyer status
   useEffect(() => {
     setMounted(true);
-  }, []);
+    checkFirstTimeBuyer();
+  }, [checkFirstTimeBuyer]);
 
   if (!mounted) return null;
 
@@ -150,16 +151,31 @@ export default function Cart() {
             <div className="border-t border-gray-200 p-6 space-y-4">
               {/* Coupon Section */}
               {coupon ? (
-                <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                <div className={`flex items-center justify-between rounded-xl px-4 py-3 ${
+                  coupon.isAutoApplied
+                    ? 'bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20'
+                    : 'bg-green-50 border border-green-200'
+                }`}>
                   <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-700">
-                      {coupon.code} ({coupon.type === 'percentage' ? `${coupon.discount}% off` : `$${coupon.discount} off`})
-                    </span>
+                    {coupon.isAutoApplied ? (
+                      <Gift className="w-4 h-4 text-primary" />
+                    ) : (
+                      <Check className="w-4 h-4 text-green-600" />
+                    )}
+                    <div>
+                      <span className={`text-sm font-medium ${coupon.isAutoApplied ? 'text-primary' : 'text-green-700'}`}>
+                        {coupon.isAutoApplied ? '🎉 New User Discount!' : coupon.code} ({coupon.type === 'percentage' ? `${coupon.discount}% off` : `$${coupon.discount} off`})
+                      </span>
+                      {coupon.isAutoApplied && (
+                        <p className="text-xs text-gray-500">Auto-applied for first-time buyers</p>
+                      )}
+                    </div>
                   </div>
-                  <button onClick={removeCoupon} className="text-sm text-red-500 hover:text-red-700">
-                    Remove
-                  </button>
+                  {!coupon.isAutoApplied && (
+                    <button onClick={removeCoupon} className="text-sm text-red-500 hover:text-red-700">
+                      Remove
+                    </button>
+                  )}
                 </div>
               ) : showCouponInput ? (
                 <div className="flex gap-2">

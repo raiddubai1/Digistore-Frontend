@@ -5,15 +5,18 @@ import { X, Sparkles, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 
 const STORAGE_KEY = "digistore1_welcomed";
+const PURCHASED_KEY = "digistore1-has-purchased";
 
 export default function WelcomePopup() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Check if user has seen the popup
+    // Check if user has seen the popup or has already made a purchase
     const hasSeenPopup = localStorage.getItem(STORAGE_KEY);
-    
-    if (!hasSeenPopup) {
+    const hasPurchased = localStorage.getItem(PURCHASED_KEY) === 'true';
+
+    // Don't show popup to returning customers
+    if (!hasSeenPopup && !hasPurchased) {
       // Show popup after a short delay for better UX
       const timer = setTimeout(() => {
         setIsVisible(true);
