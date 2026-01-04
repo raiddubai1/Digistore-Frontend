@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Search, ChevronRight, TrendingUp, Sparkles, Star, Clock } from "lucide-react";
+import { Search, ChevronRight, TrendingUp, Star, Clock } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ProductCard from "./ProductCard";
+import WelcomePopup from "./WelcomePopup";
 import { Product, Category } from "@/types";
 import { getThumbnailUrl } from "@/lib/utils";
 
@@ -140,15 +141,8 @@ export default function MobileHome({
         </form>
       </div>
 
-      {/* First Purchase Promo Banner */}
-      <div className="bg-gradient-to-r from-[#FF6B35] to-[#ff8a5c] px-4 py-2.5">
-        <div className="flex items-center justify-center gap-2">
-          <Sparkles className="w-4 h-4 text-white" />
-          <span className="text-sm font-bold text-white">
-            🎉 New here? Get 30% OFF your first purchase!
-          </span>
-        </div>
-      </div>
+      {/* Welcome Popup for First-Time Visitors */}
+      <WelcomePopup />
 
       {/* Marketing Banners - Horizontal Scroll */}
       <div className="bg-white dark:bg-slate-800 py-3 border-b border-gray-100 dark:border-slate-700">
