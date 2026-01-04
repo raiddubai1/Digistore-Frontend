@@ -10,12 +10,6 @@ import Link from "next/link";
 import { paymentsAPI } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
-interface FirstPurchaseDiscount {
-  isFirstPurchase: boolean;
-  discountPercent: number;
-  message: string | null;
-}
-
 // PayPal icon component
 const PayPalIcon = () => (
   <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
@@ -57,32 +51,9 @@ export default function CheckoutPage() {
 
   const [orderCompleted, setOrderCompleted] = useState(false);
 
-  // First purchase discount state
-  const [firstPurchaseDiscount, setFirstPurchaseDiscount] = useState<FirstPurchaseDiscount | null>(null);
-
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  // Check for first-purchase discount eligibility
-  useEffect(() => {
-    const checkFirstPurchase = async () => {
-      try {
-        const email = formData.email || undefined;
-        const response = await paymentsAPI.checkFirstPurchaseDiscount(email);
-        if (response.data?.data) {
-          setFirstPurchaseDiscount(response.data.data);
-        }
-      } catch (error) {
-        console.error('Error checking first purchase discount:', error);
-        setFirstPurchaseDiscount(null);
-      }
-    };
-
-    if (mounted) {
-      checkFirstPurchase();
-    }
-  }, [mounted, user, formData.email]);
 
   useEffect(() => {
     // Don't redirect if order was just completed
@@ -112,15 +83,10 @@ export default function CheckoutPage() {
     }
   }, [mounted, paypalLoaded]);
 
-  // Calculate first purchase discount amount
-  const firstPurchaseDiscountAmount = firstPurchaseDiscount?.isFirstPurchase
-    ? (subtotal() * (firstPurchaseDiscount.discountPercent / 100))
-    : 0;
+  // Total discount (from coupon only - WELCOME30 is auto-applied for first-time buyers)
+  const totalDiscount = discount();
 
-  // Total discount (coupon + first purchase)
-  const totalDiscount = discount() + firstPurchaseDiscountAmount;
-
-  // Final total after all discounts
+  // Final total after discount
   const finalTotal = Math.max(0, subtotal() - totalDiscount);
 
   // Check if order is free
@@ -361,12 +327,12 @@ export default function CheckoutPage() {
         )}
       </div>
 
-      {/* First Purchase Welcome Banner */}
-      {firstPurchaseDiscount?.isFirstPurchase && (
+      {/* First Purchase Welcome Banner - shows when WELCOME30 is auto-applied */}
+      {coupon?.isAutoApplied && (
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 mb-3">
           <div className="flex items-center gap-2 text-green-700">
             <Gift className="w-4 h-4" />
-            <span className="text-xs font-bold">🎉 Welcome! {firstPurchaseDiscount.discountPercent}% OFF applied!</span>
+            <span className="text-xs font-bold">🎉 Welcome! {coupon.discount}% OFF auto-applied!</span>
           </div>
         </div>
       )}
@@ -379,14 +345,8 @@ export default function CheckoutPage() {
         </div>
         {discount() > 0 && (
           <div className="flex justify-between text-sm text-green-600">
-            <span>Coupon ({coupon?.code})</span>
+            <span>{coupon?.isAutoApplied ? 'Welcome Discount' : `Coupon (${coupon?.code})`}</span>
             <span>-{formatPrice(discount())}</span>
-          </div>
-        )}
-        {firstPurchaseDiscountAmount > 0 && (
-          <div className="flex justify-between text-sm text-green-600">
-            <span>Welcome Discount</span>
-            <span>-{formatPrice(firstPurchaseDiscountAmount)}</span>
           </div>
         )}
         <div className="flex justify-between font-bold pt-2 border-t border-gray-100">
@@ -756,8 +716,8 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {/* First Purchase Welcome Banner */}
-              {firstPurchaseDiscount?.isFirstPurchase && (
+              {/* First Purchase Welcome Banner - shows when WELCOME30 is auto-applied */}
+              {coupon?.isAutoApplied && (
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
@@ -766,7 +726,7 @@ export default function CheckoutPage() {
                     <div>
                       <p className="font-bold text-green-800">🎉 Welcome to Digistore1!</p>
                       <p className="text-sm text-green-700">
-                        Enjoy <span className="font-bold">{firstPurchaseDiscount.discountPercent}% OFF</span> on your first purchase!
+                        Enjoy <span className="font-bold">{coupon.discount}% OFF</span> on your first purchase!
                       </p>
                     </div>
                   </div>
@@ -781,17 +741,8 @@ export default function CheckoutPage() {
                 </div>
                 {discount() > 0 && (
                   <div className="flex justify-between text-sm text-green-600">
-                    <span>Coupon ({coupon?.code})</span>
+                    <span>{coupon?.isAutoApplied ? 'Welcome Discount' : `Coupon (${coupon?.code})`}</span>
                     <span>-{formatPrice(discount())}</span>
-                  </div>
-                )}
-                {firstPurchaseDiscountAmount > 0 && (
-                  <div className="flex justify-between text-sm text-green-600">
-                    <span className="flex items-center gap-1">
-                      <Gift className="w-3 h-3" />
-                      Welcome Discount ({firstPurchaseDiscount?.discountPercent}%)
-                    </span>
-                    <span>-{formatPrice(firstPurchaseDiscountAmount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
