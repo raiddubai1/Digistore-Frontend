@@ -467,5 +467,71 @@ export const bundlesAPI = {
   delete: (id: string) => api.delete(`/bundles/${id}`),
 };
 
+// Blog API
+export const blogApi = {
+  // Get all published blog posts (public)
+  getAll: (params?: {
+    category?: string;
+    tag?: string;
+    featured?: boolean;
+    limit?: number;
+    page?: number;
+  }) => api.get('/blog', { params }),
+
+  // Get single blog post by slug (public)
+  getBySlug: (slug: string) => api.get(`/blog/${slug}`),
+
+  // Get blog categories (public)
+  getCategories: () => api.get('/blog/categories'),
+
+  // Admin: Get all posts including drafts
+  getAllAdmin: (params?: {
+    status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+    limit?: number;
+    page?: number;
+  }) => api.get('/blog/admin/all', { params }),
+
+  // Admin: Create blog post
+  create: (data: {
+    slug: string;
+    title: string;
+    excerpt: string;
+    content: string;
+    featuredImage?: string;
+    authorName?: string;
+    authorAvatar?: string;
+    category?: string;
+    tags?: string[];
+    metaTitle?: string;
+    metaDescription?: string;
+    metaKeywords?: string[];
+    status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+    featured?: boolean;
+    readTime?: number;
+  }) => api.post('/blog', data),
+
+  // Admin: Update blog post
+  update: (id: string, data: Partial<{
+    slug: string;
+    title: string;
+    excerpt: string;
+    content: string;
+    featuredImage: string;
+    authorName: string;
+    authorAvatar: string;
+    category: string;
+    tags: string[];
+    metaTitle: string;
+    metaDescription: string;
+    metaKeywords: string[];
+    status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+    featured: boolean;
+    readTime: number;
+  }>) => api.put(`/blog/${id}`, data),
+
+  // Admin: Delete blog post
+  delete: (id: string) => api.delete(`/blog/${id}`),
+};
+
 export default api;
 

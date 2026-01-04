@@ -16,6 +16,7 @@ const staticPages = [
   "/compare",
   "/gift-cards",
   "/bundles",
+  "/blog",
   "/terms",
   "/privacy",
 ];
@@ -46,9 +47,9 @@ async function getCategories(): Promise<{ slug: string }[]> {
     const response = await fetch(`${API_URL}/api/categories`, {
       next: { revalidate: 3600 },
     });
-    
+
     if (!response.ok) return [];
-    
+
     const data = await response.json();
     return data.data?.map((c: any) => ({ slug: c.slug })) || [];
   } catch {
@@ -56,10 +57,29 @@ async function getCategories(): Promise<{ slug: string }[]> {
   }
 }
 
+async function getBlogPosts(): Promise<{ slug: string; updatedAt: string }[]> {
+  try {
+    const response = await fetch(`${API_URL}/api/blog?limit=500`, {
+      next: { revalidate: 3600 },
+    });
+
+    if (!response.ok) return [];
+
+    const data = await response.json();
+    return data.data?.posts?.map((p: any) => ({
+      slug: p.slug,
+      updatedAt: p.publishedAt || new Date().toISOString(),
+    })) || [];
+  } catch {
+    return [];
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [products, categories] = await Promise.all([
+  const [products, categories, blogPosts] = await Promise.all([
     getProducts(),
     getCategories(),
+    getBlogPosts(),
   ]);
 
   const sitemapEntries: MetadataRoute.Sitemap = [];
@@ -96,6 +116,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(),
         changeFrequency: "weekly",
         priority: 0.6,
+      });
+    }
+  }
+
+  // Add blog post pages for each locale
+  for (const locale of locales) {
+    for (const post of blogPosts) {
+      sitemapEntries.push({
+        url: `${BASE_URL}/${locale}/blog/${post.slug}`,
+        lastModified: new Date(post.updatedAt),
+        changeFrequency: "weekly",
+        priority: 0.7,
       });
     }
   }
