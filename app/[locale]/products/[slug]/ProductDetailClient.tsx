@@ -51,6 +51,37 @@ export default function ProductDetailClient({
   const [showLightbox, setShowLightbox] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // Touch swipe state for mobile carousel
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Minimum swipe distance to trigger slide (in pixels)
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && currentImageIndex < images.length - 1) {
+      setCurrentImageIndex(prev => prev + 1);
+    }
+    if (isRightSwipe && currentImageIndex > 0) {
+      setCurrentImageIndex(prev => prev - 1);
+    }
+  };
+
   const isWishlisted = mounted ? isInWishlist(product.id) : false;
 
   // Track recently viewed products
@@ -152,29 +183,46 @@ export default function ProductDetailClient({
 
       {/* ===== MOBILE LAYOUT ===== */}
       <div className="lg:hidden min-h-screen bg-white pb-24">
-        {/* Image Carousel - Full width, edge to edge, with overlaid buttons */}
+        {/* Image Carousel - Full width, swipeable */}
         <div className="relative">
+          {/* Swipeable Image Container */}
           <div
-            className="aspect-[4/3] bg-gray-100 cursor-zoom-in"
-            onClick={() => setShowLightbox(true)}
+            className="aspect-[4/3] bg-gray-100 overflow-hidden touch-pan-y"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
-            <img
-              src={getProductImageUrl(images[currentImageIndex])}
-              alt={product.title}
-              className="w-full h-full object-cover"
-            />
+            <div
+              className="flex h-full transition-transform duration-300 ease-out"
+              style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+            >
+              {images.map((img, idx) => (
+                <div
+                  key={idx}
+                  className="w-full h-full flex-shrink-0"
+                  onClick={() => setShowLightbox(true)}
+                >
+                  <img
+                    src={getProductImageUrl(img)}
+                    alt={`${product.title} - Image ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                    draggable={false}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Floating Back Button - Inside Image */}
           <Link
             href={`/${locale}/products`}
-            className="absolute top-4 left-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md"
+            className="absolute top-4 left-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md z-10"
           >
             <ChevronLeft className="w-5 h-5 text-gray-800" />
           </Link>
 
           {/* Floating Action Buttons - Inside Image */}
-          <div className="absolute top-4 right-4 flex gap-2">
+          <div className="absolute top-4 right-4 flex gap-2 z-10">
             <button
               onClick={handleShare}
               className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md"
@@ -193,14 +241,20 @@ export default function ProductDetailClient({
 
           {/* Image Navigation Dots */}
           {images.length > 1 && (
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full z-10">
               {images.map((_, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setCurrentImageIndex(idx)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    idx === currentImageIndex ? 'bg-white w-6 shadow' : 'bg-white/60'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex(idx);
+                  }}
+                  className={`rounded-full transition-all duration-300 ${
+                    idx === currentImageIndex
+                      ? 'w-6 h-2 bg-white'
+                      : 'w-2 h-2 bg-white/50 hover:bg-white/70'
                   }`}
+                  aria-label={`Go to image ${idx + 1}`}
                 />
               ))}
             </div>
