@@ -13,7 +13,7 @@ export default function ProductJsonLd({
   product,
   reviews = [],
   averageRating = 0,
-  baseUrl = "https://digistore1.vercel.app",
+  baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.digistore1.com",
 }: ProductJsonLdProps) {
   const jsonLd = {
     "@context": "https://schema.org",

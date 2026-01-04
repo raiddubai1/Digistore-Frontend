@@ -8,7 +8,7 @@ interface CanonicalUrlProps {
 }
 
 export default function CanonicalUrl({
-  baseUrl = "https://digistore1.vercel.app",
+  baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.digistore1.com",
 }: CanonicalUrlProps) {
   const pathname = usePathname();
   

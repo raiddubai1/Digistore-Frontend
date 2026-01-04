@@ -22,7 +22,7 @@ export const viewport: Viewport = {
   ],
 };
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://digistore1.vercel.app";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.digistore1.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
