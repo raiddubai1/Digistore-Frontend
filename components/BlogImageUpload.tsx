@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
+import { X, Image as ImageIcon, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
-import { useAuth } from "@/contexts/AuthContext";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://digistore1-backend.onrender.com/api";
 
@@ -17,7 +16,6 @@ export default function BlogImageUpload({ value, onChange, label = "Featured Ima
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { token } = useAuth();
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -63,6 +61,7 @@ export default function BlogImageUpload({ value, onChange, label = "Featured Ima
     try {
       const formData = new FormData();
       formData.append("image", file);
+      const token = localStorage.getItem("accessToken");
 
       const response = await fetch(`${API_URL}/upload/image`, {
         method: "POST",

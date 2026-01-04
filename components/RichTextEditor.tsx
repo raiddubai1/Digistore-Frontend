@@ -3,7 +3,6 @@
 import { useMemo, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import toast from "react-hot-toast";
-import { useAuth } from "@/contexts/AuthContext";
 import "react-quill-new/dist/quill.snow.css";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
@@ -18,7 +17,6 @@ interface RichTextEditorProps {
 
 export default function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
   const quillRef = useRef<any>(null);
-  const { token } = useAuth();
 
   // Image handler - uploads to Cloudinary
   const imageHandler = useCallback(() => {
@@ -40,6 +38,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
       try {
         const formData = new FormData();
         formData.append("image", file);
+        const token = localStorage.getItem("accessToken");
 
         const response = await fetch(`${API_URL}/upload/image`, {
           method: "POST",
@@ -63,7 +62,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
         toast.error("Failed to upload image", { id: loadingToast });
       }
     };
-  }, [token]);
+  }, []);
 
   // Video handler - embeds YouTube videos
   const videoHandler = useCallback(() => {
