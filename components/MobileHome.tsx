@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Search, ChevronRight, TrendingUp, Star, Clock } from "lucide-react";
+import { Search, ChevronRight, TrendingUp, Sparkles, Star, Clock } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ProductCard from "./ProductCard";
