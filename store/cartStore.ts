@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Product } from "@/types";
+import { couponsAPI } from "@/lib/api";
 
 export interface CartItem {
   product: Product;
@@ -11,9 +12,10 @@ export interface CartItem {
 
 interface CouponCode {
   code: string;
-  discount: number; // percentage
+  discount: number; // percentage or fixed amount
   type: 'percentage' | 'fixed';
   isAutoApplied?: boolean; // For first-time buyer discount
+  discountAmount?: number; // Calculated discount amount from server
 }
 
 interface CartStore {
@@ -21,6 +23,7 @@ interface CartStore {
   isOpen: boolean;
   coupon: CouponCode | null;
   isFirstTimeBuyer: boolean;
+  isValidatingCoupon: boolean;
 
   // Actions
   addItem: (product: Product, license?: "personal" | "commercial" | "extended") => void;
@@ -31,8 +34,10 @@ interface CartStore {
   openCart: () => void;
   closeCart: () => void;
   applyCoupon: (code: string) => { success: boolean; message: string };
+  applyCouponAsync: (code: string, email?: string) => Promise<{ success: boolean; message: string }>;
   removeCoupon: () => void;
   checkFirstTimeBuyer: () => void;
+  checkFirstTimeBuyerAsync: (email?: string) => Promise<void>;
   markAsReturningCustomer: () => void;
 
   // Computed values
@@ -78,6 +83,7 @@ export const useCartStore = create<CartStore>()(
       isOpen: false,
       coupon: null,
       isFirstTimeBuyer: true, // Default to true, will be checked on mount
+      isValidatingCoupon: false,
 
       checkFirstTimeBuyer: () => {
         const hasPurchased = hasUserPurchasedBefore();
@@ -87,6 +93,26 @@ export const useCartStore = create<CartStore>()(
         // Auto-apply welcome discount for first-time buyers if no coupon applied
         if (isFirstTime && !get().coupon) {
           set({ coupon: WELCOME_COUPON });
+        }
+      },
+
+      // Async version that checks with backend
+      checkFirstTimeBuyerAsync: async (email?: string) => {
+        try {
+          const response = await couponsAPI.checkFirstTimeBuyer(email);
+          const isFirstTime = response.data?.data?.isFirstTimeBuyer ?? false;
+          set({ isFirstTimeBuyer: isFirstTime });
+
+          // Auto-apply welcome discount for first-time buyers if no coupon applied
+          if (isFirstTime && !get().coupon) {
+            set({ coupon: WELCOME_COUPON });
+          } else if (!isFirstTime && get().coupon?.isAutoApplied) {
+            // Remove auto-applied coupon if not first-time buyer
+            set({ coupon: null });
+          }
+        } catch (error) {
+          // Fallback to localStorage check if backend fails
+          get().checkFirstTimeBuyer();
         }
       },
 
@@ -170,6 +196,7 @@ export const useCartStore = create<CartStore>()(
         set({ isOpen: false });
       },
 
+      // Synchronous coupon application (fallback, uses local validation)
       applyCoupon: (code: string) => {
         const upperCode = code.toUpperCase().trim();
         const coupon = validCoupons[upperCode];
@@ -190,6 +217,46 @@ export const useCartStore = create<CartStore>()(
         // Apply the new coupon (replaces any auto-applied coupon)
         set({ coupon: { ...coupon, isAutoApplied: false } });
         return { success: true, message: `Coupon "${upperCode}" applied! ${coupon.type === 'percentage' ? `${coupon.discount}% off` : `$${coupon.discount} off`}` };
+      },
+
+      // Async coupon application with backend validation
+      applyCouponAsync: async (code: string, email?: string) => {
+        const upperCode = code.toUpperCase().trim();
+
+        if (get().coupon?.code === upperCode) {
+          return { success: false, message: 'Coupon already applied' };
+        }
+
+        set({ isValidatingCoupon: true });
+
+        try {
+          const subtotal = get().subtotal();
+          const response = await couponsAPI.validate({ code: upperCode, subtotal, email });
+          const data = response.data?.data;
+
+          if (!data?.valid) {
+            set({ isValidatingCoupon: false });
+            return { success: false, message: data?.message || 'Invalid coupon code' };
+          }
+
+          // Apply the validated coupon
+          set({
+            coupon: {
+              code: data.code,
+              discount: data.discount,
+              type: data.type.toLowerCase() as 'percentage' | 'fixed',
+              isAutoApplied: false,
+              discountAmount: data.discountAmount,
+            },
+            isValidatingCoupon: false,
+          });
+
+          return { success: true, message: data.message };
+        } catch (error: any) {
+          set({ isValidatingCoupon: false });
+          // Fallback to local validation if backend fails
+          return get().applyCoupon(code);
+        }
       },
 
       removeCoupon: () => {

@@ -8,11 +8,12 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function Cart() {
-  const { items, isOpen, closeCart, removeItem, updateQuantity, itemCount, subtotal, discount, total, coupon, applyCoupon, removeCoupon, checkFirstTimeBuyer, isFirstTimeBuyer } =
+  const { items, isOpen, closeCart, removeItem, updateQuantity, itemCount, subtotal, discount, total, coupon, applyCouponAsync, isValidatingCoupon, removeCoupon, checkFirstTimeBuyer, isFirstTimeBuyer } =
     useCartStore();
   const [mounted, setMounted] = useState(false);
   const [couponInput, setCouponInput] = useState("");
   const [showCouponInput, setShowCouponInput] = useState(false);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
   // Prevent hydration mismatch and check first-time buyer status
   useEffect(() => {
@@ -185,21 +186,28 @@ export default function Cart() {
                     onChange={(e) => setCouponInput(e.target.value)}
                     placeholder="Enter coupon code"
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                    disabled={isApplyingCoupon || isValidatingCoupon}
                   />
                   <button
-                    onClick={() => {
-                      const result = applyCoupon(couponInput);
-                      if (result.success) {
-                        toast.success(result.message);
-                        setCouponInput("");
-                        setShowCouponInput(false);
-                      } else {
-                        toast.error(result.message);
+                    onClick={async () => {
+                      setIsApplyingCoupon(true);
+                      try {
+                        const result = await applyCouponAsync(couponInput);
+                        if (result.success) {
+                          toast.success(result.message);
+                          setCouponInput("");
+                          setShowCouponInput(false);
+                        } else {
+                          toast.error(result.message);
+                        }
+                      } finally {
+                        setIsApplyingCoupon(false);
                       }
                     }}
-                    className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800"
+                    disabled={isApplyingCoupon || isValidatingCoupon || !couponInput.trim()}
+                    className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Apply
+                    {isApplyingCoupon || isValidatingCoupon ? 'Validating...' : 'Apply'}
                   </button>
                 </div>
               ) : (

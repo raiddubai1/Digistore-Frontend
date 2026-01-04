@@ -26,11 +26,12 @@ const PayPalIcon = () => (
 export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { items, subtotal, discount, clearCart, coupon, applyCoupon, removeCoupon } = useCartStore();
+  const { items, subtotal, discount, clearCart, coupon, applyCouponAsync, isValidatingCoupon, removeCoupon } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [couponInput, setCouponInput] = useState("");
   const [showCouponInput, setShowCouponInput] = useState(false);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [paypalLoaded, setPaypalLoaded] = useState(false);
 
@@ -323,22 +324,29 @@ export default function CheckoutPage() {
               onChange={(e) => setCouponInput(e.target.value)}
               placeholder="Coupon code"
               className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
+              disabled={isApplyingCoupon || isValidatingCoupon}
             />
             <button
               type="button"
-              onClick={() => {
-                const result = applyCoupon(couponInput);
-                if (result.success) {
-                  toast.success(result.message);
-                  setCouponInput("");
-                  setShowCouponInput(false);
-                } else {
-                  toast.error(result.message);
+              onClick={async () => {
+                setIsApplyingCoupon(true);
+                try {
+                  const result = await applyCouponAsync(couponInput, formData.email);
+                  if (result.success) {
+                    toast.success(result.message);
+                    setCouponInput("");
+                    setShowCouponInput(false);
+                  } else {
+                    toast.error(result.message);
+                  }
+                } finally {
+                  setIsApplyingCoupon(false);
                 }
               }}
-              className="px-3 py-2 bg-gray-900 text-white text-sm rounded-lg"
+              disabled={isApplyingCoupon || isValidatingCoupon || !couponInput.trim()}
+              className="px-3 py-2 bg-gray-900 text-white text-sm rounded-lg disabled:opacity-50"
             >
-              Apply
+              {isApplyingCoupon || isValidatingCoupon ? 'Validating...' : 'Apply'}
             </button>
           </div>
         ) : (
@@ -711,22 +719,29 @@ export default function CheckoutPage() {
                       onChange={(e) => setCouponInput(e.target.value)}
                       placeholder="Coupon code"
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                      disabled={isApplyingCoupon || isValidatingCoupon}
                     />
                     <button
                       type="button"
-                      onClick={() => {
-                        const result = applyCoupon(couponInput);
-                        if (result.success) {
-                          toast.success(result.message);
-                          setCouponInput("");
-                          setShowCouponInput(false);
-                        } else {
-                          toast.error(result.message);
+                      onClick={async () => {
+                        setIsApplyingCoupon(true);
+                        try {
+                          const result = await applyCouponAsync(couponInput, formData.email);
+                          if (result.success) {
+                            toast.success(result.message);
+                            setCouponInput("");
+                            setShowCouponInput(false);
+                          } else {
+                            toast.error(result.message);
+                          }
+                        } finally {
+                          setIsApplyingCoupon(false);
                         }
                       }}
-                      className="px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800"
+                      disabled={isApplyingCoupon || isValidatingCoupon || !couponInput.trim()}
+                      className="px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50"
                     >
-                      Apply
+                      {isApplyingCoupon || isValidatingCoupon ? 'Validating...' : 'Apply'}
                     </button>
                   </div>
                 ) : (

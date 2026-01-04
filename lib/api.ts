@@ -306,6 +306,20 @@ export const paymentsAPI = {
 };
 
 // ============================================
+// COUPONS API
+// ============================================
+
+export const couponsAPI = {
+  // Validate a coupon code
+  validate: (data: { code: string; subtotal: number; email?: string }) =>
+    api.post('/coupons/validate', data),
+
+  // Check if user is first-time buyer
+  checkFirstTimeBuyer: (email?: string) =>
+    api.get(`/coupons/first-time-buyer${email ? `?email=${encodeURIComponent(email)}` : ''}`),
+};
+
+// ============================================
 // DOWNLOADS API
 // ============================================
 
