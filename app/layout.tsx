@@ -15,6 +15,9 @@ export default function RootLayout({
   return (
     <html className={`${inter.variable} overflow-x-hidden`} suppressHydrationWarning>
       <head>
+        {/* Favicon */}
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" sizes="32x32" />
         {/* PWA Meta Tags */}
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
@@ -23,7 +26,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Digistore1" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="application-name" content="Digistore1" />
-        <meta name="msapplication-TileColor" content="#000000" />
+        <meta name="msapplication-TileColor" content="#FF6B35" />
         <meta name="msapplication-tap-highlight" content="no" />
       </head>
       <body className="overflow-x-hidden" suppressHydrationWarning>
