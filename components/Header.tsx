@@ -60,13 +60,13 @@ export default function Header() {
         : "bg-gradient-to-r from-white via-gray-50 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 shadow-md shadow-gray-100 dark:shadow-slate-800/50"
     )}>
       {/* Top Announcement Bar - Hidden on Mobile for App-like Feel */}
-      <div className="hidden lg:block bg-gradient-to-r from-gray-500 via-gray-600 to-gray-500 text-white py-1.5">
+      <div className="hidden lg:block bg-gradient-to-r from-primary via-secondary to-primary text-white py-1.5">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
           <div className="flex items-center justify-between text-sm">
             {/* Left - Special Offer Badge */}
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-yellow-300 animate-pulse" />
-              <span className="font-medium">Limited Time: 30% OFF on All Digital Products!</span>
+              <span className="font-medium">🎉 New User Offer: <span className="font-bold">30% OFF</span> Your First Purchase! Use code <span className="bg-white/20 px-2 py-0.5 rounded font-bold">WELCOME30</span></span>
             </div>
 
             {/* Right - Language & Support */}
