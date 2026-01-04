@@ -69,9 +69,28 @@ export default function ProductDetailClient({
     }
   };
 
-  const images = product.previewImages?.length > 0 
-    ? product.previewImages 
-    : [product.thumbnailUrl];
+  // Combine thumbnailUrl (featured image) with previewImages, ensuring featured image is first
+  // Filter out duplicates in case thumbnailUrl is already in previewImages
+  const images = (() => {
+    const allImages: string[] = [];
+
+    // Add thumbnail first (featured image)
+    if (product.thumbnailUrl) {
+      allImages.push(product.thumbnailUrl);
+    }
+
+    // Add preview images, excluding any that match the thumbnail
+    if (product.previewImages?.length > 0) {
+      for (const img of product.previewImages) {
+        if (img && img !== product.thumbnailUrl) {
+          allImages.push(img);
+        }
+      }
+    }
+
+    // Fallback to a placeholder if no images at all
+    return allImages.length > 0 ? allImages : ['/placeholder-product.jpg'];
+  })();
 
   const handleAddToCart = () => {
     addItem(product);
