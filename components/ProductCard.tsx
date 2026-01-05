@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/types";
 import { Heart, ShoppingCart, Star, Download, GitCompare } from "lucide-react";
-import { formatPrice, getThumbnailUrl } from "@/lib/utils";
+import { formatPrice, getThumbnailUrl, getCurrentCurrency, CurrencyCode } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
@@ -21,9 +21,14 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
   const { addItem: addToCompare, removeItem: removeFromCompare, isInCompare, items: compareItems } = useCompareStore();
   const [mounted, setMounted] = useState(false);
+  const [currency, setCurrency] = useState<CurrencyCode>('USD');
 
   useEffect(() => {
     setMounted(true);
+    setCurrency(getCurrentCurrency());
+    const handleCurrencyChange = () => setCurrency(getCurrentCurrency());
+    window.addEventListener('currencyChange', handleCurrencyChange);
+    return () => window.removeEventListener('currencyChange', handleCurrencyChange);
   }, []);
 
   const isWishlisted = mounted ? isInWishlist(product.id) : false;

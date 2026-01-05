@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useCartStore } from '@/store/cartStore';
 import { bundlesAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { formatPrice, getCurrentCurrency, CurrencyCode } from '@/lib/utils';
 
 interface BundleProduct {
   id: string;
@@ -38,10 +39,15 @@ interface Bundle {
 export default function BundlesPage() {
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currency, setCurrency] = useState<CurrencyCode>('USD');
   const { addItem } = useCartStore();
 
   useEffect(() => {
     fetchBundles();
+    setCurrency(getCurrentCurrency());
+    const handleCurrencyChange = () => setCurrency(getCurrentCurrency());
+    window.addEventListener('currencyChange', handleCurrencyChange);
+    return () => window.removeEventListener('currencyChange', handleCurrencyChange);
   }, []);
 
   const fetchBundles = async () => {
@@ -218,11 +224,11 @@ export default function BundlesPage() {
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-gray-100">
                         <div>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-3xl font-bold text-gray-900">${Number(bundle.bundlePrice).toFixed(2)}</span>
-                            <span className="text-lg text-gray-400 line-through">${Number(bundle.originalPrice).toFixed(2)}</span>
+                            <span className="text-3xl font-bold text-gray-900">{formatPrice(Number(bundle.bundlePrice))}</span>
+                            <span className="text-lg text-gray-400 line-through">{formatPrice(Number(bundle.originalPrice))}</span>
                           </div>
                           <p className="text-green-600 text-sm font-semibold">
-                            You save ${calculateSavings(Number(bundle.originalPrice), Number(bundle.bundlePrice)).toFixed(2)}
+                            You save {formatPrice(calculateSavings(Number(bundle.originalPrice), Number(bundle.bundlePrice)))}
                           </p>
                         </div>
                         <button
@@ -303,8 +309,8 @@ export default function BundlesPage() {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="text-gray-400 line-through text-sm">${Number(bundle.originalPrice).toFixed(2)}</span>
-                        <span className="text-xl font-bold text-gray-900 ml-2">${Number(bundle.bundlePrice).toFixed(2)}</span>
+                        <span className="text-gray-400 line-through text-sm">{formatPrice(Number(bundle.originalPrice))}</span>
+                        <span className="text-xl font-bold text-gray-900 ml-2">{formatPrice(Number(bundle.bundlePrice))}</span>
                       </div>
                       <button
                         onClick={() => handleAddBundle(bundle)}

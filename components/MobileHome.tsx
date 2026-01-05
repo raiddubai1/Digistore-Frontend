@@ -3,12 +3,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Search, ChevronRight, TrendingUp, Sparkles, Star, Clock } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ProductCard from "./ProductCard";
 import WelcomePopup from "./WelcomePopup";
 import { Product, Category } from "@/types";
-import { getThumbnailUrl } from "@/lib/utils";
+import { getThumbnailUrl, formatPrice, getCurrentCurrency, CurrencyCode } from "@/lib/utils";
 
 interface MobileHomeProps {
   featuredProducts: Product[];
@@ -307,6 +307,15 @@ export default function MobileHome({
 
 // Compact product card for mobile grid/scroll - with consistent padding
 function MiniProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
+  const [currency, setCurrency] = useState<CurrencyCode>('USD');
+
+  useEffect(() => {
+    setCurrency(getCurrentCurrency());
+    const handleCurrencyChange = () => setCurrency(getCurrentCurrency());
+    window.addEventListener('currencyChange', handleCurrencyChange);
+    return () => window.removeEventListener('currencyChange', handleCurrencyChange);
+  }, []);
+
   return (
     <Link href={`/products/${product.slug}`} className="block">
       <div className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-md active:scale-[0.98] transition-all">
@@ -350,9 +359,9 @@ function MiniProductCard({ product, priority = false }: { product: Product; prio
             <span className="text-[10px] text-gray-400 dark:text-gray-500">({product.reviewCount})</span>
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-base font-bold text-[#FF6B35]">${product.price}</span>
+            <span className="text-base font-bold text-[#FF6B35]">{formatPrice(product.price)}</span>
             {product.originalPrice && (
-              <span className="text-[10px] text-gray-400 dark:text-gray-500 line-through">${product.originalPrice}</span>
+              <span className="text-[10px] text-gray-400 dark:text-gray-500 line-through">{formatPrice(product.originalPrice)}</span>
             )}
           </div>
         </div>
