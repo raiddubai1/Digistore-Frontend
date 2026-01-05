@@ -751,7 +751,7 @@ export default function ProductsClient() {
         <div className="bg-white px-4 py-3 border-b border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <p className="text-sm font-medium text-gray-900">
-              {total} products
+              All Products
             </p>
             {hasActiveFilters && (
               <button
@@ -874,7 +874,7 @@ export default function ProductsClient() {
         {/* End of products indicator */}
         {!loading && products.length > 0 && products.length >= total && (
           <div className="px-4 py-6 text-center text-gray-400 text-sm">
-            You&apos;ve seen all {total} products
+            You&apos;ve seen all products
           </div>
         )}
       </div>
@@ -889,7 +889,7 @@ export default function ProductsClient() {
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2">All Products</h1>
             <p className="text-gray-600">
-              Browse our collection of {total} premium digital products
+              Browse our collection of premium digital products
             </p>
           </div>
 
@@ -1116,10 +1116,7 @@ export default function ProductsClient() {
                   {loading ? (
                     <span>Loading products...</span>
                   ) : (
-                    <>
-                      Showing <span className="font-semibold">{products.length}</span> of{" "}
-                      <span className="font-semibold">{total}</span> products
-                    </>
+                    <span>Browse our premium collection</span>
                   )}
                 </div>
               </div>
