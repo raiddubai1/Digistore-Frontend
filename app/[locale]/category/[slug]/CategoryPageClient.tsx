@@ -40,19 +40,20 @@ export default function CategoryPageClient({
   const [bottomContentExpanded, setBottomContentExpanded] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Get all category slugs (parent + children) for fetching products
+  // Get all category slugs for parent categories (includes children)
   const getCategorySlugs = useCallback(() => {
     const slugs = [slug];
-    // Add child category slugs if this is a parent category
     const children = (category as any)?.children || [];
     children.forEach((child: any) => {
       slugs.push(child.slug);
-      // Add grandchildren if any
       const grandchildren = child.children || [];
       grandchildren.forEach((gc: any) => slugs.push(gc.slug));
     });
     return slugs;
   }, [slug, category]);
+
+  // Check if this is a parent category (has children)
+  const isParentCategory = ((category as any)?.children || []).length > 0;
 
   // Fetch products for this category
   const fetchProducts = useCallback(async (pageNum: number, append: boolean = false) => {
@@ -62,98 +63,89 @@ export default function CategoryPageClient({
       setLoading(true);
     }
 
-    const categorySlugs = getCategorySlugs();
-    let allProducts: Product[] = [];
-    let totalCount = 0;
-
     try {
-      // Fetch products from all category slugs (parent + children)
-      for (const catSlug of categorySlugs) {
+      if (isParentCategory) {
+        // For parent categories, fetch from all child categories too
+        const categorySlugs = getCategorySlugs();
+        let allProducts: Product[] = [];
+
+        for (const catSlug of categorySlugs) {
+          const response = await productsAPI.getAll({
+            page: 1,
+            limit: 100,
+            category: catSlug,
+            sort: sortBy,
+          });
+          const data = response.data?.data || response.data;
+          allProducts = [...allProducts, ...(data?.products || [])];
+        }
+
+        // Remove duplicates and sort
+        const uniqueProducts = allProducts.filter((p, i, arr) =>
+          arr.findIndex(x => x.id === p.id) === i
+        );
+
+        const sortedProducts = [...uniqueProducts].sort((a, b) => {
+          switch (sortBy) {
+            case "newest": return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+            case "price-low": return a.price - b.price;
+            case "price-high": return b.price - a.price;
+            case "rating": return (b.rating || 0) - (a.rating || 0);
+            default: return ((b as any).downloadCount || 0) - ((a as any).downloadCount || 0);
+          }
+        });
+
+        const paginatedProducts = sortedProducts.slice(0, pageNum * 12);
+        setProducts(paginatedProducts);
+        setTotal(sortedProducts.length);
+      } else {
+        // For subcategories, backend now includes parent products
         const response = await productsAPI.getAll({
-          page: 1,
-          limit: 100, // Get more to combine
-          category: catSlug,
+          page: pageNum,
+          limit: 12,
+          category: slug,
           sort: sortBy,
         });
 
         const data = response.data?.data || response.data;
         const apiProducts = data?.products || [];
-        allProducts = [...allProducts, ...apiProducts];
-        totalCount += data?.pagination?.total || apiProducts.length;
+
+        if (append) {
+          setProducts(prev => [...prev, ...apiProducts]);
+        } else {
+          setProducts(apiProducts);
+        }
+        setTotal(data?.pagination?.total || apiProducts.length);
       }
 
-      // Remove duplicates by id
-      const uniqueProducts = allProducts.filter((p, i, arr) =>
-        arr.findIndex(x => x.id === p.id) === i
-      );
+      setLoading(false);
+      setIsLoadingMore(false);
+    } catch (error) {
+      console.error("Error fetching products:", error);
 
-      // Sort combined results
-      const sortedProducts = [...uniqueProducts].sort((a, b) => {
+      // Fallback to demo data
+      const categorySlugsForDemo = getCategorySlugs();
+      const filteredProducts = demoProducts.filter(p => {
+        const productCatSlug = typeof p.category === 'string' ? p.category : (p.category as any)?.slug;
+        return categorySlugsForDemo.includes(productCatSlug);
+      });
+
+      const sortedProducts = [...filteredProducts].sort((a, b) => {
         switch (sortBy) {
-          case "newest":
-            return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
-          case "price-low":
-            return a.price - b.price;
-          case "price-high":
-            return b.price - a.price;
-          case "rating":
-            return (b.rating || 0) - (a.rating || 0);
-          default: // popular
-            return ((b as any).downloadCount || 0) - ((a as any).downloadCount || 0);
+          case "newest": return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+          case "price-low": return a.price - b.price;
+          case "price-high": return b.price - a.price;
+          case "rating": return (b.rating || 0) - (a.rating || 0);
+          default: return ((b as any).salesCount || 0) - ((a as any).salesCount || 0);
         }
       });
 
-      // Paginate
-      const startIndex = (pageNum - 1) * 12;
-      const paginatedProducts = sortedProducts.slice(0, startIndex + 12);
-
-      if (paginatedProducts.length > 0 || sortedProducts.length > 0) {
-        if (append) {
-          setProducts(paginatedProducts);
-        } else {
-          setProducts(paginatedProducts);
-        }
-        setTotal(sortedProducts.length);
-        setLoading(false);
-        setIsLoadingMore(false);
-        return;
-      }
-    } catch (error) {
-      console.error("Error fetching products:", error);
+      setProducts(sortedProducts.slice(0, pageNum * 12));
+      setTotal(sortedProducts.length);
+      setLoading(false);
+      setIsLoadingMore(false);
     }
-
-    // Fallback to demo data
-    const categorySlugsForDemo = getCategorySlugs();
-    const filteredProducts = demoProducts.filter(p => {
-      const productCatSlug = typeof p.category === 'string' ? p.category : (p.category as any)?.slug;
-      return categorySlugsForDemo.includes(productCatSlug);
-    });
-
-    // Apply sorting
-    const sortedProducts = [...filteredProducts].sort((a, b) => {
-      switch (sortBy) {
-        case "newest":
-          return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
-        case "price-low":
-          return a.price - b.price;
-        case "price-high":
-          return b.price - a.price;
-        case "rating":
-          return (b.rating || 0) - (a.rating || 0);
-        default: // popular
-          return ((b as any).salesCount || 0) - ((a as any).salesCount || 0);
-      }
-    });
-
-    const startIndex = (pageNum - 1) * 12;
-    const paginatedProducts = sortedProducts.slice(0, startIndex + 12);
-
-    setProducts(paginatedProducts);
-    setTotal(sortedProducts.length);
-
-    setLoading(false);
-    setIsLoadingMore(false);
-  }, [slug, sortBy, getCategorySlugs]);
+  }, [slug, sortBy, getCategorySlugs, isParentCategory]);
 
   useEffect(() => {
     fetchProducts(1, false);
