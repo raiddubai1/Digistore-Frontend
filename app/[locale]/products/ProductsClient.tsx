@@ -16,6 +16,7 @@ import SortBottomSheet from "@/components/SortBottomSheet";
 import FilterBottomSheet from "@/components/FilterBottomSheet";
 import CategoryFilter from "@/components/shop/CategoryFilter";
 import { productsAPI, categoriesAPI, attributesAPI } from "@/lib/api";
+import { useTranslations } from "next-intl";
 
 // Attribute type
 interface Attribute {
@@ -72,6 +73,7 @@ const categoryConfig: { [key: string]: { emoji: string; bgColor: string } } = {
 };
 
 export default function ProductsClient() {
+  const t = useTranslations("products");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -714,7 +716,7 @@ export default function ProductsClient() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder={t("searchProducts")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-11 pl-10 pr-4 rounded-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-gray-400 focus:ring-2 focus:ring-gray-100 focus:outline-none transition-all text-sm"
@@ -751,14 +753,14 @@ export default function ProductsClient() {
         <div className="bg-white px-4 py-3 border-b border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <p className="text-sm font-medium text-gray-900">
-              All Products
+              {t("title")}
             </p>
             {hasActiveFilters && (
               <button
                 onClick={clearAllFilters}
                 className="text-xs font-medium text-[#ff6f61]"
               >
-                Clear
+                {t("clear")}
               </button>
             )}
           </div>
@@ -767,7 +769,7 @@ export default function ProductsClient() {
               onClick={() => setIsSortOpen(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 text-sm font-medium text-gray-700 active:bg-gray-50"
             >
-              Sort
+              {t("sort")}
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
@@ -780,7 +782,7 @@ export default function ProductsClient() {
                   : "border-gray-200 text-gray-700"
               }`}
             >
-              Filter
+              {t("filter")}
               {hasActiveFilters && (
                 <span className="w-4 h-4 rounded-full bg-white text-gray-900 text-xs flex items-center justify-center">
                   {selectedCategories.length + selectedPriceRanges.length + selectedRatings.length}
@@ -802,7 +804,7 @@ export default function ProductsClient() {
                   onClick={() => togglePriceRange(range)}
                   className="flex items-center gap-1 px-2.5 py-1 bg-gray-900 text-white rounded-full text-xs font-medium"
                 >
-                  {range === "free" && "Free"}
+                  {range === "free" && t("free")}
                   {range === "0-2.99" && "$0 - $2.99"}
                   {range === "3-4.99" && "$3 - $4.99"}
                   {range === "5-6.99" && "$5 - $6.99"}
@@ -841,12 +843,12 @@ export default function ProductsClient() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-500 mb-4">No products found.</p>
+              <p className="text-gray-500 mb-4">{t("noProducts")}</p>
               <button
                 onClick={clearAllFilters}
                 className="text-[#ff6f61] font-semibold"
               >
-                Clear all filters
+                {t("clearAllFilters")}
               </button>
             </div>
           )}
@@ -858,14 +860,14 @@ export default function ProductsClient() {
             {isLoadingMore ? (
               <div className="flex items-center gap-2 text-gray-500">
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span className="text-sm">Loading more...</span>
+                <span className="text-sm">{t("loadingMore")}</span>
               </div>
             ) : (
               <button
                 onClick={loadMoreProducts}
                 className="w-full py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 active:bg-gray-50"
               >
-                Load more products ({products.length} of {total})
+                {t("loadMore")} ({products.length} {t("of")} {total})
               </button>
             )}
           </div>
@@ -874,7 +876,7 @@ export default function ProductsClient() {
         {/* End of products indicator */}
         {!loading && products.length > 0 && products.length >= total && (
           <div className="px-4 py-6 text-center text-gray-400 text-sm">
-            You&apos;ve seen all products
+            {t("seenAll")}
           </div>
         )}
       </div>
@@ -887,9 +889,9 @@ export default function ProductsClient() {
 
           {/* Page Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">All Products</h1>
+            <h1 className="text-4xl font-bold mb-2">{t("title")}</h1>
             <p className="text-gray-600">
-              Browse our collection of premium digital products
+              {t("browseCollection")}
             </p>
           </div>
 
@@ -900,14 +902,14 @@ export default function ProductsClient() {
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-bold text-lg flex items-center gap-2">
                     <Filter className="w-5 h-5 text-primary" />
-                    Filters
+                    {t("filters")}
                   </h2>
                   {hasActiveFilters && (
                     <button
                       onClick={clearAllFilters}
                       className="text-sm text-primary hover:text-primary-dark font-semibold"
                     >
-                      Clear All
+                      {t("clearAll")}
                     </button>
                   )}
               </div>
@@ -951,7 +953,7 @@ export default function ProductsClient() {
 
               {/* 7. Price Range */}
               <div className="mb-6">
-                <h3 className="font-semibold text-sm text-gray-700 mb-3">Price Range</h3>
+                <h3 className="font-semibold text-sm text-gray-700 mb-3">{t("priceRange")}</h3>
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
                     <input
@@ -960,7 +962,7 @@ export default function ProductsClient() {
                       onChange={() => togglePriceRange("free")}
                       className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
-                    <span className="text-sm">Free</span>
+                    <span className="text-sm">{t("free")}</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
                     <input
@@ -1037,7 +1039,7 @@ export default function ProductsClient() {
 
               {/* 10. Rating */}
               <div className="mb-6">
-                <h3 className="font-semibold text-sm text-gray-700 mb-3">Rating</h3>
+                <h3 className="font-semibold text-sm text-gray-700 mb-3">{t("rating")}</h3>
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
                     <input
@@ -1046,7 +1048,7 @@ export default function ProductsClient() {
                       onChange={() => toggleRating("4+")}
                       className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
-                    <span className="text-sm">4+ Stars</span>
+                    <span className="text-sm">{t("fourPlusStars")}</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
                     <input
@@ -1055,7 +1057,7 @@ export default function ProductsClient() {
                       onChange={() => toggleRating("5")}
                       className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
-                    <span className="text-sm">5 Stars</span>
+                    <span className="text-sm">{t("fiveStars")}</span>
                   </label>
                 </div>
               </div>
@@ -1063,7 +1065,7 @@ export default function ProductsClient() {
               {/* 11. Tags - Only show when we have available tags */}
               {availableTags.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="font-semibold text-sm text-gray-700 mb-3">Tags</h3>
+                  <h3 className="font-semibold text-sm text-gray-700 mb-3">{t("tags")}</h3>
                   <div className="flex flex-wrap gap-2 max-h-[120px] overflow-y-auto">
                     {availableTags.slice(0, 10).map((tagItem) => (
                       <button
@@ -1114,9 +1116,9 @@ export default function ProductsClient() {
               <div className="flex items-center gap-4">
                 <div className="text-sm text-gray-600">
                   {loading ? (
-                    <span>Loading products...</span>
+                    <span>{t("loadingProducts")}</span>
                   ) : (
-                    <span>Browse our premium collection</span>
+                    <span>{t("browseCollection")}</span>
                   )}
                 </div>
               </div>
@@ -1128,11 +1130,11 @@ export default function ProductsClient() {
                   onChange={(e) => setSortBy(e.target.value)}
                   className="hidden lg:block px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary"
                 >
-                  <option value="popular">Most Popular</option>
-                  <option value="newest">Newest</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="rating">Highest Rated</option>
+                  <option value="popular">{t("mostPopular")}</option>
+                  <option value="newest">{t("newest")}</option>
+                  <option value="price-low">{t("priceLowToHigh")}</option>
+                  <option value="price-high">{t("priceHighToLow")}</option>
+                  <option value="rating">{t("highestRated")}</option>
                 </select>
 
                 {/* View Toggle */}
@@ -1217,12 +1219,12 @@ export default function ProductsClient() {
               )
             ) : (
               <div className="text-center py-12">
-                <p className="text-gray-500 mb-4">No products found matching your filters.</p>
+                <p className="text-gray-500 mb-4">{t("noProductsMatching")}</p>
                 <button
                   onClick={clearAllFilters}
                   className="text-primary font-semibold hover:text-primary-dark"
                 >
-                  Clear all filters
+                  {t("clearAllFilters")}
                 </button>
               </div>
             )}
@@ -1236,7 +1238,7 @@ export default function ProductsClient() {
                     disabled={page === 1}
                     className="px-4 py-2 border border-gray-200 rounded-lg hover:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Previous
+                    {t("previous")}
                   </button>
                   {total > 0 && [...Array(Math.ceil(total / 12))].map((_, i) => (
                     <button
@@ -1256,7 +1258,7 @@ export default function ProductsClient() {
                     disabled={page === Math.ceil(total / 12)}
                     className="px-4 py-2 border border-gray-200 rounded-lg hover:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Next
+                    {t("next")}
                   </button>
                 </div>
               </div>

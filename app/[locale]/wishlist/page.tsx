@@ -7,8 +7,10 @@ import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { getThumbnailUrl } from "@/lib/utils";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 export default function WishlistPage() {
+  const t = useTranslations("wishlist");
   const [mounted, setMounted] = useState(false);
   const { items: wishlistItems, removeItem, moveToCart: moveToCartStore } = useWishlistStore();
   const { addItem } = useCartStore();
@@ -19,12 +21,12 @@ export default function WishlistPage() {
 
   const removeFromWishlist = (productId: string) => {
     removeItem(productId);
-    toast.success("Removed from wishlist");
+    toast.success(t("removedFromWishlist"));
   };
 
   const moveToCart = (productId: string) => {
     moveToCartStore(productId, addItem);
-    toast.success("Moved to cart!");
+    toast.success(t("movedToCart"));
   };
 
   // Prevent hydration mismatch
@@ -46,7 +48,7 @@ export default function WishlistPage() {
             <Link href="/" className="p-2 -ml-2">
               <ChevronLeft className="w-6 h-6 text-gray-700" />
             </Link>
-            <h1 className="text-lg font-bold text-gray-900">Wishlist</h1>
+            <h1 className="text-lg font-bold text-gray-900">{t("title")}</h1>
             <div className="w-10" /> {/* Spacer for centering */}
           </div>
         </div>
@@ -56,13 +58,13 @@ export default function WishlistPage() {
             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <Heart className="w-10 h-10 text-gray-400" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Your wishlist is empty</h2>
-            <p className="text-gray-500 text-center mb-6">Save items you love by tapping the heart icon</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{t("empty")}</h2>
+            <p className="text-gray-500 text-center mb-6">{t("emptyDesc")}</p>
             <Link
               href="/products"
               className="px-6 py-3 bg-gray-900 text-white rounded-full font-semibold"
             >
-              Browse Products
+              {t("browseProducts")}
             </Link>
           </div>
         ) : (
@@ -93,7 +95,7 @@ export default function WishlistPage() {
                       onClick={() => moveToCart(wishlistItem.product.id)}
                       className="flex-1 py-2 bg-gray-900 text-white text-xs font-semibold rounded-full"
                     >
-                      Move to Cart
+                      {t("moveToCart")}
                     </button>
                     <button
                       onClick={() => removeFromWishlist(wishlistItem.product.id)}
@@ -112,15 +114,15 @@ export default function WishlistPage() {
       {/* Desktop Layout */}
       <div className="hidden lg:block min-h-screen bg-white py-12">
         <div className="max-w-6xl mx-auto px-4">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">My Wishlist</h1>
-          
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">{t("title")}</h1>
+
           {wishlistItems.length === 0 ? (
             <div className="text-center py-20">
               <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">Your wishlist is empty</h2>
-              <p className="text-gray-500 mb-6">Save items you love by clicking the heart icon</p>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">{t("empty")}</h2>
+              <p className="text-gray-500 mb-6">{t("emptyDesc")}</p>
               <Link href="/products" className="px-6 py-3 bg-gray-900 text-white rounded-full font-semibold">
-                Browse Products
+                {t("browseProducts")}
               </Link>
             </div>
           ) : (
@@ -146,7 +148,7 @@ export default function WishlistPage() {
                     </div>
                     <div className="flex gap-2">
                       <button onClick={() => moveToCart(wishlistItem.product.id)} className="flex-1 py-2.5 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 flex items-center justify-center gap-2">
-                        <ShoppingCart className="w-4 h-4" /> Move to Cart
+                        <ShoppingCart className="w-4 h-4" /> {t("moveToCart")}
                       </button>
                       <button onClick={() => removeFromWishlist(wishlistItem.product.id)} className="w-10 h-10 border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50">
                         <Trash2 className="w-4 h-4 text-gray-500" />
