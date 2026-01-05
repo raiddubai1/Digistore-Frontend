@@ -93,7 +93,7 @@ export default function CategoryPageClient({
         case "rating":
           return (b.rating || 0) - (a.rating || 0);
         default: // popular
-          return (b.salesCount || 0) - (a.salesCount || 0);
+          return ((b as any).salesCount || 0) - ((a as any).salesCount || 0);
       }
     });
 
