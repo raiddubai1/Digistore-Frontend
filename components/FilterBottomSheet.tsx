@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Check, RotateCcw, ChevronDown, ChevronUp, Tag, DollarSign, Star, FileType, ChevronRight, ChevronLeft, Sliders } from "lucide-react";
+import { X, Check, RotateCcw, ChevronDown, ChevronUp, Tag, DollarSign, Star, ChevronRight, ChevronLeft, Sliders } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CategoryWithChildren {
@@ -28,7 +28,6 @@ interface FilterBottomSheetProps {
   selectedSubcategories?: string[];
   selectedPriceRanges: string[];
   selectedRatings: string[];
-  selectedFileTypes?: string[];
   availableTags?: { tag: string; count: number }[];
   selectedTags?: string[];
   // Attributes support
@@ -39,7 +38,6 @@ interface FilterBottomSheetProps {
   onToggleSubcategory?: (subcategory: string) => void;
   onTogglePriceRange: (range: string) => void;
   onToggleRating: (rating: string) => void;
-  onToggleFileType?: (fileType: string) => void;
   onToggleTag?: (tag: string) => void;
   onClearAll: () => void;
 }
@@ -57,16 +55,6 @@ const ratings = [
   { value: "5", label: "4.5+ Stars", stars: 5 },
   { value: "4", label: "4.0+ Stars", stars: 4 },
   { value: "3", label: "3.0+ Stars", stars: 3 },
-];
-
-const fileTypes = [
-  { value: "pdf", label: "PDF Documents", icon: "📄" },
-  { value: "zip", label: "ZIP Archives", icon: "📦" },
-  { value: "mp4", label: "Videos", icon: "🎬" },
-  { value: "mp3", label: "Audio Files", icon: "🎵" },
-  { value: "psd", label: "Photoshop Files", icon: "🎨" },
-  { value: "doc", label: "Word Documents", icon: "📝" },
-  { value: "xls", label: "Spreadsheets", icon: "📊" },
 ];
 
 // Collapsible section component with internal scrolling
@@ -147,7 +135,6 @@ export default function FilterBottomSheet({
   selectedSubcategories = [],
   selectedPriceRanges,
   selectedRatings,
-  selectedFileTypes = [],
   availableTags = [],
   selectedTags = [],
   attributes = [],
@@ -157,13 +144,12 @@ export default function FilterBottomSheet({
   onToggleSubcategory,
   onTogglePriceRange,
   onToggleRating,
-  onToggleFileType,
   onToggleTag,
   onClearAll,
 }: FilterBottomSheetProps) {
   // Count selected attribute values
   const selectedAttributeCount = Object.values(selectedAttributes).reduce((sum, values) => sum + values.length, 0);
-  const totalFilters = selectedCategories.length + selectedSubcategories.length + selectedPriceRanges.length + selectedRatings.length + selectedFileTypes.length + selectedTags.length + selectedAttributeCount;
+  const totalFilters = selectedCategories.length + selectedSubcategories.length + selectedPriceRanges.length + selectedRatings.length + selectedTags.length + selectedAttributeCount;
 
   // Drill-down state for category navigation
   const [categoryDrillDown, setCategoryDrillDown] = useState<string | null>(null);
@@ -591,37 +577,6 @@ export default function FilterBottomSheet({
               ))}
             </div>
           </FilterSection>
-
-          {/* File Type Section */}
-          {onToggleFileType && (
-            <FilterSection
-              title="File Type"
-              icon={FileType}
-              count={selectedFileTypes.length}
-              maxHeight="220px"
-            >
-              <div className="grid grid-cols-2 gap-2">
-                {fileTypes.map((type) => (
-                  <button
-                    key={type.value}
-                    onClick={() => onToggleFileType(type.value)}
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
-                      selectedFileTypes.includes(type.value)
-                        ? "bg-[#ff6f61] text-white shadow-sm"
-                        : "bg-gray-50 text-gray-700 active:bg-gray-100"
-                    )}
-                  >
-                    <span className="text-base">{type.icon}</span>
-                    <span className="truncate">{type.label}</span>
-                    {selectedFileTypes.includes(type.value) && (
-                      <Check className="w-4 h-4 ml-auto flex-shrink-0" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </FilterSection>
-          )}
             </>
           )}
 

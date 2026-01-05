@@ -1286,7 +1286,6 @@ export default function ProductsClient() {
         selectedSubcategories={selectedSubcategories}
         selectedPriceRanges={selectedPriceRanges}
         selectedRatings={selectedRatings}
-        selectedFileTypes={selectedFileTypes}
         availableTags={availableTags}
         selectedTags={selectedTags}
         attributes={attributesWithCounts}
@@ -1296,7 +1295,6 @@ export default function ProductsClient() {
         onToggleSubcategory={toggleSubcategory}
         onTogglePriceRange={togglePriceRange}
         onToggleRating={toggleRating}
-        onToggleFileType={toggleFileType}
         onToggleTag={toggleTag}
         onClearAll={clearAllFilters}
       />
