@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Instagram, Youtube, Mail, Send, Heart, Sparkles, Package, Check, Loader2 } from "lucide-react";
+import { Instagram, Youtube, Send, Heart, Check, Loader2 } from "lucide-react";
 import Logo from "./Logo";
 import toast from "react-hot-toast";
 
@@ -137,7 +137,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link href="/bundles" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
-                    <Package className="w-3.5 h-3.5 text-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Product Bundles
                   </Link>
                 </li>
@@ -168,7 +168,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link href="/contact" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
-                    <Mail className="w-3.5 h-3.5 text-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     Contact Us
                   </Link>
                 </li>
