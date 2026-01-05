@@ -128,7 +128,7 @@ export default function BundlesPage() {
                 <div className="w-8 h-8 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center">
                   <Zap className="w-4 h-4 text-[#FF6B35]" />
                 </div>
-                <span className="text-gray-300">Up to 50% off</span>
+                <span className="text-gray-300">Huge savings</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center">
@@ -339,7 +339,7 @@ export default function BundlesPage() {
               <div className="w-16 h-16 bg-[#FF6B35] rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Zap className="w-8 h-8" />
               </div>
-              <h4 className="font-semibold text-lg mb-2">Save Up to 50%</h4>
+              <h4 className="font-semibold text-lg mb-2">Save Big</h4>
               <p className="text-gray-400">Massive discounts compared to buying products individually</p>
             </div>
             <div className="text-center">
