@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { X, ChevronDown, Briefcase, Sparkles, Code, Heart, Palette, DollarSign, Flame, Zap, Tag, Globe, Check, LucideIcon, Home, Search, Package, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCategories } from "@/hooks/useCategories";
@@ -127,6 +128,7 @@ const languages = [
 ];
 
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
+  const t = useTranslations("common");
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState("EN");
   const [languageExpanded, setLanguageExpanded] = useState(false);
@@ -181,7 +183,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 z-10">
           {/* Top Bar */}
           <div className="flex items-center justify-between px-4 py-3">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Menu</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t("menu")}</h2>
             <button
               onClick={onClose}
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 active:bg-gray-200 dark:active:bg-slate-600 transition-colors"
@@ -199,7 +201,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products, categories..."
+                  placeholder={t("searchPlaceholder")}
                   className="w-full h-12 pl-12 pr-4 rounded-full border-2 border-gray-200 dark:border-slate-600 focus:border-gray-400 dark:focus:border-slate-500 focus:ring-4 focus:ring-gray-100 dark:focus:ring-slate-700 focus:outline-none transition-all text-sm bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
@@ -214,7 +216,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#ff6f61] to-gray-600 text-white rounded-full font-semibold text-sm shadow-lg active:scale-95 transition-transform"
             >
               <Flame className="w-4 h-4" />
-              Trending
+              {t("trending")}
             </Link>
             <Link
               href="/products?filter=new"
@@ -222,7 +224,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-full font-semibold text-sm shadow-lg active:scale-95 transition-transform"
             >
               <Zap className="w-4 h-4" />
-              New
+              {t("new")}
             </Link>
             <Link
               href="/deals"
@@ -230,7 +232,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full font-semibold text-sm shadow-lg active:scale-95 transition-transform"
             >
               <Tag className="w-4 h-4" />
-              Deals
+              {t("deals")}
             </Link>
           </div>
         </div>
@@ -241,7 +243,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           {menuItems.length > 0 && (
             <div className="space-y-1 mb-8">
               <h3 className="px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
-                Navigation
+                {t("navigation")}
               </h3>
               {menuItems.map((item) => (
                 <Link
@@ -262,7 +264,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           {/* Categories */}
           <div className="space-y-1 mb-8">
             <h3 className="px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
-              Categories
+              {t("categories")}
             </h3>
             {categories.map((category) => {
               const IconComponent = category.icon;
@@ -328,7 +330,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           {/* Special Features */}
           <div className="space-y-2 border-t border-gray-200 dark:border-slate-700 pt-6 mb-6">
             <h3 className="px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
-              Special
+              {t("special")}
             </h3>
             <Link
               href="/bundles"
@@ -339,8 +341,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 <Package className="w-5 h-5 text-white" />
               </div>
               <div>
-                <span className="text-base font-medium text-gray-900 dark:text-white">Product Bundles</span>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Save more when you buy together</p>
+                <span className="text-base font-medium text-gray-900 dark:text-white">{t("productBundles")}</span>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t("bundlesDesc")}</p>
               </div>
             </Link>
             <Link
@@ -352,8 +354,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 <Tag className="w-5 h-5 text-white" />
               </div>
               <div>
-                <span className="text-base font-medium text-gray-900 dark:text-white">Hot Deals</span>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Special offers and discounts</p>
+                <span className="text-base font-medium text-gray-900 dark:text-white">{t("hotDeals")}</span>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t("dealsDesc")}</p>
               </div>
             </Link>
           </div>

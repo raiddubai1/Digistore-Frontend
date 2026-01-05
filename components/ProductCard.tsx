@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Product } from "@/types";
 import { Heart, ShoppingCart, Star, Download, GitCompare } from "lucide-react";
 import { formatPrice, getThumbnailUrl, getCurrentCurrency, CurrencyCode } from "@/lib/utils";
@@ -17,6 +18,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, priority = false }: ProductCardProps) {
+  const t = useTranslations("productCard");
   const { addItem } = useCartStore();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
   const { addItem: addToCompare, removeItem: removeFromCompare, isInCompare, items: compareItems } = useCompareStore();
@@ -37,17 +39,17 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     addItem(product);
-    toast.success("Added to cart!");
+    toast.success(t("addedToCart"));
   };
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     if (isWishlisted) {
       removeFromWishlist(product.id);
-      toast.success("Removed from wishlist");
+      toast.success(t("removedFromWishlist"));
     } else {
       addToWishlist(product);
-      toast.success("Added to wishlist!");
+      toast.success(t("addedToWishlist"));
     }
   };
 
@@ -55,14 +57,14 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
     e.preventDefault();
     if (isComparing) {
       removeFromCompare(product.id);
-      toast.success("Removed from compare");
+      toast.success(t("removedFromCompare"));
     } else {
       if (compareItems.length >= 4) {
-        toast.error("Maximum 4 products can be compared");
+        toast.error(t("maxCompareReached"));
         return;
       }
       addToCompare(product);
-      toast.success("Added to compare!");
+      toast.success(t("addedToCompare"));
     }
   };
 
@@ -93,22 +95,22 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
           <div className="absolute top-3 left-3 lg:top-4 lg:left-4 flex flex-col gap-1.5">
             {product.price === 0 && (
               <span className="px-2.5 py-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-[10px] lg:text-xs font-bold rounded-full shadow-lg">
-                🎁 Free
+                🎁 {t("free")}
               </span>
             )}
             {product.bestseller && (
               <span className="px-2.5 py-1 bg-gradient-to-r from-[#FF6B35] to-orange-500 text-white text-[10px] lg:text-xs font-bold rounded-full shadow-lg">
-                🔥 Bestseller
+                🔥 {t("bestseller")}
               </span>
             )}
             {product.newArrival && (
               <span className="px-2.5 py-1 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-[10px] lg:text-xs font-bold rounded-full shadow-lg">
-                ✨ New
+                ✨ {t("new")}
               </span>
             )}
             {product.discount !== undefined && product.discount > 0 && (
               <span className="px-2.5 py-1 bg-gradient-to-r from-[#FF6B35] to-red-500 text-white text-[10px] lg:text-xs font-bold rounded-full shadow-lg">
-                -{product.discount}% OFF
+                -{product.discount}% {t("off")}
               </span>
             )}
           </div>
@@ -144,8 +146,8 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
           {/* Category */}
           <div className="text-[10px] lg:text-xs text-gray-600 dark:text-gray-400 font-bold mb-2 uppercase tracking-wider">
             {typeof product.category === 'object' && product.category !== null
-              ? (product.category as { name?: string }).name || 'Uncategorized'
-              : product.category || 'Uncategorized'}
+              ? (product.category as { name?: string }).name || t("uncategorized")
+              : product.category || t("uncategorized")}
           </div>
 
           {/* Title - Larger on Mobile */}
@@ -182,7 +184,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
               {/* Downloads Count */}
               <div className="flex items-center gap-1 text-[10px] lg:text-xs text-gray-500 dark:text-gray-400">
                 <Download className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
-                <span className="font-medium">{product.downloadCount.toLocaleString()} downloads</span>
+                <span className="font-medium">{product.downloadCount.toLocaleString()} {t("downloads")}</span>
               </div>
             </div>
 

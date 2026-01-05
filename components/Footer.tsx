@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Instagram, Youtube, Send, Heart, Check, Loader2 } from "lucide-react";
 import Logo from "./Logo";
 import toast from "react-hot-toast";
 
 export default function Footer() {
+  const t = useTranslations("footer");
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState("");
   const [subscribing, setSubscribing] = useState(false);
@@ -56,16 +58,16 @@ export default function Footer() {
                 <Logo variant="dark" />
               </div>
               <p className="text-gray-400 leading-relaxed max-w-md">
-                Your trusted marketplace for high-quality digital products. Download instantly and start creating amazing things today.
+                {t("aboutDesc")}
               </p>
               
               {/* Newsletter */}
               <div className="space-y-3">
-                <h4 className="text-sm font-bold text-white uppercase tracking-wide">Stay Updated</h4>
+                <h4 className="text-sm font-bold text-white uppercase tracking-wide">{t("stayUpdated")}</h4>
                 {subscribed ? (
                   <div className="flex items-center gap-2 text-green-400">
                     <Check className="w-5 h-5" />
-                    <span>Thanks for subscribing!</span>
+                    <span>{t("thanksForSubscribing")}</span>
                   </div>
                 ) : (
                   <form onSubmit={handleSubscribe} className="flex gap-2">
@@ -73,7 +75,7 @@ export default function Footer() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
+                      placeholder={t("enterEmail")}
                       required
                       className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent backdrop-blur-sm"
                     />
@@ -121,36 +123,36 @@ export default function Footer() {
 
             {/* Shop Column */}
             <div className="text-left">
-              <h3 className="text-lg font-bold mb-6 text-white">Shop</h3>
+              <h3 className="text-lg font-bold mb-6 text-white">{t("shop")}</h3>
               <ul className="space-y-3">
                 <li>
                   <Link href="/products" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    All Products
+                    {t("allProducts")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/categories" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    Categories
+                    {t("categories")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/bundles" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    Product Bundles
+                    {t("bundles")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/products?filter=new" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    New Arrivals
+                    {t("newArrivals")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/products?filter=bestsellers" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    Best Sellers
+                    {t("bestSellers")}
                   </Link>
                 </li>
               </ul>
@@ -158,24 +160,24 @@ export default function Footer() {
 
             {/* Support Column */}
             <div className="text-left">
-              <h3 className="text-lg font-bold mb-6 text-white">Support</h3>
+              <h3 className="text-lg font-bold mb-6 text-white">{t("support")}</h3>
               <ul className="space-y-3">
                 <li>
                   <Link href="/help" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    Help Center
+                    {t("helpCenter")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/contact" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    Contact Us
+                    {t("contactUs")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/faq" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    FAQ
+                    {t("faq")}
                   </Link>
                 </li>
                 <li>
@@ -189,30 +191,30 @@ export default function Footer() {
 
             {/* Legal Column */}
             <div className="text-left">
-              <h3 className="text-lg font-bold mb-6 text-white">Legal</h3>
+              <h3 className="text-lg font-bold mb-6 text-white">{t("legal")}</h3>
               <ul className="space-y-3">
                 <li>
                   <Link href="/terms" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    Terms & Conditions
+                    {t("terms")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/privacy" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    Privacy Policy
+                    {t("privacy")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/cookies" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    Cookie Policy
+                    {t("cookies")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/refund-policy" className="text-gray-400 hover:text-[#ff6f61] transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ff6f61] opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    Refund Policy
+                    {t("refundPolicy")}
                   </Link>
                 </li>
               </ul>
@@ -223,16 +225,16 @@ export default function Footer() {
           <div className="pt-8 border-t border-white/10">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2 text-gray-400">
-                <span>© {currentYear} Digistore1. All rights reserved.</span>
+                <span>© {currentYear} Digistore1. {t("allRightsReserved")}</span>
                 <span className="hidden md:inline">•</span>
                 <span className="hidden md:inline-flex items-center gap-1">
-                  Made with <Heart className="w-4 h-4 text-red-500 fill-red-500 animate-pulse" /> for creators
+                  {t("madeWith")} <Heart className="w-4 h-4 text-red-500 fill-red-500 animate-pulse" /> {t("forCreators")}
                 </span>
               </div>
 
               {/* Payment Methods */}
               <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-500">We accept:</span>
+                <span className="text-sm text-gray-500">{t("weAccept")}</span>
                 <div className="flex items-center gap-2">
                   <div className="px-3 py-1.5 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10">
                     <span className="text-xs font-bold text-white">VISA</span>

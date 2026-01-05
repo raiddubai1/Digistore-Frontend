@@ -1,9 +1,11 @@
 {
   "common": {
     "search": "بحث",
+    "searchPlaceholder": "ابحث عن المنتجات الرقمية والقوالب والكتب الإلكترونية...",
     "cart": "السلة",
     "account": "الحساب",
     "language": "اللغة",
+    "selectLanguage": "اختر اللغة",
     "home": "الرئيسية",
     "products": "المنتجات",
     "categories": "الفئات",
@@ -13,52 +15,106 @@
     "register": "إنشاء حساب",
     "logout": "تسجيل الخروج",
     "viewAll": "عرض الكل",
+    "viewAllProducts": "عرض جميع المنتجات",
     "addToCart": "أضف إلى السلة",
     "buyNow": "اشتر الآن",
     "learnMore": "اعرف المزيد",
     "continueShopping": "متابعة التسوق",
-    "proceedToCheckout": "إتمام الطلب"
+    "proceedToCheckout": "إتمام الطلب",
+    "support": "دعم على مدار الساعة",
+    "myAccount": "حسابي",
+    "myOrders": "طلباتي",
+    "wishlist": "قائمة الأمنيات",
+    "settings": "الإعدادات",
+    "adminDashboard": "لوحة الإدارة",
+    "newUserOffer": "عرض للمستخدمين الجدد:",
+    "off": "خصم",
+    "yourFirstPurchase": "على أول عملية شراء! استخدم الرمز",
+    "menu": "القائمة",
+    "trending": "الرائج",
+    "new": "جديد",
+    "deals": "عروض",
+    "navigation": "التنقل",
+    "special": "خاص",
+    "productBundles": "حزم المنتجات",
+    "bundlesDesc": "وفر أكثر عند الشراء معًا",
+    "hotDeals": "عروض ساخنة",
+    "dealsDesc": "عروض وخصومات خاصة"
   },
   "home": {
     "hero": {
-      "title": "منتجات رقمية متميزة",
-      "subtitle": "قم بتنزيل كتب إلكترونية وقوالب وأدوات رقمية عالية الجودة على الفور. ابدأ في إنشاء محتوى رائع اليوم.",
-      "browseProducts": "تصفح المنتجات",
-      "viewCategories": "عرض الفئات"
+      "titleLine1": "صمم بذكاء مع",
+      "titleLine2": "قوالب Canva",
+      "subtitle": "قوالب Canva عالية الجودة للمبدعين ورواد الأعمال والمسوقين — لا حاجة لمهارات التصميم.",
+      "promoBadge": "جديد هنا؟ احصل على خصم 30% على أول عملية شراء!",
+      "browseProducts": "استكشف المنتجات",
+      "viewCategories": "تصفح الفئات"
     },
     "features": {
       "instantDownload": {
         "title": "تنزيل فوري",
-        "description": "احصل على منتجاتك الرقمية فورًا بعد الشراء. لا انتظار، لا متاعب."
+        "description": "احصل على منتجاتك الرقمية فورًا بعد الشراء. لا انتظار، لا متاعب. ابدأ الاستخدام فورًا."
       },
       "securePayment": {
         "title": "دفع آمن",
-        "description": "معاملاتك محمية بتشفير معياري صناعي."
+        "description": "معاملاتك محمية بتشفير معياري صناعي. تسوق بثقة."
       },
       "highQuality": {
-        "title": "جودة عالية",
-        "description": "يتم اختيار جميع المنتجات بعناية لضمان أعلى معايير الجودة."
+        "title": "جودة متميزة",
+        "description": "يتم اختيار جميع المنتجات بعناية لضمان أعلى معايير الجودة. التميز مضمون."
       }
     },
     "stats": {
-      "products": "منتج رقمي",
-      "customers": "عميل سعيد",
-      "rating": "متوسط التقييم",
-      "support": "دعم"
+      "editableTemplates": "قوالب قابلة للتعديل",
+      "happyCustomers": "عملاء سعداء",
+      "averageRating": "متوسط التقييم",
+      "support": "دعم",
+      "customers": "العملاء",
+      "rating": "التقييم"
     },
     "sections": {
-      "featured": "منتجات مميزة",
-      "featuredDesc": "منتجات رقمية متميزة مختارة بعناية",
-      "bestsellers": "الأكثر مبيعًا",
-      "bestsellersDesc": "المنتجات الأكثر شعبية هذا الشهر",
-      "newArrivals": "وصل حديثًا",
-      "newArrivalsDesc": "أحدث الإضافات إلى مجموعتنا"
+      "featured": {
+        "badge": "المجموعة المميزة",
+        "titlePart1": "اكتشف",
+        "titlePart2": "أفضل منتجاتنا",
+        "subtitle": "منتجات رقمية متميزة مختارة بعناية"
+      },
+      "bestsellers": {
+        "badge": "الأكثر رواجًا الآن",
+        "title": "الأكثر مبيعًا",
+        "subtitle": "الأكثر شعبية هذا الشهر"
+      },
+      "newArrivals": {
+        "badge": "أضيف حديثًا",
+        "title": "وصل حديثًا",
+        "subtitle": "أحدث الإضافات إلى مجموعتنا"
+      },
+      "recentlyViewed": {
+        "title": "شوهد مؤخرًا"
+      }
     },
     "cta": {
-      "title": "هل أنت مستعد للبدء؟",
+      "badge": "عرض لفترة محدودة",
+      "title": "هل أنت مستعد لتحويل رحلتك الرقمية؟",
       "description": "انضم إلى آلاف العملاء الراضين وقم بتنزيل منتجك الرقمي الأول اليوم.",
-      "button": "ابدأ التسوق"
+      "discount": "احصل على خصم 30% على أول عملية شراء!",
+      "shopNow": "ابدأ التسوق الآن",
+      "viewDeals": "عرض العروض الساخنة"
     }
+  },
+  "productCard": {
+    "free": "مجاني",
+    "bestseller": "الأكثر مبيعًا",
+    "new": "جديد",
+    "off": "خصم",
+    "downloads": "تحميل",
+    "uncategorized": "غير مصنف",
+    "addedToCart": "تمت الإضافة إلى السلة!",
+    "addedToWishlist": "تمت الإضافة إلى المفضلة!",
+    "removedFromWishlist": "تمت الإزالة من المفضلة",
+    "addedToCompare": "تمت الإضافة للمقارنة!",
+    "removedFromCompare": "تمت الإزالة من المقارنة",
+    "maxCompareReached": "الحد الأقصى 4 منتجات للمقارنة"
   },
   "products": {
     "title": "جميع المنتجات",
@@ -87,20 +143,33 @@
   "cart": {
     "title": "سلة التسوق",
     "empty": "سلتك فارغة",
+    "emptyMessage": "أضف بعض المنتجات للبدء!",
     "emptyDesc": "أضف بعض المنتجات للبدء!",
     "subtotal": "المجموع الفرعي",
     "total": "الإجمالي",
+    "discount": "الخصم",
     "checkout": "إتمام الطلب",
+    "proceedToCheckout": "إتمام الطلب",
     "continueShopping": "متابعة التسوق",
     "license": "الترخيص",
-    "quantity": "الكمية"
+    "quantity": "الكمية",
+    "newUserDiscount": "خصم للمستخدمين الجدد!",
+    "autoApplied": "يُطبق تلقائيًا للمشترين الجدد",
+    "off": "خصم",
+    "remove": "إزالة",
+    "enterCouponCode": "أدخل رمز القسيمة",
+    "validating": "جاري التحقق...",
+    "apply": "تطبيق",
+    "haveCoupon": "هل لديك رمز قسيمة؟"
   },
   "checkout": {
     "title": "إتمام الطلب",
     "contactInfo": "معلومات الاتصال",
     "email": "البريد الإلكتروني",
+    "emailAddress": "عنوان البريد الإلكتروني",
     "emailPlaceholder": "you@example.com",
     "emailNote": "سنرسل روابط التنزيل إلى هذا البريد الإلكتروني",
+    "downloadLinksNote": "سيتم إرسال روابط التنزيل هنا",
     "billingInfo": "معلومات الفوترة",
     "firstName": "الاسم الأول",
     "lastName": "اسم العائلة",
@@ -109,14 +178,53 @@
     "creditCard": "بطاقة ائتمان / خصم",
     "poweredByStripe": "مدعوم من Stripe",
     "completeOrder": "إتمام الطلب",
+    "completeFreeOrder": "إتمام الطلب المجاني",
     "processing": "جاري المعالجة...",
-    "secureCheckout": "دفع آمن مدعوم من Stripe. معلومات الدفع الخاصة بك مشفرة."
+    "secureCheckout": "دفع آمن. معلوماتك محمية.",
+    "secureCheckoutShort": "دفع آمن",
+    "orderSummary": "ملخص الطلب",
+    "quantity": "الكمية",
+    "addCoupon": "إضافة قسيمة",
+    "addCouponCode": "إضافة رمز قسيمة",
+    "couponCode": "رمز القسيمة",
+    "validating": "جاري التحقق...",
+    "apply": "تطبيق",
+    "checking": "جاري الفحص...",
+    "haveGiftCard": "هل لديك بطاقة هدية؟",
+    "giftCard": "بطاقة الهدية",
+    "subtotal": "المجموع الفرعي",
+    "tax": "الضريبة",
+    "total": "الإجمالي",
+    "welcomeDiscount": "خصم الترحيب",
+    "couponDiscount": "القسيمة",
+    "welcomeTitle": "مرحبًا بك في Digistore1!",
+    "welcomeMessage": "استمتع بخصم {discount}% على أول عملية شراء!",
+    "welcomeAutoApplied": "مرحبًا! خصم {discount}% مُطبق تلقائيًا!",
+    "remainingBalance": "الرصيد المتبقي لبطاقة الهدية بعد الشراء",
+    "paypal": "PayPal",
+    "paySecurely": "ادفع بأمان عبر PayPal",
+    "secure": "آمن",
+    "loadingPayment": "جاري تحميل خيارات الدفع...",
+    "loadingPayPal": "جاري تحميل PayPal...",
+    "paymentSuccess": "تم الدفع بنجاح!",
+    "paymentFailed": "فشل الدفع",
+    "paymentCancelled": "تم إلغاء الدفع",
+    "orderSuccess": "تم إكمال الطلب بنجاح!",
+    "failedToCreateOrder": "فشل إنشاء الطلب",
+    "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة",
+    "enterGiftCardCode": "يرجى إدخال رمز بطاقة الهدية",
+    "giftCardNoBalance": "هذه البطاقة لا تحتوي على رصيد",
+    "giftCardApplied": "تم تطبيق بطاقة الهدية! سيتم خصم ${amount}.",
+    "invalidGiftCard": "رمز بطاقة هدية غير صالح",
+    "license": "الترخيص"
   },
   "footer": {
     "about": "عن Digistore1",
-    "aboutDesc": "سوقك الموثوق للمنتجات الرقمية عالية الجودة. قم بالتنزيل على الفور وابدأ في الإنشاء اليوم.",
+    "aboutDesc": "سوقك الموثوق للمنتجات الرقمية عالية الجودة. قم بالتنزيل على الفور وابدأ في إنشاء أشياء رائعة اليوم.",
     "shop": "تسوق",
     "allProducts": "جميع المنتجات",
+    "categories": "الفئات",
+    "bundles": "حزم المنتجات",
     "newArrivals": "وصل حديثًا",
     "bestSellers": "الأكثر مبيعًا",
     "support": "الدعم",
@@ -125,11 +233,17 @@
     "faq": "الأسئلة الشائعة",
     "refundPolicy": "سياسة الاسترداد",
     "legal": "قانوني",
-    "terms": "شروط الخدمة",
+    "terms": "الشروط والأحكام",
     "privacy": "سياسة الخصوصية",
     "licenses": "معلومات الترخيص",
     "cookies": "سياسة ملفات تعريف الارتباط",
-    "copyright": "جميع الحقوق محفوظة."
+    "allRightsReserved": "جميع الحقوق محفوظة.",
+    "madeWith": "صنع بـ",
+    "forCreators": "للمبدعين",
+    "weAccept": "نقبل:",
+    "stayUpdated": "ابق على اطلاع",
+    "thanksForSubscribing": "شكرًا لاشتراكك!",
+    "enterEmail": "أدخل بريدك الإلكتروني"
   }
 }
 

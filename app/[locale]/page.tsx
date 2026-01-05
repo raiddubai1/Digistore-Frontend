@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { ArrowRight, Download, Shield, Star, Sparkles, TrendingUp, Award, Gift, Tag, ShoppingCart, Package } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import OfferOfTheDay from "@/components/OfferOfTheDay";
@@ -24,6 +25,8 @@ const REDIRECT_TO_LANDING = false;
 
 export default async function Home({ params }: HomeProps) {
   const { locale } = await params;
+  const t = await getTranslations("home");
+  const tCommon = await getTranslations("common");
 
   // Redirect to Ultimate Bundle landing page if enabled
   if (REDIRECT_TO_LANDING) {
@@ -80,13 +83,13 @@ export default async function Home({ params }: HomeProps) {
               {/* Main Heading */}
               <div className="space-y-3 lg:space-y-4">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
-                  <span className="block text-gray-900 dark:text-white">Design Smarter with</span>
+                  <span className="block text-gray-900 dark:text-white">{t("hero.titleLine1")}</span>
                   <span className="block bg-gradient-to-r from-gray-600 via-[#ff8a7a] to-[#ff6f61] bg-clip-text text-transparent">
-                    Canva Templates
+                    {t("hero.titleLine2")}
                   </span>
                 </h1>
                 <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                  High-quality Canva templates for creators, entrepreneurs, and marketers — no design skills needed.
+                  {t("hero.subtitle")}
                 </p>
 
                 {/* First Purchase Promo Badge */}
@@ -94,7 +97,7 @@ export default async function Home({ params }: HomeProps) {
                   <div className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-gradient-to-r from-[#FF6B35] to-[#ff8a5c] dark:from-[#FF6B35] dark:to-[#ff8a5c] rounded-full shadow-lg shadow-orange-200 dark:shadow-orange-900/30 hover:shadow-xl hover:scale-105 transition-all cursor-default">
                     <Sparkles className="w-4 h-4 text-white" />
                     <span className="text-sm font-bold text-white">
-                      🎉 New here? Get 30% OFF your first purchase!
+                      🎉 {t("hero.promoBadge")}
                     </span>
                   </div>
                 </div>
@@ -106,13 +109,13 @@ export default async function Home({ params }: HomeProps) {
                   href={`/${locale}/products`}
                   className="w-full lg:w-auto inline-flex items-center justify-center px-8 py-4 lg:py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 dark:hover:shadow-slate-900 transition-all active:scale-95 lg:hover:scale-105"
                 >
-                  Explore Products
+                  {t("hero.browseProducts")}
                 </Link>
                 <Link
                   href={`/${locale}/categories`}
                   className="w-full lg:w-auto inline-flex items-center justify-center px-8 py-4 lg:py-3.5 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-full font-bold text-base hover:border-gray-300 dark:hover:border-slate-500 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all shadow-md hover:shadow-lg active:scale-95"
                 >
-                  Browse Categories
+                  {t("hero.viewCategories")}
                 </Link>
               </div>
 
@@ -126,7 +129,7 @@ export default async function Home({ params }: HomeProps) {
                   </div>
                   <div className="text-left">
                     <div className="text-sm font-bold text-gray-900 dark:text-white">50,000+</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Customers</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{t("stats.customers")}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -137,7 +140,7 @@ export default async function Home({ params }: HomeProps) {
                   </div>
                   <div className="text-left">
                     <div className="text-sm font-bold text-gray-900 dark:text-white">4.9/5</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Rating</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{t("stats.rating")}</div>
                   </div>
                 </div>
               </div>
@@ -274,9 +277,9 @@ export default async function Home({ params }: HomeProps) {
                 <div className="w-14 h-14 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg">
                   <Download className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Instant Download</h3>
+                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">{t("features.instantDownload.title")}</h3>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">
-                  Get your digital products immediately after purchase. No waiting, no hassle. Start using right away.
+                  {t("features.instantDownload.description")}
                 </p>
               </div>
             </div>
@@ -288,9 +291,9 @@ export default async function Home({ params }: HomeProps) {
                 <div className="w-14 h-14 bg-gradient-to-br from-[#ff6f61] to-[#ff6f61] rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg">
                   <Shield className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Secure Payment</h3>
+                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">{t("features.securePayment.title")}</h3>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">
-                  Your transactions are protected with industry-standard encryption. Shop with confidence.
+                  {t("features.securePayment.description")}
                 </p>
               </div>
             </div>
@@ -302,9 +305,9 @@ export default async function Home({ params }: HomeProps) {
                 <div className="w-14 h-14 bg-gradient-to-br from-green-600 to-green-700 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg">
                   <Award className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Premium Quality</h3>
+                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">{t("features.highQuality.title")}</h3>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">
-                  All products are carefully curated to ensure the highest quality standards. Excellence guaranteed.
+                  {t("features.highQuality.description")}
                 </p>
               </div>
             </div>
@@ -319,22 +322,22 @@ export default async function Home({ params }: HomeProps) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="space-y-2">
               <div className="text-4xl md:text-5xl font-black text-white">100%</div>
-              <div className="text-gray-100 font-medium text-sm md:text-base">Editable Templates</div>
+              <div className="text-gray-100 font-medium text-sm md:text-base">{t("stats.editableTemplates")}</div>
             </div>
             <div className="space-y-2">
               <div className="text-4xl md:text-5xl font-black text-white">5K+</div>
-              <div className="text-gray-100 font-medium text-sm md:text-base">Happy Customers</div>
+              <div className="text-gray-100 font-medium text-sm md:text-base">{t("stats.happyCustomers")}</div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-center gap-1 mb-2">
                 <Star className="w-5 h-5 md:w-6 md:h-6 fill-yellow-300 text-yellow-300" />
                 <span className="text-4xl md:text-5xl font-black text-white">4.9</span>
               </div>
-              <div className="text-gray-100 font-medium text-sm md:text-base">Average Rating</div>
+              <div className="text-gray-100 font-medium text-sm md:text-base">{t("stats.averageRating")}</div>
             </div>
             <div className="space-y-2">
               <div className="text-4xl md:text-5xl font-black text-white">24/7</div>
-              <div className="text-gray-100 font-medium text-sm md:text-base">Support</div>
+              <div className="text-gray-100 font-medium text-sm md:text-base">{t("stats.support")}</div>
             </div>
           </div>
         </div>
@@ -348,14 +351,14 @@ export default async function Home({ params }: HomeProps) {
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-slate-800 rounded-full mb-4">
                 <Sparkles className="w-4 h-4 text-gray-500" />
-                <span className="text-sm font-bold text-gray-500 dark:text-gray-400">FEATURED COLLECTION</span>
+                <span className="text-sm font-bold text-gray-500 dark:text-gray-400">{t("sections.featured.badge")}</span>
               </div>
               <h2 className="text-4xl font-black mb-3">
-                <span className="text-gray-900 dark:text-white">Discover Our </span>
-                <span className="bg-gradient-to-r from-gray-500 to-[#ff6f61] bg-clip-text text-transparent">Best Products</span>
+                <span className="text-gray-900 dark:text-white">{t("sections.featured.titlePart1")} </span>
+                <span className="bg-gradient-to-r from-gray-500 to-[#ff6f61] bg-clip-text text-transparent">{t("sections.featured.titlePart2")}</span>
               </h2>
               <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                Hand-picked premium digital products
+                {t("sections.featured.subtitle")}
               </p>
             </div>
 
@@ -372,7 +375,7 @@ export default async function Home({ params }: HomeProps) {
                 href={`/${locale}/products`}
                 className="inline-flex items-center gap-3 px-8 py-3.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-bold text-base hover:shadow-xl hover:shadow-gray-200 transition-all hover:scale-105 group"
               >
-                View All Products
+                {tCommon("viewAllProducts")}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
@@ -391,16 +394,16 @@ export default async function Home({ params }: HomeProps) {
               <div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 dark:bg-orange-900/30 rounded-full mb-4">
                   <TrendingUp className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                  <span className="text-sm font-bold text-orange-600 dark:text-orange-400">TRENDING NOW</span>
+                  <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{t("sections.bestsellers.badge")}</span>
                 </div>
-                <h2 className="text-5xl font-black text-gray-900 dark:text-white">Bestsellers</h2>
-                <p className="text-lg text-gray-600 dark:text-gray-300 mt-2">Most popular this month</p>
+                <h2 className="text-5xl font-black text-gray-900 dark:text-white">{t("sections.bestsellers.title")}</h2>
+                <p className="text-lg text-gray-600 dark:text-gray-300 mt-2">{t("sections.bestsellers.subtitle")}</p>
               </div>
               <Link
                 href={`/${locale}/products?filter=bestsellers`}
                 className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 font-bold hover:gap-3 transition-all"
               >
-                View All
+                {tCommon("viewAll")}
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -426,16 +429,16 @@ export default async function Home({ params }: HomeProps) {
               <div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
                   <Sparkles className="w-4 h-4 text-green-600 dark:text-green-400" />
-                  <span className="text-sm font-bold text-green-600 dark:text-green-400">JUST ADDED</span>
+                  <span className="text-sm font-bold text-green-600 dark:text-green-400">{t("sections.newArrivals.badge")}</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">New Arrivals</h2>
-                <p className="text-lg text-gray-600 dark:text-gray-300 mt-2">Latest additions to our collection</p>
+                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">{t("sections.newArrivals.title")}</h2>
+                <p className="text-lg text-gray-600 dark:text-gray-300 mt-2">{t("sections.newArrivals.subtitle")}</p>
               </div>
               <Link
                 href={`/${locale}/products?filter=new`}
                 className="hidden md:inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 font-bold hover:gap-3 transition-all"
               >
-                View All
+                {tCommon("viewAll")}
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -455,7 +458,7 @@ export default async function Home({ params }: HomeProps) {
       {/* Recently Viewed Products */}
       <section className="py-12 bg-gray-50 dark:bg-slate-800/50">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <RecentlyViewed title="Recently Viewed" maxItems={6} />
+          <RecentlyViewed title={t("sections.recentlyViewed.title")} maxItems={6} />
         </div>
       </section>
 
@@ -469,14 +472,14 @@ export default async function Home({ params }: HomeProps) {
             <div className="relative z-10 max-w-3xl mx-auto space-y-6">
               <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/20 backdrop-blur-sm rounded-full">
                 <Gift className="w-5 h-5 text-white" />
-                <span className="text-sm font-bold text-white">LIMITED TIME OFFER</span>
+                <span className="text-sm font-bold text-white">{t("cta.badge")}</span>
               </div>
 
               <h2 className="text-3xl md:text-4xl font-black text-white leading-tight">
-                Ready to Transform Your Digital Journey?
+                {t("cta.title")}
               </h2>
               <p className="text-lg text-gray-100">
-                Join thousands of satisfied customers and download your first digital product today. <span className="font-bold">Get 30% OFF on your first purchase!</span>
+                {t("cta.description")} <span className="font-bold">{t("cta.discount")}</span>
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -484,7 +487,7 @@ export default async function Home({ params }: HomeProps) {
                   href={`/${locale}/products`}
                   className="inline-flex items-center justify-center gap-3 px-8 py-3.5 bg-white text-gray-500 rounded-full font-bold text-base hover:shadow-xl transition-all hover:scale-105 group"
                 >
-                  Start Shopping Now
+                  {t("cta.shopNow")}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
@@ -492,7 +495,7 @@ export default async function Home({ params }: HomeProps) {
                   className="inline-flex items-center justify-center gap-3 px-8 py-3.5 bg-gray-400/20 backdrop-blur-sm border-2 border-white/30 text-white rounded-full font-bold text-base hover:bg-gray-400/30 transition-all"
                 >
                   <Tag className="w-5 h-5" />
-                  View Hot Deals
+                  {t("cta.viewDeals")}
                 </Link>
               </div>
             </div>

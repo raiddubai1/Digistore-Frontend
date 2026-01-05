@@ -1,9 +1,11 @@
 {
   "common": {
     "search": "Pesquisar",
+    "searchPlaceholder": "Pesquisar produtos digitais, templates, eBooks...",
     "cart": "Carrinho",
     "account": "Conta",
     "language": "Idioma",
+    "selectLanguage": "Selecionar Idioma",
     "home": "Início",
     "products": "Produtos",
     "categories": "Categorias",
@@ -13,52 +15,96 @@
     "register": "Cadastrar",
     "logout": "Sair",
     "viewAll": "Ver tudo",
+    "viewAllProducts": "Ver Todos os Produtos",
     "addToCart": "Adicionar ao carrinho",
     "buyNow": "Comprar agora",
     "learnMore": "Saiba mais",
     "continueShopping": "Continuar comprando",
-    "proceedToCheckout": "Finalizar compra"
+    "proceedToCheckout": "Finalizar compra",
+    "support": "Suporte 24/7",
+    "myAccount": "Minha Conta",
+    "myOrders": "Meus Pedidos",
+    "wishlist": "Lista de Desejos",
+    "settings": "Configurações",
+    "adminDashboard": "Painel Admin",
+    "newUserOffer": "Oferta para Novos Usuários:",
+    "off": "DE DESCONTO",
+    "yourFirstPurchase": "Na Sua Primeira Compra! Use o código"
   },
   "home": {
     "hero": {
-      "title": "Produtos Digitais Premium",
-      "subtitle": "Baixe e-books, templates e ferramentas digitais de alta qualidade instantaneamente. Comece a criar conteúdo incrível hoje.",
-      "browseProducts": "Explorar produtos",
-      "viewCategories": "Ver categorias"
+      "titleLine1": "Design mais inteligente com",
+      "titleLine2": "Templates do Canva",
+      "subtitle": "Templates de Canva de alta qualidade para criadores, empreendedores e profissionais de marketing — sem necessidade de habilidades de design.",
+      "promoBadge": "Novo aqui? Ganhe 30% de desconto na sua primeira compra!",
+      "browseProducts": "Explorar Produtos",
+      "viewCategories": "Ver Categorias"
     },
     "features": {
       "instantDownload": {
-        "title": "Download instantâneo",
-        "description": "Receba seus produtos digitais imediatamente após a compra. Sem espera, sem complicações."
+        "title": "Download Instantâneo",
+        "description": "Receba seus produtos digitais imediatamente após a compra. Sem espera, sem complicações. Comece a usar imediatamente."
       },
       "securePayment": {
-        "title": "Pagamento seguro",
-        "description": "Suas transações são protegidas com criptografia padrão da indústria."
+        "title": "Pagamento Seguro",
+        "description": "Suas transações são protegidas com criptografia padrão da indústria. Compre com confiança."
       },
       "highQuality": {
-        "title": "Alta qualidade",
-        "description": "Todos os produtos são cuidadosamente selecionados para garantir os mais altos padrões de qualidade."
+        "title": "Qualidade Premium",
+        "description": "Todos os produtos são cuidadosamente selecionados para garantir os mais altos padrões de qualidade. Excelência garantida."
       }
     },
     "stats": {
-      "products": "Produtos digitais",
-      "customers": "Clientes satisfeitos",
-      "rating": "Avaliação média",
-      "support": "Suporte"
+      "editableTemplates": "Templates Editáveis",
+      "happyCustomers": "Clientes Satisfeitos",
+      "averageRating": "Avaliação Média",
+      "support": "Suporte",
+      "customers": "Clientes",
+      "rating": "Avaliação"
     },
     "sections": {
-      "featured": "Produtos em destaque",
-      "featuredDesc": "Produtos digitais premium selecionados a dedo",
-      "bestsellers": "Mais vendidos",
-      "bestsellersDesc": "Produtos mais populares deste mês",
-      "newArrivals": "Novidades",
-      "newArrivalsDesc": "Últimas adições à nossa coleção"
+      "featured": {
+        "badge": "COLEÇÃO EM DESTAQUE",
+        "titlePart1": "Descubra Nossos",
+        "titlePart2": "Melhores Produtos",
+        "subtitle": "Produtos digitais premium selecionados a dedo"
+      },
+      "bestsellers": {
+        "badge": "EM ALTA AGORA",
+        "title": "Mais Vendidos",
+        "subtitle": "Os mais populares deste mês"
+      },
+      "newArrivals": {
+        "badge": "RECÉM ADICIONADO",
+        "title": "Novidades",
+        "subtitle": "Últimas adições à nossa coleção"
+      },
+      "recentlyViewed": {
+        "title": "Vistos Recentemente"
+      }
     },
     "cta": {
-      "title": "Pronto para começar?",
+      "badge": "OFERTA POR TEMPO LIMITADO",
+      "title": "Pronto para Transformar sua Jornada Digital?",
       "description": "Junte-se a milhares de clientes satisfeitos e baixe seu primeiro produto digital hoje.",
-      "button": "Começar a comprar"
+      "discount": "Ganhe 30% de desconto na sua primeira compra!",
+      "shopNow": "Começar a Comprar",
+      "viewDeals": "Ver Ofertas"
     }
+  },
+  "productCard": {
+    "free": "Grátis",
+    "bestseller": "Mais Vendido",
+    "new": "Novo",
+    "off": "DESC",
+    "downloads": "downloads",
+    "uncategorized": "Sem Categoria",
+    "addedToCart": "Adicionado ao carrinho!",
+    "addedToWishlist": "Adicionado aos favoritos!",
+    "removedFromWishlist": "Removido dos favoritos",
+    "addedToCompare": "Adicionado para comparar!",
+    "removedFromCompare": "Removido da comparação",
+    "maxCompareReached": "Máximo de 4 produtos podem ser comparados"
   },
   "products": {
     "title": "Todos os produtos",
@@ -87,20 +133,33 @@
   "cart": {
     "title": "Carrinho de compras",
     "empty": "Seu carrinho está vazio",
+    "emptyMessage": "Adicione alguns produtos para começar!",
     "emptyDesc": "Adicione alguns produtos para começar!",
     "subtotal": "Subtotal",
     "total": "Total",
+    "discount": "Desconto",
     "checkout": "Finalizar compra",
+    "proceedToCheckout": "Finalizar compra",
     "continueShopping": "Continuar comprando",
     "license": "Licença",
-    "quantity": "Quantidade"
+    "quantity": "Quantidade",
+    "newUserDiscount": "Desconto para novos usuários!",
+    "autoApplied": "Aplicado automaticamente para novos compradores",
+    "off": "desc",
+    "remove": "Remover",
+    "enterCouponCode": "Insira o código do cupom",
+    "validating": "Validando...",
+    "apply": "Aplicar",
+    "haveCoupon": "Tem um código de cupom?"
   },
   "checkout": {
     "title": "Pagamento",
     "contactInfo": "Informações de contato",
-    "email": "Endereço de e-mail",
+    "email": "E-mail",
+    "emailAddress": "Endereço de e-mail",
     "emailPlaceholder": "voce@exemplo.com",
     "emailNote": "Enviaremos seus links de download para este e-mail",
+    "downloadLinksNote": "Os links de download serão enviados aqui",
     "billingInfo": "Informações de faturamento",
     "firstName": "Nome",
     "lastName": "Sobrenome",
@@ -109,8 +168,45 @@
     "creditCard": "Cartão de crédito / débito",
     "poweredByStripe": "Powered by Stripe",
     "completeOrder": "Concluir pedido",
+    "completeFreeOrder": "Concluir pedido grátis",
     "processing": "Processando...",
-    "secureCheckout": "Pagamento seguro com Stripe. Suas informações de pagamento são criptografadas."
+    "secureCheckout": "Pagamento seguro. Suas informações estão protegidas.",
+    "secureCheckoutShort": "Pagamento seguro",
+    "orderSummary": "Resumo do pedido",
+    "quantity": "Qtd",
+    "addCoupon": "Adicionar cupom",
+    "addCouponCode": "Adicionar código de cupom",
+    "couponCode": "Código do cupom",
+    "validating": "Validando...",
+    "apply": "Aplicar",
+    "checking": "Verificando...",
+    "haveGiftCard": "Tem um cartão presente?",
+    "giftCard": "Cartão Presente",
+    "subtotal": "Subtotal",
+    "tax": "Imposto",
+    "total": "Total",
+    "welcomeDiscount": "Desconto de boas-vindas",
+    "couponDiscount": "Cupom",
+    "welcomeTitle": "Bem-vindo à Digistore1!",
+    "welcomeMessage": "Aproveite {discount}% de desconto na sua primeira compra!",
+    "welcomeAutoApplied": "Bem-vindo! {discount}% de desconto aplicado!",
+    "remainingBalance": "Saldo restante do cartão presente após a compra",
+    "paypal": "PayPal",
+    "paySecurely": "Pague com segurança via PayPal",
+    "secure": "Seguro",
+    "loadingPayment": "Carregando opções de pagamento...",
+    "loadingPayPal": "Carregando PayPal...",
+    "paymentSuccess": "Pagamento realizado com sucesso!",
+    "paymentFailed": "Pagamento falhou",
+    "paymentCancelled": "Pagamento cancelado",
+    "orderSuccess": "Pedido concluído com sucesso!",
+    "failedToCreateOrder": "Erro ao criar o pedido",
+    "fillRequiredFields": "Por favor preencha todos os campos obrigatórios",
+    "enterGiftCardCode": "Por favor insira um código de cartão presente",
+    "giftCardNoBalance": "Este cartão presente não tem saldo",
+    "giftCardApplied": "Cartão presente aplicado! ${amount} serão deduzidos.",
+    "invalidGiftCard": "Código de cartão presente inválido",
+    "license": "Licença"
   },
   "footer": {
     "about": "Sobre a Digistore1",

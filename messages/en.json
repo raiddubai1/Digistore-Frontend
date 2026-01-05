@@ -1,9 +1,11 @@
 {
   "common": {
     "search": "Search",
+    "searchPlaceholder": "Search for digital products, templates, eBooks...",
     "cart": "Cart",
     "account": "Account",
     "language": "Language",
+    "selectLanguage": "Select Language",
     "home": "Home",
     "products": "Products",
     "categories": "Categories",
@@ -13,52 +15,106 @@
     "register": "Register",
     "logout": "Logout",
     "viewAll": "View All",
+    "viewAllProducts": "View All Products",
     "addToCart": "Add to Cart",
     "buyNow": "Buy Now",
     "learnMore": "Learn More",
     "continueShopping": "Continue Shopping",
-    "proceedToCheckout": "Proceed to Checkout"
+    "proceedToCheckout": "Proceed to Checkout",
+    "support": "24/7 Support",
+    "myAccount": "My Account",
+    "myOrders": "My Orders",
+    "wishlist": "Wishlist",
+    "settings": "Settings",
+    "adminDashboard": "Admin Dashboard",
+    "newUserOffer": "New User Offer:",
+    "off": "OFF",
+    "yourFirstPurchase": "Your First Purchase! Use code",
+    "menu": "Menu",
+    "trending": "Trending",
+    "new": "New",
+    "deals": "Deals",
+    "navigation": "Navigation",
+    "special": "Special",
+    "productBundles": "Product Bundles",
+    "bundlesDesc": "Save more when you buy together",
+    "hotDeals": "Hot Deals",
+    "dealsDesc": "Special offers and discounts"
   },
   "home": {
     "hero": {
-      "title": "Premium Digital Products",
-      "subtitle": "Download high-quality eBooks, templates, and digital tools instantly. Start creating amazing content today.",
-      "browseProducts": "Browse Products",
-      "viewCategories": "View Categories"
+      "titleLine1": "Design Smarter with",
+      "titleLine2": "Canva Templates",
+      "subtitle": "High-quality Canva templates for creators, entrepreneurs, and marketers — no design skills needed.",
+      "promoBadge": "New here? Get 30% OFF your first purchase!",
+      "browseProducts": "Explore Products",
+      "viewCategories": "Browse Categories"
     },
     "features": {
       "instantDownload": {
         "title": "Instant Download",
-        "description": "Get your digital products immediately after purchase. No waiting, no hassle."
+        "description": "Get your digital products immediately after purchase. No waiting, no hassle. Start using right away."
       },
       "securePayment": {
         "title": "Secure Payment",
-        "description": "Your transactions are protected with industry-standard encryption."
+        "description": "Your transactions are protected with industry-standard encryption. Shop with confidence."
       },
       "highQuality": {
-        "title": "High Quality",
-        "description": "All products are carefully curated to ensure the highest quality standards."
+        "title": "Premium Quality",
+        "description": "All products are carefully curated to ensure the highest quality standards. Excellence guaranteed."
       }
     },
     "stats": {
-      "products": "Digital Products",
-      "customers": "Happy Customers",
-      "rating": "Average Rating",
-      "support": "Support"
+      "editableTemplates": "Editable Templates",
+      "happyCustomers": "Happy Customers",
+      "averageRating": "Average Rating",
+      "support": "Support",
+      "customers": "Customers",
+      "rating": "Rating"
     },
     "sections": {
-      "featured": "Featured Products",
-      "featuredDesc": "Hand-picked premium digital products",
-      "bestsellers": "Bestsellers",
-      "bestsellersDesc": "Most popular products this month",
-      "newArrivals": "New Arrivals",
-      "newArrivalsDesc": "Latest additions to our collection"
+      "featured": {
+        "badge": "FEATURED COLLECTION",
+        "titlePart1": "Discover Our",
+        "titlePart2": "Best Products",
+        "subtitle": "Hand-picked premium digital products"
+      },
+      "bestsellers": {
+        "badge": "TRENDING NOW",
+        "title": "Bestsellers",
+        "subtitle": "Most popular this month"
+      },
+      "newArrivals": {
+        "badge": "JUST ADDED",
+        "title": "New Arrivals",
+        "subtitle": "Latest additions to our collection"
+      },
+      "recentlyViewed": {
+        "title": "Recently Viewed"
+      }
     },
     "cta": {
-      "title": "Ready to Get Started?",
+      "badge": "LIMITED TIME OFFER",
+      "title": "Ready to Transform Your Digital Journey?",
       "description": "Join thousands of satisfied customers and download your first digital product today.",
-      "button": "Start Shopping"
+      "discount": "Get 30% OFF on your first purchase!",
+      "shopNow": "Start Shopping Now",
+      "viewDeals": "View Hot Deals"
     }
+  },
+  "productCard": {
+    "free": "Free",
+    "bestseller": "Bestseller",
+    "new": "New",
+    "off": "OFF",
+    "downloads": "downloads",
+    "uncategorized": "Uncategorized",
+    "addedToCart": "Added to cart!",
+    "addedToWishlist": "Added to wishlist!",
+    "removedFromWishlist": "Removed from wishlist",
+    "addedToCompare": "Added to compare!",
+    "removedFromCompare": "Removed from compare",
+    "maxCompareReached": "Maximum 4 products can be compared"
   },
   "products": {
     "title": "All Products",
@@ -87,20 +143,33 @@
   "cart": {
     "title": "Shopping Cart",
     "empty": "Your cart is empty",
+    "emptyMessage": "Add some products to get started!",
     "emptyDesc": "Add some products to get started!",
     "subtotal": "Subtotal",
     "total": "Total",
+    "discount": "Discount",
     "checkout": "Proceed to Checkout",
+    "proceedToCheckout": "Proceed to Checkout",
     "continueShopping": "Continue Shopping",
     "license": "License",
-    "quantity": "Quantity"
+    "quantity": "Quantity",
+    "newUserDiscount": "New User Discount!",
+    "autoApplied": "Auto-applied for first-time buyers",
+    "off": "off",
+    "remove": "Remove",
+    "enterCouponCode": "Enter coupon code",
+    "validating": "Validating...",
+    "apply": "Apply",
+    "haveCoupon": "Have a coupon code?"
   },
   "checkout": {
     "title": "Checkout",
     "contactInfo": "Contact Information",
-    "email": "Email Address",
+    "email": "Email",
+    "emailAddress": "Email Address",
     "emailPlaceholder": "you@example.com",
     "emailNote": "We'll send your download links to this email",
+    "downloadLinksNote": "Download links will be sent here",
     "billingInfo": "Billing Information",
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -109,14 +178,53 @@
     "creditCard": "Credit / Debit Card",
     "poweredByStripe": "Powered by Stripe",
     "completeOrder": "Complete Order",
+    "completeFreeOrder": "Complete Free Order",
     "processing": "Processing...",
-    "secureCheckout": "Secure checkout powered by Stripe. Your payment information is encrypted."
+    "secureCheckout": "Secure checkout. Your information is protected.",
+    "secureCheckoutShort": "Secure checkout",
+    "orderSummary": "Order Summary",
+    "quantity": "Qty",
+    "addCoupon": "Add coupon",
+    "addCouponCode": "Add coupon code",
+    "couponCode": "Coupon code",
+    "validating": "Validating...",
+    "apply": "Apply",
+    "checking": "Checking...",
+    "haveGiftCard": "Have a gift card?",
+    "giftCard": "Gift Card",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "total": "Total",
+    "welcomeDiscount": "Welcome Discount",
+    "couponDiscount": "Coupon",
+    "welcomeTitle": "Welcome to Digistore1!",
+    "welcomeMessage": "Enjoy {discount}% OFF on your first purchase!",
+    "welcomeAutoApplied": "Welcome! {discount}% OFF auto-applied!",
+    "remainingBalance": "Remaining gift card balance after purchase",
+    "paypal": "PayPal",
+    "paySecurely": "Pay securely with PayPal",
+    "secure": "Secure",
+    "loadingPayment": "Loading payment options...",
+    "loadingPayPal": "Loading PayPal...",
+    "paymentSuccess": "Payment successful!",
+    "paymentFailed": "Payment failed",
+    "paymentCancelled": "Payment cancelled",
+    "orderSuccess": "Order completed successfully!",
+    "failedToCreateOrder": "Failed to create order",
+    "fillRequiredFields": "Please fill in all required fields",
+    "enterGiftCardCode": "Please enter a gift card code",
+    "giftCardNoBalance": "This gift card has no remaining balance",
+    "giftCardApplied": "Gift card applied! ${amount} will be deducted.",
+    "invalidGiftCard": "Invalid gift card code",
+    "license": "License"
   },
   "footer": {
     "about": "About Digistore1",
-    "aboutDesc": "Your trusted marketplace for high-quality digital products. Download instantly and start creating today.",
+    "aboutDesc": "Your trusted marketplace for high-quality digital products. Download instantly and start creating amazing things today.",
     "shop": "Shop",
     "allProducts": "All Products",
+    "categories": "Categories",
+    "bundles": "Product Bundles",
     "newArrivals": "New Arrivals",
     "bestSellers": "Best Sellers",
     "support": "Support",
@@ -125,11 +233,17 @@
     "faq": "FAQ",
     "refundPolicy": "Refund Policy",
     "legal": "Legal",
-    "terms": "Terms of Service",
+    "terms": "Terms & Conditions",
     "privacy": "Privacy Policy",
     "licenses": "License Information",
     "cookies": "Cookie Policy",
-    "copyright": "All rights reserved."
+    "allRightsReserved": "All rights reserved.",
+    "madeWith": "Made with",
+    "forCreators": "for creators",
+    "weAccept": "We accept:",
+    "stayUpdated": "Stay Updated",
+    "thanksForSubscribing": "Thanks for subscribing!",
+    "enterEmail": "Enter your email"
   }
 }
 

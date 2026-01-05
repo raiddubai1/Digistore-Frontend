@@ -3,10 +3,11 @@
 import { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Logo from "./Logo";
 import MobileMenu from "./MobileMenu";
 import CurrencySelector from "./CurrencySelector";
-import { Search, ShoppingCart, User, Menu, Globe, LogOut, Settings, Heart, Package, Sparkles, TrendingUp, Bell, ChevronDown, LayoutDashboard, Sun, Moon, Check } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, Globe, LogOut, Settings, Heart, Package, Sparkles, ChevronDown, LayoutDashboard, Sun, Moon, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,11 +24,10 @@ const languages = [
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations("common");
   const [isPending, startTransition] = useTransition();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -88,7 +88,7 @@ export default function Header() {
             {/* Left - Special Offer Badge */}
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-yellow-300 animate-pulse" />
-              <span className="font-medium">🎉 New User Offer: <span className="font-bold">30% OFF</span> Your First Purchase! Use code <span className="bg-white/20 px-2 py-0.5 rounded font-bold">WELCOME30</span></span>
+              <span className="font-medium">🎉 {t("newUserOffer")} <span className="font-bold">30% {t("off")}</span> {t("yourFirstPurchase")} <span className="bg-white/20 px-2 py-0.5 rounded font-bold">WELCOME30</span></span>
             </div>
 
             {/* Right - Language & Support */}
@@ -114,7 +114,7 @@ export default function Header() {
                     ></div>
                     <div className="absolute right-0 top-full mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 overflow-hidden">
                       <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Select Language</p>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{t("selectLanguage")}</p>
                       </div>
                       {languages.map((lang) => (
                         <button
@@ -141,7 +141,7 @@ export default function Header() {
 
               {/* Support Link */}
               <Link href="/support" className="text-sm font-medium hover:text-gray-200 transition-colors">
-                24/7 Support
+                {t("support")}
               </Link>
             </div>
           </div>
@@ -170,7 +170,7 @@ export default function Header() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
-                placeholder="Search for digital products, templates, eBooks..."
+                placeholder={t("searchPlaceholder")}
                 className="w-full h-12 pl-12 pr-4 rounded-full border-2 border-gray-200 dark:border-slate-600 focus:border-gray-400 dark:focus:border-slate-500 focus:ring-4 focus:ring-gray-100 dark:focus:ring-slate-700 focus:outline-none transition-all text-sm bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
             </div>
@@ -283,7 +283,7 @@ export default function Header() {
                             className="flex items-center gap-3 px-4 py-2.5 bg-red-50 hover:bg-red-100 transition-colors group"
                           >
                             <LayoutDashboard className="w-4 h-4 text-red-600" />
-                            <span className="text-sm font-medium text-red-600">Admin Dashboard</span>
+                            <span className="text-sm font-medium text-red-600">{t("adminDashboard")}</span>
                           </Link>
                         </div>
                       )}
@@ -295,28 +295,28 @@ export default function Header() {
                           className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors group"
                         >
                           <User className="w-4 h-4 text-gray-600 group-hover:text-gray-500" />
-                          <span className="text-sm text-gray-700 group-hover:text-gray-500">My Account</span>
+                          <span className="text-sm text-gray-700 group-hover:text-gray-500">{t("myAccount")}</span>
                         </Link>
                         <Link
                           href="/account/orders"
                           className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors group"
                         >
                           <Package className="w-4 h-4 text-gray-600 group-hover:text-gray-500" />
-                          <span className="text-sm text-gray-700 group-hover:text-gray-500">My Orders</span>
+                          <span className="text-sm text-gray-700 group-hover:text-gray-500">{t("myOrders")}</span>
                         </Link>
                         <Link
                           href="/wishlist"
                           className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors group"
                         >
                           <Heart className="w-4 h-4 text-gray-600 group-hover:text-gray-500" />
-                          <span className="text-sm text-gray-700 group-hover:text-gray-500">Wishlist</span>
+                          <span className="text-sm text-gray-700 group-hover:text-gray-500">{t("wishlist")}</span>
                         </Link>
                         <Link
                           href="/account?tab=settings"
                           className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors group"
                         >
                           <Settings className="w-4 h-4 text-gray-600 group-hover:text-gray-500" />
-                          <span className="text-sm text-gray-700 group-hover:text-gray-500">Settings</span>
+                          <span className="text-sm text-gray-700 group-hover:text-gray-500">{t("settings")}</span>
                         </Link>
                       </div>
 
@@ -327,7 +327,7 @@ export default function Header() {
                           className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 transition-colors group"
                         >
                           <LogOut className="w-4 h-4 text-gray-600 group-hover:text-red-600" />
-                          <span className="text-sm text-gray-700 group-hover:text-red-600">Logout</span>
+                          <span className="text-sm text-gray-700 group-hover:text-red-600">{t("logout")}</span>
                         </button>
                       </div>
                     </div>
@@ -340,7 +340,7 @@ export default function Header() {
                 className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-medium hover:shadow-lg hover:shadow-gray-200 transition-all hover:scale-105"
               >
                 <User className="w-4 h-4" />
-                <span>Login</span>
+                <span>{t("login")}</span>
               </Link>
             )}
           </div>

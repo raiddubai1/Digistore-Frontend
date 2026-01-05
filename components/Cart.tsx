@@ -5,9 +5,11 @@ import { X, ShoppingBag, Trash2, Plus, Minus, Tag, Check, Gift } from "lucide-re
 import { formatPrice, getThumbnailUrl } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 
 export default function Cart() {
+  const t = useTranslations("cart");
   const { items, isOpen, closeCart, removeItem, updateQuantity, itemCount, subtotal, discount, total, coupon, applyCouponAsync, isValidatingCoupon, removeCoupon, checkFirstTimeBuyer, isFirstTimeBuyer } =
     useCartStore();
   const [mounted, setMounted] = useState(false);
@@ -45,7 +47,7 @@ export default function Cart() {
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-primary" />
               <h2 className="text-xl font-bold">
-                Shopping Cart ({itemCount()})
+                {t("title")} ({itemCount()})
               </h2>
             </div>
             <button
@@ -63,15 +65,15 @@ export default function Cart() {
                 <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                   <ShoppingBag className="w-12 h-12 text-gray-400" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">Your cart is empty</h3>
+                <h3 className="text-lg font-semibold mb-2">{t("empty")}</h3>
                 <p className="text-gray-500 mb-6">
-                  Add some products to get started!
+                  {t("emptyMessage")}
                 </p>
                 <button
                   onClick={closeCart}
                   className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-full font-semibold hover:shadow-lg transition-all"
                 >
-                  Continue Shopping
+                  {t("continueShopping")}
                 </button>
               </div>
             ) : (
@@ -102,7 +104,7 @@ export default function Cart() {
                         {item.product.title}
                       </h3>
                       <p className="text-xs text-gray-500 mb-2 capitalize">
-                        {item.license} License
+                        {item.license} {t("license")}
                       </p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -165,16 +167,16 @@ export default function Cart() {
                     )}
                     <div>
                       <span className={`text-sm font-medium ${coupon.isAutoApplied ? 'text-primary' : 'text-green-700'}`}>
-                        {coupon.isAutoApplied ? '🎉 New User Discount!' : coupon.code} ({coupon.type === 'percentage' ? `${coupon.discount}% off` : `$${coupon.discount} off`})
+                        {coupon.isAutoApplied ? `🎉 ${t("newUserDiscount")}` : coupon.code} ({coupon.type === 'percentage' ? `${coupon.discount}% ${t("off")}` : `$${coupon.discount} ${t("off")}`})
                       </span>
                       {coupon.isAutoApplied && (
-                        <p className="text-xs text-gray-500">Auto-applied for first-time buyers</p>
+                        <p className="text-xs text-gray-500">{t("autoApplied")}</p>
                       )}
                     </div>
                   </div>
                   {!coupon.isAutoApplied && (
                     <button onClick={removeCoupon} className="text-sm text-red-500 hover:text-red-700">
-                      Remove
+                      {t("remove")}
                     </button>
                   )}
                 </div>
@@ -184,7 +186,7 @@ export default function Cart() {
                     type="text"
                     value={couponInput}
                     onChange={(e) => setCouponInput(e.target.value)}
-                    placeholder="Enter coupon code"
+                    placeholder={t("enterCouponCode")}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-gray-200 focus:outline-none"
                     disabled={isApplyingCoupon || isValidatingCoupon}
                   />
@@ -207,7 +209,7 @@ export default function Cart() {
                     disabled={isApplyingCoupon || isValidatingCoupon || !couponInput.trim()}
                     className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isApplyingCoupon || isValidatingCoupon ? 'Validating...' : 'Apply'}
+                    {isApplyingCoupon || isValidatingCoupon ? t("validating") : t("apply")}
                   </button>
                 </div>
               ) : (
@@ -216,27 +218,27 @@ export default function Cart() {
                   className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
                 >
                   <Tag className="w-4 h-4" />
-                  Have a coupon code?
+                  {t("haveCoupon")}
                 </button>
               )}
 
               {/* Subtotal */}
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Subtotal:</span>
+                <span className="text-gray-600">{t("subtotal")}:</span>
                 <span className="font-medium">{formatPrice(subtotal())}</span>
               </div>
 
               {/* Discount */}
               {discount() > 0 && (
                 <div className="flex justify-between text-sm text-green-600">
-                  <span>Discount:</span>
+                  <span>{t("discount")}:</span>
                   <span>-{formatPrice(discount())}</span>
                 </div>
               )}
 
               {/* Total */}
               <div className="flex justify-between text-xl border-t border-gray-200 pt-4">
-                <span className="font-bold">Total:</span>
+                <span className="font-bold">{t("total")}:</span>
                 <span className="font-bold text-gray-900">{formatPrice(total())}</span>
               </div>
 
@@ -246,14 +248,14 @@ export default function Cart() {
                 onClick={closeCart}
                 className="block w-full py-4 bg-gray-900 text-white text-center rounded-full font-semibold hover:bg-gray-800 transition-all"
               >
-                Proceed to Checkout
+                {t("proceedToCheckout")}
               </Link>
 
               <button
                 onClick={closeCart}
                 className="block w-full py-3 text-gray-600 text-center font-semibold hover:text-gray-900"
               >
-                Continue Shopping
+                {t("continueShopping")}
               </button>
             </div>
           )}

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Lock, Mail, User, Tag, Check, X, ChevronLeft, ChevronDown, ChevronUp, Gift, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { paymentsAPI, giftCardsAPI } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -19,6 +20,7 @@ const PayPalIcon = () => (
 );
 
 export default function CheckoutPage() {
+  const t = useTranslations("checkout");
   const router = useRouter();
   const { user } = useAuth();
   const { items, subtotal, discount, clearCart, coupon, applyCouponAsync, isValidatingCoupon, removeCoupon } = useCartStore();
@@ -110,7 +112,7 @@ export default function CheckoutPage() {
   // Gift card validation
   const handleApplyGiftCard = async () => {
     if (!giftCardInput.trim()) {
-      toast.error('Please enter a gift card code');
+      toast.error(t("enterGiftCardCode"));
       return;
     }
 
@@ -120,16 +122,16 @@ export default function CheckoutPage() {
       const { balance } = response.data.data;
 
       if (balance <= 0) {
-        toast.error('This gift card has no remaining balance');
+        toast.error(t("giftCardNoBalance"));
         return;
       }
 
       applyGiftCard(giftCardInput.trim().toUpperCase(), balance);
-      toast.success(`Gift card applied! $${balance.toFixed(2)} will be deducted.`);
+      toast.success(`${t("giftCard")} $${balance.toFixed(2)}`);
       setGiftCardInput('');
       setShowGiftCardInput(false);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Invalid gift card code');
+      toast.error(error.response?.data?.message || t("invalidGiftCard"));
     } finally {
       setIsValidatingGiftCard(false);
     }
@@ -169,7 +171,7 @@ export default function CheckoutPage() {
 
           return response.data.data.orderId;
         } catch (error: any) {
-          toast.error(error.response?.data?.message || 'Failed to create order');
+          toast.error(error.response?.data?.message || t("failedToCreateOrder"));
           throw error;
         }
       },
@@ -214,21 +216,21 @@ export default function CheckoutPage() {
           setOrderCompleted(true);
           clearCart();
           clearAppliedCard(); // Clear gift card after successful order
-          toast.success('Payment successful!');
+          toast.success(t("paymentSuccess"));
           router.push(`/checkout/success?orderId=${response.data.data.order.id}`);
         } catch (error: any) {
-          toast.error(error.response?.data?.message || 'Payment failed');
+          toast.error(error.response?.data?.message || t("paymentFailed"));
         } finally {
           setIsProcessing(false);
         }
       },
       onError: (err: any) => {
         console.error('PayPal error:', err);
-        toast.error('Payment failed. Please try again.');
+        toast.error(t("paymentFailed"));
         setIsProcessing(false);
       },
       onCancel: () => {
-        toast.error('Payment cancelled');
+        toast.error(t("paymentCancelled"));
         setIsProcessing(false);
       },
     };
@@ -255,7 +257,7 @@ export default function CheckoutPage() {
   // Handle free order (from coupon or gift card covering full amount)
   const handleFreeOrder = async () => {
     if (!formData.email || !formData.firstName || !formData.lastName) {
-      toast.error('Please fill in all required fields');
+      toast.error(t("fillRequiredFields"));
       return;
     }
 
@@ -296,12 +298,12 @@ export default function CheckoutPage() {
       setOrderCompleted(true);
       clearCart();
       clearAppliedCard();
-      toast.success('Order completed successfully!');
+      toast.success(t("orderSuccess"));
       router.push(`/checkout/success?orderId=${response.data.data.order.id}`);
     } catch (error: any) {
       console.error('Free order error:', error);
       console.error('Error response:', error.response?.data);
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to complete order';
+      const errorMessage = error.response?.data?.message || error.message || t("failedToCreateOrder");
       toast.error(errorMessage);
     } finally {
       setIsProcessing(false);
@@ -312,7 +314,7 @@ export default function CheckoutPage() {
     e.preventDefault();
     // PayPal handles payment - this is just for form validation
     if (!formData.email || !formData.firstName || !formData.lastName) {
-      toast.error('Please fill in all required fields');
+      toast.error(t("fillRequiredFields"));
       return;
     }
   };
@@ -339,7 +341,7 @@ export default function CheckoutPage() {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-sm line-clamp-1">{item.product.title}</h3>
-              <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+              <p className="text-xs text-gray-500">{t("quantity")}: {item.quantity}</p>
             </div>
             <div className="text-sm font-semibold">{formatPrice(item.price * item.quantity)}</div>
           </div>
@@ -364,7 +366,7 @@ export default function CheckoutPage() {
               type="text"
               value={couponInput}
               onChange={(e) => setCouponInput(e.target.value)}
-              placeholder="Coupon code"
+              placeholder={t("couponCode")}
               className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
               disabled={isApplyingCoupon || isValidatingCoupon}
             />
@@ -388,7 +390,7 @@ export default function CheckoutPage() {
               disabled={isApplyingCoupon || isValidatingCoupon || !couponInput.trim()}
               className="px-3 py-2 bg-gray-900 text-white text-sm rounded-lg disabled:opacity-50"
             >
-              {isApplyingCoupon || isValidatingCoupon ? 'Validating...' : 'Apply'}
+              {isApplyingCoupon || isValidatingCoupon ? t("validating") : t("apply")}
             </button>
           </div>
         ) : (
@@ -398,7 +400,7 @@ export default function CheckoutPage() {
             className="flex items-center gap-2 text-sm text-gray-500"
           >
             <Tag className="w-4 h-4" />
-            Add coupon
+            {t("addCoupon")}
           </button>
         )}
       </div>
@@ -408,7 +410,7 @@ export default function CheckoutPage() {
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 mb-3">
           <div className="flex items-center gap-2 text-green-700">
             <Gift className="w-4 h-4" />
-            <span className="text-xs font-bold">🎉 Welcome! {coupon.discount}% OFF auto-applied!</span>
+            <span className="text-xs font-bold">🎉 {t("welcomeAutoApplied", { discount: coupon.discount })}</span>
           </div>
         </div>
       )}
@@ -416,17 +418,17 @@ export default function CheckoutPage() {
       {/* Totals */}
       <div className="border-t border-gray-100 pt-3 space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-500">Subtotal</span>
+          <span className="text-gray-500">{t("subtotal")}</span>
           <span>{formatPrice(subtotal())}</span>
         </div>
         {discount() > 0 && (
           <div className="flex justify-between text-sm text-green-600">
-            <span>{coupon?.isAutoApplied ? 'Welcome Discount' : `Coupon (${coupon?.code})`}</span>
+            <span>{coupon?.isAutoApplied ? t("welcomeDiscount") : `${t("couponDiscount")} (${coupon?.code})`}</span>
             <span>-{formatPrice(discount())}</span>
           </div>
         )}
         <div className="flex justify-between font-bold pt-2 border-t border-gray-100">
-          <span>Total</span>
+          <span>{t("total")}</span>
           <span>{formatPrice(finalTotal)}</span>
         </div>
       </div>
@@ -443,7 +445,7 @@ export default function CheckoutPage() {
             <Link href="/products" className="p-1">
               <ChevronLeft className="w-6 h-6" />
             </Link>
-            <h1 className="text-lg font-bold">Checkout</h1>
+            <h1 className="text-lg font-bold">{t("title")}</h1>
           </div>
         </div>
 
@@ -454,7 +456,7 @@ export default function CheckoutPage() {
             className="w-full px-4 py-3 flex items-center justify-between"
           >
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Order Summary</span>
+              <span className="text-sm font-medium">{t("orderSummary")}</span>
               <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">{items.length}</span>
             </div>
             <div className="flex items-center gap-2">
@@ -473,23 +475,23 @@ export default function CheckoutPage() {
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           {/* Email */}
           <div className="bg-white rounded-xl p-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t("email")}</label>
             <input
               type="email"
               required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-200 focus:outline-none"
-              placeholder="you@example.com"
+              placeholder={t("emailPlaceholder")}
             />
-            <p className="text-xs text-gray-500 mt-2">Download links will be sent here</p>
+            <p className="text-xs text-gray-500 mt-2">{t("downloadLinksNote")}</p>
           </div>
 
           {/* Name */}
           <div className="bg-white rounded-xl p-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("firstName")}</label>
                 <input
                   type="text"
                   required
@@ -499,7 +501,7 @@ export default function CheckoutPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t("lastName")}</label>
                 <input
                   type="text"
                   required
@@ -513,7 +515,7 @@ export default function CheckoutPage() {
 
           {/* Country */}
           <div className="bg-white rounded-xl p-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t("country")}</label>
             <select
               value={formData.country}
               onChange={(e) => setFormData({ ...formData, country: e.target.value })}
@@ -532,12 +534,12 @@ export default function CheckoutPage() {
           {/* Payment */}
           {!isFreeOrder && (
             <div className="bg-white rounded-xl p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-3">Payment Method</label>
+              <label className="block text-sm font-medium text-gray-700 mb-3">{t("paymentMethod")}</label>
               <div className="flex items-center gap-3 p-3 border-2 border-blue-600 rounded-lg bg-blue-50">
                 <PayPalIcon />
                 <div className="flex-1">
-                  <p className="font-medium text-sm">PayPal</p>
-                  <p className="text-xs text-gray-500">Pay securely with PayPal</p>
+                  <p className="font-medium text-sm">{t("paypal")}</p>
+                  <p className="text-xs text-gray-500">{t("paySecurely")}</p>
                 </div>
               </div>
             </div>
@@ -552,24 +554,24 @@ export default function CheckoutPage() {
           {isProcessing ? (
             <div className="w-full py-4 bg-gray-200 rounded-xl flex items-center justify-center gap-2">
               <div className="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
-              <span className="text-gray-700 font-semibold">Processing...</span>
+              <span className="text-gray-700 font-semibold">{t("processing")}</span>
             </div>
           ) : isFreeOrder ? (
             <button
               onClick={handleFreeOrder}
               className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-colors"
             >
-              Complete Free Order
+              {t("completeFreeOrder")}
             </button>
           ) : paypalLoaded ? (
             <div id="paypal-button-container-mobile" className="w-full"></div>
           ) : (
             <div className="w-full py-4 bg-gray-200 rounded-xl flex items-center justify-center">
-              <span className="text-gray-500">Loading payment options...</span>
+              <span className="text-gray-500">{t("loadingPayment")}</span>
             </div>
           )}
           <p className="text-center text-xs text-gray-500 mt-2">
-            🔒 Secure checkout
+            🔒 {t("secureCheckoutShort")}
           </p>
         </div>
       </div>
@@ -577,7 +579,7 @@ export default function CheckoutPage() {
       {/* ===== DESKTOP LAYOUT ===== */}
       <div className="hidden lg:block min-h-screen bg-gray-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+          <h1 className="text-3xl font-bold mb-8">{t("title")}</h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column - Checkout Form */}
@@ -587,11 +589,11 @@ export default function CheckoutPage() {
                 <div className="bg-white rounded-2xl p-6 shadow-sm">
                   <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                     <Mail className="w-5 h-5 text-primary" />
-                    Contact Information
+                    {t("contactInfo")}
                   </h2>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address
+                      {t("emailAddress")}
                     </label>
                     <input
                       type="email"
@@ -599,10 +601,10 @@ export default function CheckoutPage() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                      placeholder="you@example.com"
+                      placeholder={t("emailPlaceholder")}
                     />
                     <p className="text-sm text-gray-500 mt-2">
-                      We'll send your download links to this email
+                      {t("emailNote")}
                     </p>
                   </div>
                 </div>
@@ -611,12 +613,12 @@ export default function CheckoutPage() {
               <div className="bg-white rounded-2xl p-6 shadow-sm">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <User className="w-5 h-5 text-primary" />
-                  Billing Information
+                  {t("billingInfo")}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      First Name
+                      {t("firstName")}
                     </label>
                     <input
                       type="text"
@@ -629,7 +631,7 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Last Name
+                      {t("lastName")}
                     </label>
                     <input
                       type="text"
@@ -642,7 +644,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Country
+                      {t("country")}
                     </label>
                     <select
                       value={formData.country}
@@ -667,17 +669,17 @@ export default function CheckoutPage() {
                 <div className="bg-white rounded-2xl p-6 shadow-sm">
                   <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                     <Lock className="w-5 h-5 text-primary" />
-                    Payment Method
+                    {t("paymentMethod")}
                   </h2>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 p-4 border-2 border-blue-600 bg-blue-50 rounded-lg">
                       <PayPalIcon />
                       <div className="flex-1">
-                        <div className="font-semibold">PayPal</div>
-                        <div className="text-sm text-gray-500">Pay securely with PayPal</div>
+                        <div className="font-semibold">{t("paypal")}</div>
+                        <div className="text-sm text-gray-500">{t("paySecurely")}</div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Secure</span>
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{t("secure")}</span>
                       </div>
                     </div>
                   </div>
@@ -689,25 +691,25 @@ export default function CheckoutPage() {
                 {isProcessing ? (
                   <div className="w-full py-4 bg-gray-100 rounded-xl flex items-center justify-center gap-2">
                     <div className="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
-                    <span className="text-gray-700 font-semibold">Processing...</span>
+                    <span className="text-gray-700 font-semibold">{t("processing")}</span>
                   </div>
                 ) : isFreeOrder ? (
                   <button
                     onClick={handleFreeOrder}
                     className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-colors text-lg"
                   >
-                    🎉 Complete Free Order
+                    🎉 {t("completeFreeOrder")}
                   </button>
                 ) : paypalLoaded ? (
                   <div id="paypal-button-container"></div>
                 ) : (
                   <div className="w-full py-4 bg-gray-100 rounded-xl flex items-center justify-center">
                     <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2" />
-                    <span className="text-gray-500">Loading PayPal...</span>
+                    <span className="text-gray-500">{t("loadingPayPal")}</span>
                   </div>
                 )}
                 <p className="text-center text-sm text-gray-500 mt-4">
-                  🔒 Secure checkout. Your information is protected.
+                  🔒 {t("secureCheckout")}
                 </p>
               </div>
             </form>
@@ -716,7 +718,7 @@ export default function CheckoutPage() {
           {/* Right Column - Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl p-6 shadow-sm sticky top-24">
-              <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+              <h2 className="text-xl font-bold mb-4">{t("orderSummary")}</h2>
 
               {/* Order Items */}
               <div className="space-y-4 mb-6">
@@ -725,8 +727,8 @@ export default function CheckoutPage() {
                     <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-sm line-clamp-2">{item.product.title}</h3>
-                      <p className="text-xs text-gray-500 capitalize">{item.license} License</p>
-                      <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                      <p className="text-xs text-gray-500 capitalize">{item.license} {t("license")}</p>
+                      <p className="text-xs text-gray-500">{t("quantity")}: {item.quantity}</p>
                     </div>
                     <div className="text-sm font-semibold">{formatPrice(item.price * item.quantity)}</div>
                   </div>
@@ -753,7 +755,7 @@ export default function CheckoutPage() {
                       type="text"
                       value={couponInput}
                       onChange={(e) => setCouponInput(e.target.value)}
-                      placeholder="Coupon code"
+                      placeholder={t("couponCode")}
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:outline-none"
                       disabled={isApplyingCoupon || isValidatingCoupon}
                     />
@@ -777,7 +779,7 @@ export default function CheckoutPage() {
                       disabled={isApplyingCoupon || isValidatingCoupon || !couponInput.trim()}
                       className="px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50"
                     >
-                      {isApplyingCoupon || isValidatingCoupon ? 'Validating...' : 'Apply'}
+                      {isApplyingCoupon || isValidatingCoupon ? t("validating") : t("apply")}
                     </button>
                   </div>
                 ) : (
@@ -787,7 +789,7 @@ export default function CheckoutPage() {
                     className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
                   >
                     <Tag className="w-4 h-4" />
-                    Add coupon code
+                    {t("addCouponCode")}
                   </button>
                 )}
               </div>
@@ -799,7 +801,7 @@ export default function CheckoutPage() {
                     <div className="flex items-center gap-2">
                       <Gift className="w-4 h-4 text-purple-600" />
                       <span className="text-sm font-medium text-purple-700">
-                        Gift Card ({appliedGiftCard.code.slice(-8)})
+                        {t("giftCard")} ({appliedGiftCard.code.slice(-8)})
                       </span>
                     </div>
                     <button onClick={clearAppliedCard} className="p-1 hover:bg-purple-100 rounded">
@@ -822,7 +824,7 @@ export default function CheckoutPage() {
                       disabled={isValidatingGiftCard || !giftCardInput.trim()}
                       className="px-3 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50"
                     >
-                      {isValidatingGiftCard ? 'Checking...' : 'Apply'}
+                      {isValidatingGiftCard ? t("checking") : t("apply")}
                     </button>
                   </div>
                 ) : (
@@ -832,7 +834,7 @@ export default function CheckoutPage() {
                     className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
                   >
                     <Gift className="w-4 h-4" />
-                    Have a gift card?
+                    {t("haveGiftCard")}
                   </button>
                 )}
               </div>
@@ -845,9 +847,9 @@ export default function CheckoutPage() {
                       <Sparkles className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
-                      <p className="font-bold text-green-800">🎉 Welcome to Digistore1!</p>
+                      <p className="font-bold text-green-800">🎉 {t("welcomeTitle")}</p>
                       <p className="text-sm text-green-700">
-                        Enjoy <span className="font-bold">{coupon.discount}% OFF</span> on your first purchase!
+                        {t("welcomeMessage", { discount: coupon.discount })}
                       </p>
                     </div>
                   </div>
@@ -857,32 +859,32 @@ export default function CheckoutPage() {
               {/* Totals */}
               <div className="border-t border-gray-200 pt-4 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal</span>
+                  <span className="text-gray-600">{t("subtotal")}</span>
                   <span className="font-semibold">{formatPrice(subtotal())}</span>
                 </div>
                 {discount() > 0 && (
                   <div className="flex justify-between text-sm text-green-600">
-                    <span>{coupon?.isAutoApplied ? 'Welcome Discount' : `Coupon (${coupon?.code})`}</span>
+                    <span>{coupon?.isAutoApplied ? t("welcomeDiscount") : `${t("couponDiscount")} (${coupon?.code})`}</span>
                     <span>-{formatPrice(discount())}</span>
                   </div>
                 )}
                 {giftCardDiscount > 0 && (
                   <div className="flex justify-between text-sm text-purple-600">
-                    <span>Gift Card</span>
+                    <span>{t("giftCard")}</span>
                     <span>-{formatPrice(giftCardDiscount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Tax</span>
+                  <span className="text-gray-600">{t("tax")}</span>
                   <span className="font-semibold">$0.00</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold border-t border-gray-200 pt-2">
-                  <span>Total</span>
+                  <span>{t("total")}</span>
                   <span className="text-gray-900">{formatPrice(finalTotal)}</span>
                 </div>
                 {appliedGiftCard && giftCardDiscount < appliedGiftCard.balance && (
                   <p className="text-xs text-gray-500">
-                    Remaining gift card balance after purchase: {formatPrice(appliedGiftCard.balance - giftCardDiscount)}
+                    {t("remainingBalance")}: {formatPrice(appliedGiftCard.balance - giftCardDiscount)}
                   </p>
                 )}
               </div>
