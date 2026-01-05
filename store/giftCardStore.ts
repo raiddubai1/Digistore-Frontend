@@ -27,8 +27,8 @@ interface GiftCardState {
   useBalance: (amount: number) => number; // Returns remaining amount to pay
 }
 
-// Gift card denominations
-export const GIFT_CARD_AMOUNTS = [10, 25, 50, 100, 200];
+// Gift card denominations (must match backend validation)
+export const GIFT_CARD_AMOUNTS = [10, 25, 50, 75, 100, 150, 200, 250];
 
 // Generate a gift card code
 export const generateGiftCardCode = (): string => {

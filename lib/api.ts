@@ -259,6 +259,8 @@ export const paymentsAPI = {
     totalAmount: number;
     currency?: string;
     couponCode?: string;
+    giftCardCode?: string;
+    giftCardAmount?: number;
   }) => api.post('/payments/paypal/create-order', data),
 
   // Capture PayPal payment
@@ -278,9 +280,11 @@ export const paymentsAPI = {
       country: string;
     };
     couponCode?: string;
+    giftCardCode?: string;
+    giftCardAmount?: number;
   }) => api.post('/payments/paypal/capture-order', data),
 
-  // Create free order (for $0 products)
+  // Create free order (for $0 products or fully covered by gift card)
   createFreeOrder: (data: {
     items: Array<{
       productId: string;
@@ -295,6 +299,8 @@ export const paymentsAPI = {
       lastName: string;
       country: string;
     };
+    giftCardCode?: string;
+    giftCardAmount?: number;
   }) => api.post('/payments/free-order', data),
 
   // Get available payment methods
@@ -479,6 +485,54 @@ export const bundlesAPI = {
 
   // Delete bundle (admin only)
   delete: (id: string) => api.delete(`/bundles/${id}`),
+};
+
+// ============================================
+// GIFT CARDS API
+// ============================================
+
+export const giftCardsAPI = {
+  // Create PayPal order for gift card purchase
+  createOrder: (data: {
+    amount: number;
+    recipientEmail: string;
+    recipientName: string;
+    personalMessage?: string;
+    purchaserEmail?: string;
+    purchaserName?: string;
+  }) => api.post('/gift-cards/create-order', data),
+
+  // Capture payment and activate gift card
+  capturePayment: (data: {
+    paypalOrderId: string;
+    giftCardId: string;
+  }) => api.post('/gift-cards/capture-payment', data),
+
+  // Validate gift card code
+  validate: (code: string) => api.post('/gift-cards/validate', { code }),
+
+  // Check gift card balance
+  checkBalance: (code: string) => api.get(`/gift-cards/balance/${code}`),
+
+  // Apply gift card to order
+  apply: (data: {
+    code: string;
+    orderTotal: number;
+    orderId?: string;
+  }) => api.post('/gift-cards/apply', data),
+
+  // Redeem gift card (use balance for order)
+  redeem: (data: {
+    code: string;
+    amount: number;
+    orderId?: string;
+  }) => api.post('/gift-cards/redeem', data),
+
+  // Get user's purchased gift cards
+  getMyGiftCards: () => api.get('/gift-cards/my-gift-cards'),
+
+  // Resend gift card email
+  resendEmail: (giftCardId: string) => api.post(`/gift-cards/${giftCardId}/resend`),
 };
 
 // Blog API

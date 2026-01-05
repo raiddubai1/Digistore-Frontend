@@ -1,13 +1,14 @@
 "use client";
 
 import { useCartStore } from "@/store/cartStore";
+import { useGiftCardStore } from "@/store/giftCardStore";
 import { formatPrice, getThumbnailUrl } from "@/lib/utils";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Mail, User, Tag, Check, X, ChevronLeft, ChevronDown, ChevronUp, Gift, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
-import { paymentsAPI } from "@/lib/api";
+import { paymentsAPI, giftCardsAPI } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 // PayPal icon component
@@ -21,6 +22,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { items, subtotal, discount, clearCart, coupon, applyCouponAsync, isValidatingCoupon, removeCoupon } = useCartStore();
+  const { appliedGiftCard, applyGiftCard, clearAppliedCard } = useGiftCardStore();
   const [mounted, setMounted] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [couponInput, setCouponInput] = useState("");
@@ -28,6 +30,11 @@ export default function CheckoutPage() {
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [paypalLoaded, setPaypalLoaded] = useState(false);
+
+  // Gift card state
+  const [giftCardInput, setGiftCardInput] = useState("");
+  const [showGiftCardInput, setShowGiftCardInput] = useState(false);
+  const [isValidatingGiftCard, setIsValidatingGiftCard] = useState(false);
 
   const [formData, setFormData] = useState({
     email: user?.email || "",
@@ -86,11 +93,47 @@ export default function CheckoutPage() {
   // Total discount (from coupon only - WELCOME30 is auto-applied for first-time buyers)
   const totalDiscount = discount();
 
-  // Final total after discount
-  const finalTotal = Math.max(0, subtotal() - totalDiscount);
+  // Amount after coupon discount
+  const afterCouponTotal = Math.max(0, subtotal() - totalDiscount);
+
+  // Gift card discount (can only apply up to the remaining amount)
+  const giftCardDiscount = appliedGiftCard
+    ? Math.min(appliedGiftCard.balance, afterCouponTotal)
+    : 0;
+
+  // Final total after all discounts
+  const finalTotal = Math.max(0, afterCouponTotal - giftCardDiscount);
 
   // Check if order is free
   const isFreeOrder = finalTotal === 0;
+
+  // Gift card validation
+  const handleApplyGiftCard = async () => {
+    if (!giftCardInput.trim()) {
+      toast.error('Please enter a gift card code');
+      return;
+    }
+
+    setIsValidatingGiftCard(true);
+    try {
+      const response = await giftCardsAPI.validate(giftCardInput.trim().toUpperCase());
+      const { balance } = response.data.data;
+
+      if (balance <= 0) {
+        toast.error('This gift card has no remaining balance');
+        return;
+      }
+
+      applyGiftCard(giftCardInput.trim().toUpperCase(), balance);
+      toast.success(`Gift card applied! $${balance.toFixed(2)} will be deducted.`);
+      setGiftCardInput('');
+      setShowGiftCardInput(false);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Invalid gift card code');
+    } finally {
+      setIsValidatingGiftCard(false);
+    }
+  };
 
   // Initialize PayPal buttons for both desktop and mobile
   const initPayPalButton = useCallback(() => {
@@ -120,6 +163,8 @@ export default function CheckoutPage() {
             totalAmount: finalTotal,
             currency: 'USD',
             couponCode: coupon?.code,
+            giftCardCode: appliedGiftCard?.code,
+            giftCardAmount: giftCardDiscount,
           });
 
           return response.data.data.orderId;
@@ -139,6 +184,19 @@ export default function CheckoutPage() {
             license: item.license,
           }));
 
+          // If gift card was used, redeem it first
+          if (appliedGiftCard && giftCardDiscount > 0) {
+            try {
+              await giftCardsAPI.redeem({
+                code: appliedGiftCard.code,
+                amount: giftCardDiscount,
+              });
+            } catch (error: any) {
+              console.error('Gift card redeem error:', error);
+              // Continue with order - gift card might already be redeemed
+            }
+          }
+
           const response = await paymentsAPI.capturePayPalOrder({
             paypalOrderId: data.orderID,
             items: orderItems,
@@ -149,10 +207,13 @@ export default function CheckoutPage() {
               country: formData.country,
             },
             couponCode: coupon?.code,
+            giftCardCode: appliedGiftCard?.code,
+            giftCardAmount: giftCardDiscount,
           });
 
           setOrderCompleted(true);
           clearCart();
+          clearAppliedCard(); // Clear gift card after successful order
           toast.success('Payment successful!');
           router.push(`/checkout/success?orderId=${response.data.data.order.id}`);
         } catch (error: any) {
@@ -183,7 +244,7 @@ export default function CheckoutPage() {
     if (mobileContainer && !mobileContainer.hasChildNodes()) {
       (window as any).paypal.Buttons(buttonConfig).render('#paypal-button-container-mobile');
     }
-  }, [paypalLoaded, items, finalTotal, coupon, formData, clearCart, router, isFreeOrder]);
+  }, [paypalLoaded, items, finalTotal, coupon, formData, clearCart, clearAppliedCard, router, isFreeOrder, appliedGiftCard, giftCardDiscount]);
 
   useEffect(() => {
     if (paypalLoaded && !isFreeOrder) {
@@ -191,7 +252,7 @@ export default function CheckoutPage() {
     }
   }, [paypalLoaded, initPayPalButton, isFreeOrder]);
 
-  // Handle free order
+  // Handle free order (from coupon or gift card covering full amount)
   const handleFreeOrder = async () => {
     if (!formData.email || !formData.firstName || !formData.lastName) {
       toast.error('Please fill in all required fields');
@@ -200,6 +261,18 @@ export default function CheckoutPage() {
 
     setIsProcessing(true);
     try {
+      // If gift card was used to make order free, redeem it first
+      if (appliedGiftCard && giftCardDiscount > 0) {
+        try {
+          await giftCardsAPI.redeem({
+            code: appliedGiftCard.code,
+            amount: giftCardDiscount,
+          });
+        } catch (error: any) {
+          console.error('Gift card redeem error:', error);
+        }
+      }
+
       const orderItems = items.map(item => ({
         productId: item.product.id,
         vendorId: (item.product as any).vendorId,
@@ -216,10 +289,13 @@ export default function CheckoutPage() {
           lastName: formData.lastName,
           country: formData.country,
         },
+        giftCardCode: appliedGiftCard?.code,
+        giftCardAmount: giftCardDiscount,
       });
 
       setOrderCompleted(true);
       clearCart();
+      clearAppliedCard();
       toast.success('Order completed successfully!');
       router.push(`/checkout/success?orderId=${response.data.data.order.id}`);
     } catch (error: any) {
@@ -716,6 +792,51 @@ export default function CheckoutPage() {
                 )}
               </div>
 
+              {/* Gift Card Section */}
+              <div className="mb-4">
+                {appliedGiftCard ? (
+                  <div className="flex items-center justify-between bg-purple-50 border border-purple-200 rounded-xl px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <Gift className="w-4 h-4 text-purple-600" />
+                      <span className="text-sm font-medium text-purple-700">
+                        Gift Card ({appliedGiftCard.code.slice(-8)})
+                      </span>
+                    </div>
+                    <button onClick={clearAppliedCard} className="p-1 hover:bg-purple-100 rounded">
+                      <X className="w-4 h-4 text-gray-500" />
+                    </button>
+                  </div>
+                ) : showGiftCardInput ? (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={giftCardInput}
+                      onChange={(e) => setGiftCardInput(e.target.value.toUpperCase())}
+                      placeholder="GC-XXXX-XXXX-XXXX"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-gray-200 focus:outline-none font-mono"
+                      disabled={isValidatingGiftCard}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyGiftCard}
+                      disabled={isValidatingGiftCard || !giftCardInput.trim()}
+                      className="px-3 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                    >
+                      {isValidatingGiftCard ? 'Checking...' : 'Apply'}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowGiftCardInput(true)}
+                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                  >
+                    <Gift className="w-4 h-4" />
+                    Have a gift card?
+                  </button>
+                )}
+              </div>
+
               {/* First Purchase Welcome Banner - shows when WELCOME30 is auto-applied */}
               {coupon?.isAutoApplied && (
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
@@ -745,6 +866,12 @@ export default function CheckoutPage() {
                     <span>-{formatPrice(discount())}</span>
                   </div>
                 )}
+                {giftCardDiscount > 0 && (
+                  <div className="flex justify-between text-sm text-purple-600">
+                    <span>Gift Card</span>
+                    <span>-{formatPrice(giftCardDiscount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Tax</span>
                   <span className="font-semibold">$0.00</span>
@@ -753,6 +880,11 @@ export default function CheckoutPage() {
                   <span>Total</span>
                   <span className="text-gray-900">{formatPrice(finalTotal)}</span>
                 </div>
+                {appliedGiftCard && giftCardDiscount < appliedGiftCard.balance && (
+                  <p className="text-xs text-gray-500">
+                    Remaining gift card balance after purchase: {formatPrice(appliedGiftCard.balance - giftCardDiscount)}
+                  </p>
+                )}
               </div>
             </div>
           </div>

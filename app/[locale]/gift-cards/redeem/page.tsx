@@ -1,64 +1,72 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Gift, CreditCard, Check, ChevronLeft, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useGiftCardStore } from '@/store/giftCardStore';
+import { giftCardsAPI } from '@/lib/api';
 
 export default function RedeemGiftCardPage() {
+  const searchParams = useSearchParams();
   const [code, setCode] = useState('');
   const [isChecking, setIsChecking] = useState(false);
   const [cardInfo, setCardInfo] = useState<{
     balance: number;
-    expiresAt: string;
+    originalAmount: number;
+    expiresAt: string | null;
   } | null>(null);
   const [error, setError] = useState('');
 
   const { applyGiftCard, appliedGiftCard } = useGiftCardStore();
 
-  const formatCode = (value: string) => {
-    // Remove non-alphanumeric characters and convert to uppercase
-    const cleaned = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-    // Add dashes every 4 characters
-    const formatted = cleaned.match(/.{1,4}/g)?.join('-') || cleaned;
-    return formatted.slice(0, 19); // Max 16 chars + 3 dashes
-  };
+  // Pre-fill code from URL if present
+  useEffect(() => {
+    const urlCode = searchParams.get('code');
+    if (urlCode) {
+      setCode(urlCode.toUpperCase());
+      // Auto-check balance
+      checkBalanceForCode(urlCode.toUpperCase());
+    }
+  }, [searchParams]);
 
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCode(formatCode(e.target.value));
+    // Gift card format: GC-XXXX-XXXX-XXXX
+    const value = e.target.value.toUpperCase();
+    setCode(value);
     setError('');
     setCardInfo(null);
   };
 
-  const checkBalance = async () => {
-    if (code.replace(/-/g, '').length !== 16) {
-      setError('Please enter a valid 16-character gift card code');
-      return;
-    }
-
+  const checkBalanceForCode = async (codeToCheck: string) => {
     setIsChecking(true);
     setError('');
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await giftCardsAPI.validate(codeToCheck);
+      const data = response.data.data;
 
-    // Demo: Check if code matches a pattern
-    if (code.startsWith('DEMO')) {
       setCardInfo({
-        balance: 50.0,
-        expiresAt: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(),
+        balance: data.balance,
+        originalAmount: data.originalAmount,
+        expiresAt: data.expiresAt,
       });
-    } else {
-      // Random demo balance
-      const demoBalance = Math.floor(Math.random() * 100) + 10;
-      setCardInfo({
-        balance: demoBalance,
-        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-      });
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Failed to validate gift card';
+      setError(message);
+      setCardInfo(null);
+    } finally {
+      setIsChecking(false);
     }
+  };
 
-    setIsChecking(false);
+  const checkBalance = async () => {
+    if (!code || code.length < 10) {
+      setError('Please enter a valid gift card code (e.g., GC-XXXX-XXXX-XXXX)');
+      return;
+    }
+    await checkBalanceForCode(code);
   };
 
   const handleApply = () => {
@@ -104,7 +112,7 @@ export default function RedeemGiftCardPage() {
             </div>
             <div>
               <h2 className="font-semibold">Enter Gift Card Code</h2>
-              <p className="text-sm text-gray-500">16-character code from your gift card</p>
+              <p className="text-sm text-gray-500">Code from your gift card email (e.g., GC-XXXX-XXXX-XXXX)</p>
             </div>
           </div>
 
@@ -113,9 +121,9 @@ export default function RedeemGiftCardPage() {
               type="text"
               value={code}
               onChange={handleCodeChange}
-              placeholder="XXXX-XXXX-XXXX-XXXX"
+              placeholder="GC-XXXX-XXXX-XXXX"
               className="w-full px-4 py-4 text-center text-xl font-mono tracking-wider border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#ff6f61] focus:border-transparent uppercase"
-              maxLength={19}
+              maxLength={20}
             />
 
             {error && (
@@ -127,7 +135,7 @@ export default function RedeemGiftCardPage() {
 
             <button
               onClick={checkBalance}
-              disabled={isChecking || code.replace(/-/g, '').length < 16}
+              disabled={isChecking || code.length < 10}
               className="w-full py-3 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isChecking ? 'Checking...' : 'Check Balance'}
@@ -148,17 +156,31 @@ export default function RedeemGiftCardPage() {
               </span>
             </div>
 
-            <div className="text-sm text-gray-500 mb-4">
-              Expires: {new Date(cardInfo.expiresAt).toLocaleDateString()}
-            </div>
+            {cardInfo.balance < cardInfo.originalAmount && (
+              <div className="text-sm text-gray-400 mb-2">
+                Original value: ${cardInfo.originalAmount.toFixed(2)}
+              </div>
+            )}
 
-            <button
-              onClick={handleApply}
-              disabled={!!appliedGiftCard}
-              className="w-full py-3 bg-[#ff6f61] text-white font-medium rounded-xl hover:bg-[#e55a4d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {appliedGiftCard ? 'Already Applied' : 'Apply to Checkout'}
-            </button>
+            {cardInfo.expiresAt && (
+              <div className="text-sm text-gray-500 mb-4">
+                Expires: {new Date(cardInfo.expiresAt).toLocaleDateString()}
+              </div>
+            )}
+
+            {cardInfo.balance <= 0 ? (
+              <div className="w-full py-3 bg-gray-200 text-gray-500 font-medium rounded-xl text-center">
+                This gift card has been fully used
+              </div>
+            ) : (
+              <button
+                onClick={handleApply}
+                disabled={!!appliedGiftCard}
+                className="w-full py-3 bg-[#ff6f61] text-white font-medium rounded-xl hover:bg-[#e55a4d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {appliedGiftCard ? 'Already Applied' : 'Apply to Checkout'}
+              </button>
+            )}
           </div>
         )}
 

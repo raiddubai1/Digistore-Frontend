@@ -1,63 +1,157 @@
 'use client';
 
-import { useState } from 'react';
-import { Gift, CreditCard, Mail, User, MessageSquare, Check, ChevronLeft } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Gift, CreditCard, Mail, MessageSquare, Check, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { GIFT_CARD_AMOUNTS, generateGiftCardCode, useGiftCardStore } from '@/store/giftCardStore';
+import { GIFT_CARD_AMOUNTS, useGiftCardStore } from '@/store/giftCardStore';
+import { giftCardsAPI } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function GiftCardsPage() {
+  const router = useRouter();
+  const { user } = useAuth();
   const [selectedAmount, setSelectedAmount] = useState(50);
-  const [customAmount, setCustomAmount] = useState('');
   const [recipientEmail, setRecipientEmail] = useState('');
   const [recipientName, setRecipientName] = useState('');
   const [message, setMessage] = useState('');
-  const [deliveryDate, setDeliveryDate] = useState('');
+  const [purchaserEmail, setPurchaserEmail] = useState('');
+  const [purchaserName, setPurchaserName] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  
+  const [paypalLoaded, setPaypalLoaded] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [pendingGiftCardId, setPendingGiftCardId] = useState<string | null>(null);
+
   const { addPurchasedCard } = useGiftCardStore();
 
-  const finalAmount = customAmount ? parseFloat(customAmount) : selectedAmount;
-  const isValidAmount = finalAmount >= 5 && finalAmount <= 500;
-
-  const handlePurchase = async () => {
-    if (!recipientEmail) {
-      toast.error('Please enter recipient email');
-      return;
+  // Set purchaser info from user
+  useEffect(() => {
+    if (user) {
+      setPurchaserEmail(user.email || '');
+      setPurchaserName(user.name || '');
     }
-    if (!isValidAmount) {
-      toast.error('Amount must be between $5 and $500');
-      return;
+  }, [user]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Load PayPal script
+  useEffect(() => {
+    if (mounted && !paypalLoaded && typeof window !== 'undefined') {
+      const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+      if (!clientId) {
+        console.warn('PayPal client ID not configured');
+        return;
+      }
+
+      const existingScript = document.querySelector(`script[src*="paypal.com/sdk/js"]`);
+      if (existingScript) {
+        setPaypalLoaded(true);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD&intent=capture`;
+      script.async = true;
+      script.onload = () => setPaypalLoaded(true);
+      document.body.appendChild(script);
     }
+  }, [mounted, paypalLoaded]);
 
-    setIsProcessing(true);
+  const isFormValid = recipientEmail && recipientName && (purchaserEmail || user?.email);
 
-    // Simulate purchase
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+  // Initialize PayPal button
+  const initPayPalButton = useCallback(() => {
+    if (!paypalLoaded || !(window as any).paypal || !isFormValid) return;
 
-    const newCard = {
-      id: Date.now().toString(),
-      code: generateGiftCardCode(),
-      amount: finalAmount,
-      balance: finalAmount,
-      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-      purchasedAt: new Date().toISOString(),
-      recipientEmail,
-      recipientName,
-      message,
-      status: 'active' as const,
-    };
+    const container = document.getElementById('paypal-giftcard-button');
+    if (!container) return;
 
-    addPurchasedCard(newCard);
-    toast.success('Gift card purchased successfully!');
-    setIsProcessing(false);
+    // Clear existing buttons
+    container.innerHTML = '';
 
-    // Reset form
-    setRecipientEmail('');
-    setRecipientName('');
-    setMessage('');
-    setCustomAmount('');
-  };
+    (window as any).paypal.Buttons({
+      style: {
+        layout: 'vertical' as const,
+        color: 'gold' as const,
+        shape: 'rect' as const,
+        label: 'paypal' as const,
+        height: 50,
+      },
+      createOrder: async () => {
+        try {
+          const response = await giftCardsAPI.createOrder({
+            amount: selectedAmount,
+            recipientEmail,
+            recipientName,
+            personalMessage: message || undefined,
+            purchaserEmail: purchaserEmail || user?.email,
+            purchaserName: purchaserName || user?.name,
+          });
+
+          setPendingGiftCardId(response.data.data.giftCardId);
+          return response.data.data.paypalOrderId;
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || 'Failed to create gift card order');
+          throw error;
+        }
+      },
+      onApprove: async (data: any) => {
+        setIsProcessing(true);
+        try {
+          const response = await giftCardsAPI.capturePayment({
+            paypalOrderId: data.orderID,
+            giftCardId: pendingGiftCardId!,
+          });
+
+          const giftCard = response.data.data.giftCard;
+
+          // Add to local store
+          addPurchasedCard({
+            id: giftCard.id,
+            code: giftCard.code,
+            amount: giftCard.amount,
+            balance: giftCard.amount,
+            expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+            purchasedAt: new Date().toISOString(),
+            recipientEmail: giftCard.recipientEmail,
+            recipientName: giftCard.recipientName,
+            message,
+            status: 'active',
+          });
+
+          toast.success('Gift card purchased successfully! The recipient will receive an email shortly.');
+
+          // Reset form
+          setRecipientEmail('');
+          setRecipientName('');
+          setMessage('');
+          setPendingGiftCardId(null);
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || 'Failed to complete purchase');
+        } finally {
+          setIsProcessing(false);
+        }
+      },
+      onError: (err: any) => {
+        console.error('PayPal error:', err);
+        toast.error('Payment failed. Please try again.');
+        setIsProcessing(false);
+      },
+      onCancel: () => {
+        toast.error('Payment cancelled');
+        setIsProcessing(false);
+      },
+    }).render('#paypal-giftcard-button');
+  }, [paypalLoaded, isFormValid, selectedAmount, recipientEmail, recipientName, message, purchaserEmail, purchaserName, user, pendingGiftCardId, addPurchasedCard]);
+
+  useEffect(() => {
+    if (paypalLoaded && isFormValid) {
+      initPayPalButton();
+    }
+  }, [paypalLoaded, isFormValid, initPayPalButton]);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24 lg:pb-12">
@@ -91,16 +185,13 @@ export default function GiftCardsPage() {
                 <CreditCard className="w-5 h-5 text-[#ff6f61]" />
                 Select Amount
               </h2>
-              <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="grid grid-cols-4 gap-3">
                 {GIFT_CARD_AMOUNTS.map((amount) => (
                   <button
                     key={amount}
-                    onClick={() => {
-                      setSelectedAmount(amount);
-                      setCustomAmount('');
-                    }}
+                    onClick={() => setSelectedAmount(amount)}
                     className={`py-3 rounded-xl font-bold transition-all ${
-                      selectedAmount === amount && !customAmount
+                      selectedAmount === amount
                         ? 'bg-black text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
@@ -108,21 +199,6 @@ export default function GiftCardsPage() {
                     ${amount}
                   </button>
                 ))}
-              </div>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                <input
-                  type="number"
-                  placeholder="Custom amount (5-500)"
-                  value={customAmount}
-                  onChange={(e) => {
-                    setCustomAmount(e.target.value);
-                    setSelectedAmount(0);
-                  }}
-                  className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#ff6f61] focus:border-transparent"
-                  min="5"
-                  max="500"
-                />
               </div>
             </div>
 
@@ -168,7 +244,7 @@ export default function GiftCardsPage() {
               <div className="flex justify-between items-start mb-8">
                 <div>
                   <p className="text-gray-400 text-sm">Gift Card</p>
-                  <p className="text-3xl font-bold">${finalAmount.toFixed(2)}</p>
+                  <p className="text-3xl font-bold">${selectedAmount.toFixed(2)}</p>
                 </div>
                 <Gift className="w-10 h-10 text-[#ff6f61]" />
               </div>
@@ -198,21 +274,73 @@ export default function GiftCardsPage() {
               <p className="text-xs text-gray-400 mt-1 text-right">{message.length}/200</p>
             </div>
 
-            {/* Purchase Button */}
-            <button
-              onClick={handlePurchase}
-              disabled={isProcessing || !isValidAmount}
-              className="w-full py-4 bg-[#ff6f61] text-white font-bold rounded-xl hover:bg-[#e55a4d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {isProcessing ? (
-                <>Processing...</>
-              ) : (
-                <>
-                  <Gift className="w-5 h-5" />
-                  Purchase Gift Card - ${finalAmount.toFixed(2)}
-                </>
+            {/* Your Email (for guest) */}
+            {!user && (
+              <div className="bg-white rounded-xl p-6 shadow-sm">
+                <h2 className="font-semibold mb-4 flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-[#ff6f61]" />
+                  Your Information
+                </h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Your Email *
+                    </label>
+                    <input
+                      type="email"
+                      value={purchaserEmail}
+                      onChange={(e) => setPurchaserEmail(e.target.value)}
+                      placeholder="your@email.com"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#ff6f61] focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Your Name
+                    </label>
+                    <input
+                      type="text"
+                      value={purchaserName}
+                      onChange={(e) => setPurchaserName(e.target.value)}
+                      placeholder="Your name"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#ff6f61] focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Purchase with PayPal */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <h2 className="font-semibold mb-4 flex items-center gap-2">
+                <Gift className="w-5 h-5 text-[#ff6f61]" />
+                Complete Purchase - ${selectedAmount.toFixed(2)}
+              </h2>
+
+              {!isFormValid && (
+                <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-700 text-sm">
+                  Please fill in the recipient email and name to continue.
+                </div>
               )}
-            </button>
+
+              {isProcessing ? (
+                <div className="w-full py-4 bg-gray-200 rounded-xl flex items-center justify-center gap-2">
+                  <div className="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-gray-700 font-semibold">Processing...</span>
+                </div>
+              ) : paypalLoaded && isFormValid ? (
+                <div id="paypal-giftcard-button" className="w-full"></div>
+              ) : !paypalLoaded ? (
+                <div className="w-full py-4 bg-gray-200 rounded-xl flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2" />
+                  <span className="text-gray-500">Loading payment options...</span>
+                </div>
+              ) : null}
+
+              <p className="text-center text-xs text-gray-500 mt-3">
+                🔒 Secure checkout with PayPal
+              </p>
+            </div>
 
             {/* Features */}
             <div className="bg-gray-100 rounded-xl p-4">
