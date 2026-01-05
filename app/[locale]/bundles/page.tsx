@@ -105,14 +105,38 @@ export default function BundlesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24 lg:pb-12">
-      {/* Simple Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="p-2 hover:bg-gray-100 rounded-full transition-colors lg:hidden">
-              <ChevronLeft className="w-5 h-5 text-gray-600" />
+      {/* Hero Header */}
+      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+        <div className="max-w-6xl mx-auto px-4 py-8 lg:py-12">
+          <div className="flex items-center gap-3 lg:hidden mb-4">
+            <Link href="/" className="p-1 hover:bg-white/10 rounded-full transition-colors">
+              <ChevronLeft className="w-6 h-6" />
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900">Bundles</h1>
+          </div>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-gradient-to-br from-[#FF6B35] to-[#ff6f61] rounded-2xl flex items-center justify-center shadow-lg">
+                <Package className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold">Bundle Deals</h1>
+                <p className="text-gray-400">Save big with curated collections</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center">
+                  <Zap className="w-4 h-4 text-[#FF6B35]" />
+                </div>
+                <span className="text-gray-300">Up to 50% off</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-[#FF6B35]" />
+                </div>
+                <span className="text-gray-300">Instant download</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
