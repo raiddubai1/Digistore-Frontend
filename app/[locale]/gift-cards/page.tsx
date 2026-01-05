@@ -323,19 +323,25 @@ export default function GiftCardsPage() {
                 </div>
               )}
 
-              {isProcessing ? (
-                <div className="w-full py-4 bg-gray-200 rounded-xl flex items-center justify-center gap-2">
+              {isProcessing && (
+                <div className="w-full py-4 bg-gray-200 rounded-xl flex items-center justify-center gap-2 mb-4">
                   <div className="w-5 h-5 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
                   <span className="text-gray-700 font-semibold">Processing...</span>
                 </div>
-              ) : paypalLoaded && isFormValid ? (
-                <div id="paypal-giftcard-button" className="w-full"></div>
-              ) : !paypalLoaded ? (
+              )}
+
+              {!paypalLoaded && (
                 <div className="w-full py-4 bg-gray-200 rounded-xl flex items-center justify-center">
                   <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2" />
                   <span className="text-gray-500">Loading payment options...</span>
                 </div>
-              ) : null}
+              )}
+
+              {/* Keep PayPal container in DOM but hide when processing */}
+              <div
+                id="paypal-giftcard-button"
+                className={`w-full ${isProcessing || !paypalLoaded || !isFormValid ? 'hidden' : ''}`}
+              ></div>
 
               <p className="text-center text-xs text-gray-500 mt-3">
                 🔒 Secure checkout with PayPal
