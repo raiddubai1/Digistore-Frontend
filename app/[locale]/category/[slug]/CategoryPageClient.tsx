@@ -40,6 +40,20 @@ export default function CategoryPageClient({
   const [bottomContentExpanded, setBottomContentExpanded] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
+  // Get all category slugs (parent + children) for fetching products
+  const getCategorySlugs = useCallback(() => {
+    const slugs = [slug];
+    // Add child category slugs if this is a parent category
+    const children = (category as any)?.children || [];
+    children.forEach((child: any) => {
+      slugs.push(child.slug);
+      // Add grandchildren if any
+      const grandchildren = child.children || [];
+      grandchildren.forEach((gc: any) => slugs.push(gc.slug));
+    });
+    return slugs;
+  }, [slug, category]);
+
   // Fetch products for this category
   const fetchProducts = useCallback(async (pageNum: number, append: boolean = false) => {
     if (append) {
@@ -48,39 +62,73 @@ export default function CategoryPageClient({
       setLoading(true);
     }
 
+    const categorySlugs = getCategorySlugs();
+    let allProducts: Product[] = [];
+    let totalCount = 0;
+
     try {
-      // Try API first
-      if (process.env.NEXT_PUBLIC_API_URL) {
+      // Fetch products from all category slugs (parent + children)
+      for (const catSlug of categorySlugs) {
         const response = await productsAPI.getAll({
-          page: pageNum,
-          limit: 12,
-          category: slug,
+          page: 1,
+          limit: 100, // Get more to combine
+          category: catSlug,
           sort: sortBy,
         });
 
         const data = response.data?.data || response.data;
-        const products = data?.products || [];
+        const apiProducts = data?.products || [];
+        allProducts = [...allProducts, ...apiProducts];
+        totalCount += data?.pagination?.total || apiProducts.length;
+      }
 
-        if (products.length > 0) {
-          if (append) {
-            setProducts(prev => [...prev, ...products]);
-          } else {
-            setProducts(products);
-          }
-          setTotal(data?.total || data?.pagination?.total || products.length);
-          return;
+      // Remove duplicates by id
+      const uniqueProducts = allProducts.filter((p, i, arr) =>
+        arr.findIndex(x => x.id === p.id) === i
+      );
+
+      // Sort combined results
+      const sortedProducts = [...uniqueProducts].sort((a, b) => {
+        switch (sortBy) {
+          case "newest":
+            return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+          case "price-low":
+            return a.price - b.price;
+          case "price-high":
+            return b.price - a.price;
+          case "rating":
+            return (b.rating || 0) - (a.rating || 0);
+          default: // popular
+            return ((b as any).downloadCount || 0) - ((a as any).downloadCount || 0);
         }
+      });
+
+      // Paginate
+      const startIndex = (pageNum - 1) * 12;
+      const paginatedProducts = sortedProducts.slice(0, startIndex + 12);
+
+      if (paginatedProducts.length > 0 || sortedProducts.length > 0) {
+        if (append) {
+          setProducts(paginatedProducts);
+        } else {
+          setProducts(paginatedProducts);
+        }
+        setTotal(sortedProducts.length);
+        setLoading(false);
+        setIsLoadingMore(false);
+        return;
       }
     } catch (error) {
       console.error("Error fetching products:", error);
     }
 
     // Fallback to demo data
-    const filteredProducts = demoProducts.filter(p => 
-      p.category === slug || 
-      (typeof p.category === 'object' && (p.category as any)?.slug === slug)
-    );
-    
+    const categorySlugsForDemo = getCategorySlugs();
+    const filteredProducts = demoProducts.filter(p => {
+      const productCatSlug = typeof p.category === 'string' ? p.category : (p.category as any)?.slug;
+      return categorySlugsForDemo.includes(productCatSlug);
+    });
+
     // Apply sorting
     const sortedProducts = [...filteredProducts].sort((a, b) => {
       switch (sortBy) {
@@ -99,17 +147,13 @@ export default function CategoryPageClient({
 
     const startIndex = (pageNum - 1) * 12;
     const paginatedProducts = sortedProducts.slice(0, startIndex + 12);
-    
-    if (append) {
-      setProducts(paginatedProducts);
-    } else {
-      setProducts(paginatedProducts);
-    }
+
+    setProducts(paginatedProducts);
     setTotal(sortedProducts.length);
-    
+
     setLoading(false);
     setIsLoadingMore(false);
-  }, [slug, sortBy]);
+  }, [slug, sortBy, getCategorySlugs]);
 
   useEffect(() => {
     fetchProducts(1, false);
