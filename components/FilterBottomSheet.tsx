@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Check, RotateCcw, ChevronDown, ChevronUp, Tag, DollarSign, Star, FileType, ChevronRight, ChevronLeft } from "lucide-react";
+import { X, Check, RotateCcw, ChevronDown, ChevronUp, Tag, DollarSign, Star, FileType, ChevronRight, ChevronLeft, Sliders } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CategoryWithChildren {
@@ -11,6 +11,13 @@ interface CategoryWithChildren {
   parentId?: string | null;
   children?: CategoryWithChildren[];
   productCount?: number;
+}
+
+interface AttributeWithCounts {
+  id: string;
+  name: string;
+  slug: string;
+  optionsWithCounts: { option: string; count: number }[];
 }
 
 interface FilterBottomSheetProps {
@@ -24,6 +31,10 @@ interface FilterBottomSheetProps {
   selectedFileTypes?: string[];
   availableTags?: { tag: string; count: number }[];
   selectedTags?: string[];
+  // Attributes support
+  attributes?: AttributeWithCounts[];
+  selectedAttributes?: Record<string, string[]>;
+  onToggleAttribute?: (attributeSlug: string, value: string) => void;
   onToggleCategory: (category: string) => void;
   onToggleSubcategory?: (subcategory: string) => void;
   onTogglePriceRange: (range: string) => void;
@@ -139,6 +150,9 @@ export default function FilterBottomSheet({
   selectedFileTypes = [],
   availableTags = [],
   selectedTags = [],
+  attributes = [],
+  selectedAttributes = {},
+  onToggleAttribute,
   onToggleCategory,
   onToggleSubcategory,
   onTogglePriceRange,
@@ -147,7 +161,9 @@ export default function FilterBottomSheet({
   onToggleTag,
   onClearAll,
 }: FilterBottomSheetProps) {
-  const totalFilters = selectedCategories.length + selectedSubcategories.length + selectedPriceRanges.length + selectedRatings.length + selectedFileTypes.length + selectedTags.length;
+  // Count selected attribute values
+  const selectedAttributeCount = Object.values(selectedAttributes).reduce((sum, values) => sum + values.length, 0);
+  const totalFilters = selectedCategories.length + selectedSubcategories.length + selectedPriceRanges.length + selectedRatings.length + selectedFileTypes.length + selectedTags.length + selectedAttributeCount;
 
   // Drill-down state for category navigation
   const [categoryDrillDown, setCategoryDrillDown] = useState<string | null>(null);
@@ -455,6 +471,49 @@ export default function FilterBottomSheet({
                 ))}
               </div>
             </FilterSection>
+          )}
+
+          {/* Attributes Sections - Dynamic based on available attributes */}
+          {attributes.length > 0 && onToggleAttribute && (
+            <>
+              {attributes.map((attr) => (
+                <FilterSection
+                  key={attr.id}
+                  title={attr.name}
+                  icon={Sliders}
+                  count={(selectedAttributes[attr.slug] || []).length}
+                  maxHeight="220px"
+                >
+                  <div className="space-y-2">
+                    {attr.optionsWithCounts.map(({ option, count }) => (
+                      <button
+                        key={option}
+                        onClick={() => onToggleAttribute(attr.slug, option)}
+                        className={cn(
+                          "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                          (selectedAttributes[attr.slug] || []).includes(option)
+                            ? "bg-[#ff6f61] text-white shadow-sm"
+                            : "bg-gray-50 text-gray-700 active:bg-gray-100"
+                        )}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span>{option}</span>
+                          <span className={cn(
+                            "text-xs",
+                            (selectedAttributes[attr.slug] || []).includes(option) ? "text-white/70" : "text-gray-400"
+                          )}>
+                            ({count})
+                          </span>
+                        </div>
+                        {(selectedAttributes[attr.slug] || []).includes(option) && (
+                          <Check className="w-5 h-5" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </FilterSection>
+              ))}
+            </>
           )}
 
           {/* Price Range Section */}

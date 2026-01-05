@@ -1289,6 +1289,9 @@ export default function ProductsClient() {
         selectedFileTypes={selectedFileTypes}
         availableTags={availableTags}
         selectedTags={selectedTags}
+        attributes={attributesWithCounts}
+        selectedAttributes={selectedAttributes}
+        onToggleAttribute={toggleAttribute}
         onToggleCategory={toggleCategory}
         onToggleSubcategory={toggleSubcategory}
         onTogglePriceRange={togglePriceRange}
