@@ -171,16 +171,6 @@ export default function LoginPage({ params }: LoginPageProps) {
           </div>
         )}
 
-        {/* Demo Accounts */}
-        <div className="bg-blue-50 dark:bg-slate-700 border border-blue-200 dark:border-slate-600 rounded-xl p-4 shadow-sm">
-          <p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">🎯 Demo Accounts:</p>
-          <div className="text-xs text-blue-800 dark:text-blue-300 space-y-1">
-            <p>👤 Customer: customer@example.com / customer123456</p>
-            <p>🏪 Vendor: vendor@example.com / vendor123456</p>
-            <p>⚙️ Admin: admin@digistore1.com / admin123!</p>
-          </div>
-        </div>
-
         {/* Form */}
         <form className="mt-8 space-y-6 bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
