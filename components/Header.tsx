@@ -88,12 +88,13 @@ export default function Header() {
             {/* Left - Special Offer Badge */}
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-yellow-300 animate-pulse" />
-              <span className="font-medium">🎉 {t("newUserOffer")} <span className="font-bold">30% {t("off")}</span> {t("yourFirstPurchase")} <span className="bg-white/20 px-2 py-0.5 rounded font-bold">WELCOME30</span></span>
+              <span className="font-medium">🎉 {t("newUserOffer")} <span className="font-bold">30% {t("off")}</span> {t("yourFirstPurchase")}</span>
             </div>
 
-            {/* Right - Language & Support */}
+            {/* Right - Support Link */}
             <div className="flex items-center gap-4">
-              {/* Language Selector */}
+              {/* Language Selector - Temporarily hidden for production */}
+              {/* TODO: Re-enable when translations are complete
               <div className="relative">
                 <button
                   onClick={() => setLanguageMenuOpen(!languageMenuOpen)}
@@ -105,7 +106,6 @@ export default function Header() {
                   <ChevronDown className={cn("w-3 h-3 transition-transform", languageMenuOpen && "rotate-180")} />
                 </button>
 
-                {/* Language Dropdown - Modern Design */}
                 {languageMenuOpen && (
                   <>
                     <div
@@ -138,6 +138,7 @@ export default function Header() {
                   </>
                 )}
               </div>
+              */}
 
               {/* Support Link */}
               <Link href="/support" className="text-sm font-medium hover:text-gray-200 transition-colors">
