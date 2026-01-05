@@ -215,7 +215,7 @@ export default function Footer() {
               <div className="flex items-center gap-2 text-gray-400">
                 <span>© {currentYear} Digistore1. All rights reserved.</span>
                 <span className="hidden md:inline">•</span>
-                <span className="hidden md:inline flex items-center gap-1">
+                <span className="hidden md:inline-flex items-center gap-1">
                   Made with <Heart className="w-4 h-4 text-red-500 fill-red-500 animate-pulse" /> for creators
                 </span>
               </div>
