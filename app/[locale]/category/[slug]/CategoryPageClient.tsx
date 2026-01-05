@@ -55,7 +55,7 @@ export default function CategoryPageClient({
           page: pageNum,
           limit: 12,
           category: slug,
-          sortBy: sortBy,
+          sort: sortBy,
         });
         
         if (response.products && response.products.length > 0) {
