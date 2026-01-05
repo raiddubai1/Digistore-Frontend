@@ -57,14 +57,17 @@ export default function CategoryPageClient({
           category: slug,
           sort: sortBy,
         });
-        
-        if (response.products && response.products.length > 0) {
+
+        const data = response.data?.data || response.data;
+        const products = data?.products || [];
+
+        if (products.length > 0) {
           if (append) {
-            setProducts(prev => [...prev, ...response.products]);
+            setProducts(prev => [...prev, ...products]);
           } else {
-            setProducts(response.products);
+            setProducts(products);
           }
-          setTotal(response.total || response.products.length);
+          setTotal(data?.total || data?.pagination?.total || products.length);
           return;
         }
       }
