@@ -636,6 +636,23 @@ export default function ProductsClient() {
       .slice(0, 20); // Limit to top 20 tags
   })();
 
+  // Compute attribute options with product counts
+  const attributesWithCounts = attributes.map(attr => {
+    const optionsWithCounts = attr.options.map(option => {
+      const count = allProducts.filter(p => {
+        const productAttrs = p.attributes || [];
+        const productAttr = productAttrs.find((pa: any) => pa.attribute?.slug === attr.slug);
+        return productAttr && productAttr.value === option;
+      }).length;
+      return { option, count };
+    }).filter(o => o.count > 0); // Only keep options with products
+
+    return {
+      ...attr,
+      optionsWithCounts
+    };
+  }).filter(attr => attr.optionsWithCounts.length > 0); // Only keep attributes that have options with products
+
   // Mini product card for mobile
   const MiniProductCard = ({ product }: { product: Product }) => (
     <Link href={`/products/${product.slug}`} className="block">
@@ -1015,14 +1032,12 @@ export default function ProductsClient() {
                 </div>
               </div>
 
-              {/* Product Attributes - Only show attributes with options (SELECT/MULTISELECT) */}
-              {attributes
-                .filter((attr) => attr.options && attr.options.length > 0)
-                .map((attr) => (
+              {/* Product Attributes - Only show attributes with options that have products */}
+              {attributesWithCounts.map((attr) => (
                 <div key={attr.id} className="mb-6">
                   <h3 className="font-semibold text-sm text-gray-700 mb-3">{attr.name}</h3>
                   <div className="space-y-2">
-                    {attr.options.map((option) => (
+                    {attr.optionsWithCounts.map(({ option, count }) => (
                       <label key={option} className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
                         <input
                           type="checkbox"
@@ -1031,6 +1046,7 @@ export default function ProductsClient() {
                           className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                         />
                         <span className="text-sm">{option}</span>
+                        <span className="text-xs text-gray-400">({count})</span>
                       </label>
                     ))}
                   </div>
