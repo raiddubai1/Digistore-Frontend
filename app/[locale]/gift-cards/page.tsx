@@ -1,16 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Gift, CreditCard, Mail, MessageSquare, Check, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { GIFT_CARD_AMOUNTS, useGiftCardStore } from '@/store/giftCardStore';
 import { giftCardsAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function GiftCardsPage() {
-  const router = useRouter();
   const { user } = useAuth();
   const [selectedAmount, setSelectedAmount] = useState(50);
   const [recipientEmail, setRecipientEmail] = useState('');
@@ -21,9 +19,33 @@ export default function GiftCardsPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paypalLoaded, setPaypalLoaded] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [pendingGiftCardId, setPendingGiftCardId] = useState<string | null>(null);
+  const [paypalRendered, setPaypalRendered] = useState(false);
+
+  // Use refs to store current values for PayPal callbacks
+  const formDataRef = useRef({
+    selectedAmount: 50,
+    recipientEmail: '',
+    recipientName: '',
+    message: '',
+    purchaserEmail: '',
+    purchaserName: '',
+    pendingGiftCardId: null as string | null,
+  });
 
   const { addPurchasedCard } = useGiftCardStore();
+
+  // Update ref when form values change
+  useEffect(() => {
+    formDataRef.current = {
+      selectedAmount,
+      recipientEmail,
+      recipientName,
+      message,
+      purchaserEmail: purchaserEmail || user?.email || '',
+      purchaserName: purchaserName || user?.name || '',
+      pendingGiftCardId: formDataRef.current.pendingGiftCardId,
+    };
+  }, [selectedAmount, recipientEmail, recipientName, message, purchaserEmail, purchaserName, user]);
 
   // Set purchaser info from user
   useEffect(() => {
@@ -62,15 +84,12 @@ export default function GiftCardsPage() {
 
   const isFormValid = recipientEmail && recipientName && (purchaserEmail || user?.email);
 
-  // Initialize PayPal button
-  const initPayPalButton = useCallback(() => {
-    if (!paypalLoaded || !(window as any).paypal || !isFormValid) return;
+  // Initialize PayPal button ONCE when loaded
+  useEffect(() => {
+    if (!paypalLoaded || paypalRendered || !(window as any).paypal) return;
 
     const container = document.getElementById('paypal-giftcard-button');
     if (!container) return;
-
-    // Clear existing buttons
-    container.innerHTML = '';
 
     (window as any).paypal.Buttons({
       style: {
@@ -81,17 +100,20 @@ export default function GiftCardsPage() {
         height: 50,
       },
       createOrder: async () => {
+        // Read current form values from ref
+        const formData = formDataRef.current;
+
         try {
           const response = await giftCardsAPI.createOrder({
-            amount: selectedAmount,
-            recipientEmail,
-            recipientName,
-            personalMessage: message || undefined,
-            purchaserEmail: purchaserEmail || user?.email,
-            purchaserName: purchaserName || user?.name,
+            amount: formData.selectedAmount,
+            recipientEmail: formData.recipientEmail,
+            recipientName: formData.recipientName,
+            personalMessage: formData.message || undefined,
+            purchaserEmail: formData.purchaserEmail,
+            purchaserName: formData.purchaserName,
           });
 
-          setPendingGiftCardId(response.data.data.giftCardId);
+          formDataRef.current.pendingGiftCardId = response.data.data.giftCardId;
           return response.data.data.paypalOrderId;
         } catch (error: any) {
           toast.error(error.response?.data?.message || 'Failed to create gift card order');
@@ -103,7 +125,7 @@ export default function GiftCardsPage() {
         try {
           const response = await giftCardsAPI.capturePayment({
             paypalOrderId: data.orderID,
-            giftCardId: pendingGiftCardId!,
+            giftCardId: formDataRef.current.pendingGiftCardId!,
           });
 
           const giftCard = response.data.data.giftCard;
@@ -118,7 +140,7 @@ export default function GiftCardsPage() {
             purchasedAt: new Date().toISOString(),
             recipientEmail: giftCard.recipientEmail,
             recipientName: giftCard.recipientName,
-            message,
+            message: formDataRef.current.message,
             status: 'active',
           });
 
@@ -128,7 +150,7 @@ export default function GiftCardsPage() {
           setRecipientEmail('');
           setRecipientName('');
           setMessage('');
-          setPendingGiftCardId(null);
+          formDataRef.current.pendingGiftCardId = null;
         } catch (error: any) {
           toast.error(error.response?.data?.message || 'Failed to complete purchase');
         } finally {
@@ -145,13 +167,9 @@ export default function GiftCardsPage() {
         setIsProcessing(false);
       },
     }).render('#paypal-giftcard-button');
-  }, [paypalLoaded, isFormValid, selectedAmount, recipientEmail, recipientName, message, purchaserEmail, purchaserName, user, pendingGiftCardId, addPurchasedCard]);
 
-  useEffect(() => {
-    if (paypalLoaded && isFormValid) {
-      initPayPalButton();
-    }
-  }, [paypalLoaded, isFormValid, initPayPalButton]);
+    setPaypalRendered(true);
+  }, [paypalLoaded, paypalRendered, addPurchasedCard]);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24 lg:pb-12">
