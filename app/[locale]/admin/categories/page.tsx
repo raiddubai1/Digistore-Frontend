@@ -47,11 +47,11 @@ const countAllCategories = (categories: Category[]): { total: number; level2: nu
 
 export default function CategoriesPage() {
   const pathname = usePathname();
-  // Extract locale/basePath from pathname
-  const validLocales = ['en', 'ar', 'es', 'fr', 'de'];
+  // Supported languages: English, Portuguese, Arabic, Spanish
+  const validLocales = ['en', 'pt', 'ar', 'es'];
   const segments = pathname.split('/').filter(Boolean);
   const firstSegment = segments[0] || '';
-  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
+  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '/en';
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);

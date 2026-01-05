@@ -21,8 +21,8 @@ const staticPages = [
   "/privacy",
 ];
 
-// Locales supported
-const locales = ["en", "ar"];
+// Supported languages: English, Portuguese, Arabic, Spanish
+const locales = ["en", "pt", "ar", "es"];
 
 async function getProducts(): Promise<{ slug: string; updatedAt: string }[]> {
   try {

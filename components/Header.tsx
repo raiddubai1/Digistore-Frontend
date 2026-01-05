@@ -1,25 +1,34 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Logo from "./Logo";
 import MobileMenu from "./MobileMenu";
 import CurrencySelector from "./CurrencySelector";
-import { Search, ShoppingCart, User, Menu, Globe, LogOut, Settings, Heart, Package, Sparkles, TrendingUp, Bell, ChevronDown, LayoutDashboard, Sun, Moon } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, Globe, LogOut, Settings, Heart, Package, Sparkles, TrendingUp, Bell, ChevronDown, LayoutDashboard, Sun, Moon, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 
+// Supported languages: English, Portuguese, Arabic, Spanish
+const languages = [
+  { code: "en", name: "English", flag: "🇺🇸" },
+  { code: "pt", name: "Português", flag: "🇧🇷" },
+  { code: "ar", name: "العربية", flag: "🇸🇦" },
+  { code: "es", name: "Español", flag: "🇪🇸" },
+];
+
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("EN");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -28,17 +37,30 @@ export default function Header() {
   const { resolvedTheme, toggleTheme } = useTheme();
   const cartItemsCount = mounted ? itemCount() : 0;
 
-  const languages = [
-    { code: "EN", name: "English", flag: "🇺🇸" },
-    { code: "AR", name: "العربية", flag: "🇸🇦" },
-    { code: "ES", name: "Español", flag: "🇪🇸" },
-    { code: "FR", name: "Français", flag: "🇫🇷" },
-    { code: "DE", name: "Deutsch", flag: "🇩🇪" },
-  ];
+  // Get current locale from pathname
+  const getCurrentLocale = (): string => {
+    const segments = pathname.split('/');
+    const possibleLocale = segments[1];
+    if (languages.some(lang => lang.code === possibleLocale)) {
+      return possibleLocale;
+    }
+    return 'en'; // Default to English
+  };
 
-  const handleLanguageChange = (code: string) => {
-    setSelectedLanguage(code);
-    setLanguageMenuOpen(false);
+  const currentLocale = getCurrentLocale();
+  const currentLanguage = languages.find(lang => lang.code === currentLocale) || languages[0];
+
+  const handleLanguageChange = (newLocale: string) => {
+    startTransition(() => {
+      // Remove current locale from pathname if it exists
+      const pathnameWithoutLocale = pathname.replace(/^\/(en|pt|ar|es)/, "") || "/";
+
+      // Always add locale prefix (using localePrefix: 'always' for SEO)
+      const newPathname = `/${newLocale}${pathnameWithoutLocale}`;
+
+      router.push(newPathname);
+      setLanguageMenuOpen(false);
+    });
   };
 
   useEffect(() => {
@@ -75,10 +97,11 @@ export default function Header() {
               <div className="relative">
                 <button
                   onClick={() => setLanguageMenuOpen(!languageMenuOpen)}
+                  disabled={isPending}
                   className="flex items-center gap-1.5 hover:text-gray-200 transition-colors px-2 py-1 rounded-lg hover:bg-white/10"
                 >
                   <Globe className="w-4 h-4" />
-                  <span className="text-sm font-medium hidden md:inline">{selectedLanguage}</span>
+                  <span className="text-sm font-medium hidden md:inline">{currentLanguage.flag} {currentLanguage.name}</span>
                   <ChevronDown className={cn("w-3 h-3 transition-transform", languageMenuOpen && "rotate-180")} />
                 </button>
 
@@ -99,15 +122,15 @@ export default function Header() {
                           onClick={() => handleLanguageChange(lang.code)}
                           className={cn(
                             "w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-all text-left group",
-                            selectedLanguage === lang.code && "bg-gray-50 border-l-4 border-gray-500"
+                            currentLocale === lang.code && "bg-primary/10 border-l-4 border-primary"
                           )}
                         >
                           <span className="text-2xl">{lang.flag}</span>
                           <div className="flex-1">
-                            <div className="text-sm font-medium text-gray-900 group-hover:text-gray-500">{lang.name}</div>
+                            <div className="text-sm font-medium text-gray-900 group-hover:text-primary">{lang.name}</div>
                           </div>
-                          {selectedLanguage === lang.code && (
-                            <div className="w-2 h-2 rounded-full bg-gray-500"></div>
+                          {currentLocale === lang.code && (
+                            <Check className="w-4 h-4 text-primary" />
                           )}
                         </button>
                       ))}

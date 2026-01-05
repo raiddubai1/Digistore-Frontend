@@ -23,11 +23,11 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
   const { id } = use(params);
   const pathname = usePathname();
   const router = useRouter();
-  // Extract locale/basePath from pathname
-  const validLocales = ['en', 'ar', 'es', 'fr', 'de'];
+  // Supported languages: English, Portuguese, Arabic, Spanish
+  const validLocales = ['en', 'pt', 'ar', 'es'];
   const segments = pathname.split('/').filter(Boolean);
   const firstSegment = segments[0] || '';
-  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
+  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '/en';
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

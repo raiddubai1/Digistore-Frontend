@@ -2,14 +2,14 @@ import createMiddleware from 'next-intl/middleware';
 import { locales } from './i18n/request';
 
 export default createMiddleware({
-  // A list of all locales that are supported
+  // Supported languages: English, Portuguese, Arabic, Spanish
   locales: locales as unknown as string[],
 
   // Used when no locale matches
   defaultLocale: 'en',
 
-  // Show locale prefix as needed (not for default locale)
-  localePrefix: 'as-needed'
+  // Always show locale prefix for consistent SEO URLs (/en/, /pt/, /ar/, /es/)
+  localePrefix: 'always'
 });
 
 export const config = {

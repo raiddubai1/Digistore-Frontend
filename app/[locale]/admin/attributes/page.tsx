@@ -25,11 +25,11 @@ interface Attribute {
 
 export default function AttributesPage() {
   const pathname = usePathname();
-  // Extract locale/basePath from pathname - validate against known locales
-  const validLocales = ['en', 'ar', 'es', 'fr', 'de'];
+  // Supported languages: English, Portuguese, Arabic, Spanish
+  const validLocales = ['en', 'pt', 'ar', 'es'];
   const segments = pathname.split('/').filter(Boolean);
   const firstSegment = segments[0] || '';
-  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
+  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '/en';
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);

@@ -36,7 +36,10 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       canonical: `/${locale}/products/${slug}`,
       languages: {
         "en": `/en/products/${slug}`,
+        "pt": `/pt/products/${slug}`,
         "ar": `/ar/products/${slug}`,
+        "es": `/es/products/${slug}`,
+        "x-default": `/en/products/${slug}`,
       },
     },
     openGraph: {

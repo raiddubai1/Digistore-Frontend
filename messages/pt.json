@@ -1,0 +1,135 @@
+{
+  "common": {
+    "search": "Pesquisar",
+    "cart": "Carrinho",
+    "account": "Conta",
+    "language": "Idioma",
+    "home": "Início",
+    "products": "Produtos",
+    "categories": "Categorias",
+    "about": "Sobre",
+    "contact": "Contato",
+    "login": "Entrar",
+    "register": "Cadastrar",
+    "logout": "Sair",
+    "viewAll": "Ver tudo",
+    "addToCart": "Adicionar ao carrinho",
+    "buyNow": "Comprar agora",
+    "learnMore": "Saiba mais",
+    "continueShopping": "Continuar comprando",
+    "proceedToCheckout": "Finalizar compra"
+  },
+  "home": {
+    "hero": {
+      "title": "Produtos Digitais Premium",
+      "subtitle": "Baixe e-books, templates e ferramentas digitais de alta qualidade instantaneamente. Comece a criar conteúdo incrível hoje.",
+      "browseProducts": "Explorar produtos",
+      "viewCategories": "Ver categorias"
+    },
+    "features": {
+      "instantDownload": {
+        "title": "Download instantâneo",
+        "description": "Receba seus produtos digitais imediatamente após a compra. Sem espera, sem complicações."
+      },
+      "securePayment": {
+        "title": "Pagamento seguro",
+        "description": "Suas transações são protegidas com criptografia padrão da indústria."
+      },
+      "highQuality": {
+        "title": "Alta qualidade",
+        "description": "Todos os produtos são cuidadosamente selecionados para garantir os mais altos padrões de qualidade."
+      }
+    },
+    "stats": {
+      "products": "Produtos digitais",
+      "customers": "Clientes satisfeitos",
+      "rating": "Avaliação média",
+      "support": "Suporte"
+    },
+    "sections": {
+      "featured": "Produtos em destaque",
+      "featuredDesc": "Produtos digitais premium selecionados a dedo",
+      "bestsellers": "Mais vendidos",
+      "bestsellersDesc": "Produtos mais populares deste mês",
+      "newArrivals": "Novidades",
+      "newArrivalsDesc": "Últimas adições à nossa coleção"
+    },
+    "cta": {
+      "title": "Pronto para começar?",
+      "description": "Junte-se a milhares de clientes satisfeitos e baixe seu primeiro produto digital hoje.",
+      "button": "Começar a comprar"
+    }
+  },
+  "products": {
+    "title": "Todos os produtos",
+    "description": "Explore nossa coleção de {count} produtos digitais premium",
+    "filters": "Filtros",
+    "clearAll": "Limpar tudo",
+    "categories": "Categorias",
+    "priceRange": "Faixa de preço",
+    "rating": "Avaliação",
+    "under20": "Menos de $20",
+    "range2050": "$20 - $50",
+    "over50": "Mais de $50",
+    "stars4plus": "4+ estrelas",
+    "stars5": "5 estrelas",
+    "showing": "Mostrando",
+    "sortBy": "Ordenar por",
+    "mostPopular": "Mais popular",
+    "newest": "Mais recente",
+    "priceLowHigh": "Preço: Menor para maior",
+    "priceHighLow": "Preço: Maior para menor",
+    "highestRated": "Melhor avaliado",
+    "noProducts": "Nenhum produto encontrado com seus filtros.",
+    "downloads": "downloads",
+    "reviews": "avaliações"
+  },
+  "cart": {
+    "title": "Carrinho de compras",
+    "empty": "Seu carrinho está vazio",
+    "emptyDesc": "Adicione alguns produtos para começar!",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "checkout": "Finalizar compra",
+    "continueShopping": "Continuar comprando",
+    "license": "Licença",
+    "quantity": "Quantidade"
+  },
+  "checkout": {
+    "title": "Pagamento",
+    "contactInfo": "Informações de contato",
+    "email": "Endereço de e-mail",
+    "emailPlaceholder": "voce@exemplo.com",
+    "emailNote": "Enviaremos seus links de download para este e-mail",
+    "billingInfo": "Informações de faturamento",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "country": "País",
+    "paymentMethod": "Método de pagamento",
+    "creditCard": "Cartão de crédito / débito",
+    "poweredByStripe": "Powered by Stripe",
+    "completeOrder": "Concluir pedido",
+    "processing": "Processando...",
+    "secureCheckout": "Pagamento seguro com Stripe. Suas informações de pagamento são criptografadas."
+  },
+  "footer": {
+    "about": "Sobre a Digistore1",
+    "aboutDesc": "Seu marketplace de confiança para produtos digitais de alta qualidade. Baixe instantaneamente e comece a criar hoje.",
+    "shop": "Loja",
+    "allProducts": "Todos os produtos",
+    "newArrivals": "Novidades",
+    "bestSellers": "Mais vendidos",
+    "support": "Suporte",
+    "helpCenter": "Central de ajuda",
+    "contactUs": "Fale conosco",
+    "faq": "Perguntas frequentes",
+    "refundPolicy": "Política de reembolso",
+    "legal": "Legal",
+    "terms": "Termos de serviço",
+    "privacy": "Política de privacidade",
+    "licenses": "Informações de licença",
+    "cookies": "Política de cookies",
+    "copyright": "Todos os direitos reservados."
+  }
+}
+

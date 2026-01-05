@@ -38,8 +38,11 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
     alternates: {
       canonical: `/${locale}/blog/${slug}`,
       languages: {
-        en: `/en/blog/${slug}`,
-        ar: `/ar/blog/${slug}`,
+        "en": `/en/blog/${slug}`,
+        "pt": `/pt/blog/${slug}`,
+        "ar": `/ar/blog/${slug}`,
+        "es": `/es/blog/${slug}`,
+        "x-default": `/en/blog/${slug}`,
       },
     },
     openGraph: {

@@ -17,10 +17,11 @@ export default function EditAttributePage({ params }: EditAttributePageProps) {
   const { id } = use(params);
   const pathname = usePathname();
   const router = useRouter();
-  const validLocales = ['en', 'ar', 'es', 'fr', 'de'];
+  // Supported languages: English, Portuguese, Arabic, Spanish
+  const validLocales = ['en', 'pt', 'ar', 'es'];
   const segments = pathname.split('/').filter(Boolean);
   const firstSegment = segments[0] || '';
-  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '';
+  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : '/en';
 
   const [formData, setFormData] = useState({
     name: "",

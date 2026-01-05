@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import { getRequestConfig } from "next-intl/server";
 
-// Can be imported from a shared config
-export const locales = ["en", "ar", "es", "fr", "de"] as const;
+// Supported languages: English, Portuguese, Arabic, Spanish
+export const locales = ["en", "pt", "ar", "es"] as const;
 export type Locale = (typeof locales)[number];
 
 export default getRequestConfig(async ({ requestLocale }) => {

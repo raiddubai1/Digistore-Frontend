@@ -8,7 +8,8 @@ import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 
-const locales = ['en', 'ar', 'es', 'fr', 'de'];
+// Supported languages: English, Portuguese, Arabic, Spanish
+const locales = ['en', 'pt', 'ar', 'es'];
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -31,13 +32,13 @@ export const metadata: Metadata = {
   keywords: ["digital products", "ebooks", "templates", "downloads", "digital marketplace"],
   authors: [{ name: "Digistore1" }],
   alternates: {
-    canonical: "/",
+    canonical: "/en",
     languages: {
       "en": "/en",
+      "pt": "/pt",
       "ar": "/ar",
       "es": "/es",
-      "fr": "/fr",
-      "de": "/de",
+      "x-default": "/en",
     },
   },
   appleWebApp: {

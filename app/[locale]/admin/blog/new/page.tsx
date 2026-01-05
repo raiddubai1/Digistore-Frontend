@@ -12,10 +12,11 @@ import RichTextEditor from "@/components/RichTextEditor";
 export default function NewBlogPostPage() {
   const pathname = usePathname();
   const router = useRouter();
-  const validLocales = ["en", "ar", "es", "fr", "de"];
+  // Supported languages: English, Portuguese, Arabic, Spanish
+  const validLocales = ["en", "pt", "ar", "es"];
   const segments = pathname.split("/").filter(Boolean);
   const firstSegment = segments[0] || "";
-  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : "";
+  const basePath = validLocales.includes(firstSegment) ? `/${firstSegment}` : "/en";
 
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
