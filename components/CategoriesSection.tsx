@@ -53,7 +53,7 @@ export default function CategoriesSection({ categories }: CategoriesSectionProps
             return (
               <Link
                 key={category.id}
-                href={`/categories/${category.slug}`}
+                href={`/category/${category.slug}`}
                 className="group relative bg-white rounded-2xl p-6 hover:shadow-xl transition-all duration-300 border-2 border-gray-100 hover:border-primary overflow-hidden"
               >
                 {/* Background on Hover */}

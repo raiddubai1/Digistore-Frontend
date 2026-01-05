@@ -223,7 +223,7 @@ export default function MegaMenu() {
                       {activeCategoryData.subcategories.map((sub) => (
                         <Link
                           key={sub.slug}
-                          href={`/products?category=${sub.slug}`}
+                          href={`/category/${sub.slug}`}
                           className="group p-4 rounded-xl border-2 border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-all"
                         >
                           <div className="flex items-center justify-between mb-2">
@@ -246,7 +246,7 @@ export default function MegaMenu() {
                   {/* View All Link */}
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <Link
-                      href={`/products?category=${activeCategoryData.slug}`}
+                      href={`/category/${activeCategoryData.slug}`}
                       className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-gray-200 transition-all group"
                     >
                       View All {activeCategoryData.name}

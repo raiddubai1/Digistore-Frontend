@@ -308,7 +308,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                       {category.subcategories.map((sub: any) => (
                         <Link
                           key={sub.name}
-                          href={`/products?category=${sub.slug || sub.name}`}
+                          href={`/category/${sub.slug || sub.name}`}
                           onClick={onClose}
                           className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-white dark:hover:bg-slate-700 active:bg-gray-100 dark:active:bg-slate-600 transition-colors group"
                         >

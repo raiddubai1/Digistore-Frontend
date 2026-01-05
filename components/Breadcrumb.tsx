@@ -19,6 +19,7 @@ interface BreadcrumbProps {
 const pathLabels: Record<string, string> = {
   products: "Products",
   categories: "Categories",
+  category: "Category",
   cart: "Cart",
   checkout: "Checkout",
   account: "Account",

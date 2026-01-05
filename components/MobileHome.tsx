@@ -239,7 +239,7 @@ export default function MobileHome({
               return (
                 <Link
                   key={category.id}
-                  href={`/${locale}/products?category=${category.slug}`}
+                  href={`/${locale}/category/${category.slug}`}
                   className="px-4 py-2 bg-gray-100 dark:bg-slate-700 rounded-full whitespace-nowrap flex-shrink-0 active:scale-95 transition-transform"
                 >
                   <span className="text-sm font-medium text-gray-800 dark:text-white">{category.name}</span>

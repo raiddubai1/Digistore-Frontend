@@ -283,8 +283,8 @@ export default function ProductDetailClient({
         {/* Product Info */}
         <div className="px-4 py-4">
           {/* Category */}
-          <Link 
-            href={`/${locale}/products?category=${product.category}`}
+          <Link
+            href={`/${locale}/category/${product.category}`}
             className="text-xs font-medium text-[#ff6f61] uppercase tracking-wide"
           >
             {typeof product.category === 'string' ? product.category.replace(/-/g, ' ') : ''}
@@ -604,7 +604,7 @@ export default function ProductDetailClient({
             </Link>
             <span>/</span>
             <Link
-              href={`/${locale}/products?category=${product.category}`}
+              href={`/${locale}/category/${product.category}`}
               className="hover:text-primary transition-colors"
             >
               {typeof product.category === 'string' ? product.category.replace(/-/g, ' ') : ''}

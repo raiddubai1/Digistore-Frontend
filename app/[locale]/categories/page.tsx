@@ -86,7 +86,7 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
             return (
               <Link
                 key={category.id}
-                href={`/${locale}/products?category=${category.slug}`}
+                href={`/${locale}/category/${category.slug}`}
                 className="flex items-center gap-4 px-4 py-4 active:bg-gray-50"
               >
                 <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-2xl">
@@ -138,7 +138,7 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
               return (
                 <Link
                   key={category.id}
-                  href={`/${locale}/products?category=${category.slug}`}
+                  href={`/${locale}/category/${category.slug}`}
                   className="group"
                 >
                   <div className="bg-white dark:bg-slate-800 rounded-2xl border-2 border-gray-200 dark:border-slate-700 hover:border-primary p-8 transition-all hover:shadow-xl">
