@@ -912,7 +912,7 @@ export default function ProductsClient() {
                   )}
               </div>
 
-              {/* Categories - 3-Level Drill-Down */}
+              {/* 1. Categories - 3-Level Drill-Down */}
               <CategoryFilter
                 categories={categoriesWithCounts}
                 selectedCategories={selectedCategories}
@@ -924,29 +924,32 @@ export default function ProductsClient() {
                 onClearCategories={clearCategories}
               />
 
-              {/* Tags - Only show when we have available tags */}
-              {availableTags.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="font-semibold text-sm text-gray-700 mb-3">Tags</h3>
-                  <div className="flex flex-wrap gap-2 max-h-[120px] overflow-y-auto">
-                    {availableTags.slice(0, 10).map((tagItem) => (
-                      <button
-                        key={tagItem.tag}
-                        onClick={() => toggleTag(tagItem.tag)}
-                        className={`px-2 py-1 text-xs rounded-full transition-colors ${
-                          selectedTags.includes(tagItem.tag)
-                            ? 'bg-primary text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {tagItem.tag} ({tagItem.count})
-                      </button>
-                    ))}
+              {/* 2-6. Ordered Attributes: Category/Purpose, Business Type, Content Type, Size, Number of Pages */}
+              {['category-purpose', 'business-type', 'content-type', 'size-dimensions', 'number-of-pages'].map(slug => {
+                const attr = attributesWithCounts.find(a => a.slug === slug);
+                if (!attr) return null;
+                return (
+                  <div key={attr.id} className="mb-6">
+                    <h3 className="font-semibold text-sm text-gray-700 mb-3">{attr.name}</h3>
+                    <div className="space-y-2">
+                      {attr.optionsWithCounts.map(({ option, count }) => (
+                        <label key={option} className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={(selectedAttributes[attr.slug] || []).includes(option)}
+                            onChange={() => toggleAttribute(attr.slug, option)}
+                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                          />
+                          <span className="text-sm">{option}</span>
+                          <span className="text-xs text-gray-400">({count})</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })}
 
-              {/* Price Range */}
+              {/* 7. Price Range */}
               <div className="mb-6">
                 <h3 className="font-semibold text-sm text-gray-700 mb-3">Price Range</h3>
                 <div className="space-y-2">
@@ -1007,7 +1010,32 @@ export default function ProductsClient() {
                 </div>
               </div>
 
-              {/* Rating */}
+              {/* 8-9. Language, License Type */}
+              {['language', 'license-type'].map(slug => {
+                const attr = attributesWithCounts.find(a => a.slug === slug);
+                if (!attr) return null;
+                return (
+                  <div key={attr.id} className="mb-6">
+                    <h3 className="font-semibold text-sm text-gray-700 mb-3">{attr.name}</h3>
+                    <div className="space-y-2">
+                      {attr.optionsWithCounts.map(({ option, count }) => (
+                        <label key={option} className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={(selectedAttributes[attr.slug] || []).includes(option)}
+                            onChange={() => toggleAttribute(attr.slug, option)}
+                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                          />
+                          <span className="text-sm">{option}</span>
+                          <span className="text-xs text-gray-400">({count})</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* 10. Rating */}
               <div className="mb-6">
                 <h3 className="font-semibold text-sm text-gray-700 mb-3">Rating</h3>
                 <div className="space-y-2">
@@ -1032,8 +1060,32 @@ export default function ProductsClient() {
                 </div>
               </div>
 
-              {/* Product Attributes - Only show attributes with options that have products */}
-              {attributesWithCounts.map((attr) => (
+              {/* 11. Tags - Only show when we have available tags */}
+              {availableTags.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="font-semibold text-sm text-gray-700 mb-3">Tags</h3>
+                  <div className="flex flex-wrap gap-2 max-h-[120px] overflow-y-auto">
+                    {availableTags.slice(0, 10).map((tagItem) => (
+                      <button
+                        key={tagItem.tag}
+                        onClick={() => toggleTag(tagItem.tag)}
+                        className={`px-2 py-1 text-xs rounded-full transition-colors ${
+                          selectedTags.includes(tagItem.tag)
+                            ? 'bg-primary text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {tagItem.tag} ({tagItem.count})
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Remaining attributes not in the ordered list */}
+              {attributesWithCounts
+                .filter(attr => !['category-purpose', 'business-type', 'content-type', 'size-dimensions', 'number-of-pages', 'language', 'license-type'].includes(attr.slug))
+                .map((attr) => (
                 <div key={attr.id} className="mb-6">
                   <h3 className="font-semibold text-sm text-gray-700 mb-3">{attr.name}</h3>
                   <div className="space-y-2">
