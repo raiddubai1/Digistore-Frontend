@@ -75,12 +75,12 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   }
 
   // Get products for this category (for initial load count)
-  const categoryProducts = demoProducts.filter(p => 
-    p.category === slug || 
-    (typeof p.category === 'object' && p.category?.slug === slug)
+  const categoryProducts = demoProducts.filter(p =>
+    p.category === slug ||
+    (typeof p.category === 'object' && (p.category as any)?.slug === slug)
   );
-  
-  const productCount = categoryProducts.length || category._count?.products || category.productCount || 0;
+
+  const productCount = categoryProducts.length || (category as any)._count?.products || (category as any).productCount || 0;
 
   return (
     <CategoryPageClient
