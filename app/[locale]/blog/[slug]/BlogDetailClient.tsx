@@ -105,7 +105,7 @@ export default function BlogDetailClient({ post }: BlogDetailClientProps) {
       </div>
 
       {/* Content */}
-      <article className="max-w-4xl mx-auto px-6 sm:px-8 py-12">
+      <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Featured Image */}
         {post.featuredImage && (
           <div className="mb-10 rounded-2xl overflow-hidden shadow-lg">
@@ -118,8 +118,8 @@ export default function BlogDetailClient({ post }: BlogDetailClientProps) {
         )}
 
         {/* Article Content */}
-        <div 
-          className="prose prose-lg max-w-none prose-headings:text-secondary prose-a:text-primary hover:prose-a:text-accent prose-img:rounded-xl"
+        <div
+          className="blog-content prose prose-lg max-w-none"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 

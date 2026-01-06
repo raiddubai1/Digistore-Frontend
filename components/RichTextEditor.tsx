@@ -20,10 +20,20 @@ const IMAGE_SIZES = {
   full: { width: "100%", label: "Full" },
 };
 
+// Spacing presets
+const SPACING_OPTIONS = {
+  none: { value: "0", label: "None" },
+  small: { value: "0.5em", label: "Small" },
+  medium: { value: "1em", label: "Medium" },
+  large: { value: "1.5em", label: "Large" },
+  xlarge: { value: "2em", label: "XL" },
+};
+
 export default function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const [selectedImage, setSelectedImage] = useState<HTMLImageElement | null>(null);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+  const [showSpacingMenu, setShowSpacingMenu] = useState(false);
 
   const modules = useMemo(
     () => ({
@@ -121,8 +131,79 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
     return selectedImage.getAttribute("data-size") || "full";
   };
 
+  // Insert a spacing element at cursor position
+  const insertSpacing = (size: keyof typeof SPACING_OPTIONS) => {
+    const editor = editorRef.current?.querySelector(".ql-editor") as HTMLElement;
+    if (editor) {
+      const spacingValue = SPACING_OPTIONS[size].value;
+      // Insert a div with margin for spacing
+      const spacingHtml = `<div class="blog-spacer" data-spacing="${size}" style="height: ${spacingValue}; margin: ${spacingValue} 0;"></div>`;
+
+      // Get Quill instance and insert at cursor
+      const quillContainer = editorRef.current?.querySelector(".quill");
+      if (quillContainer) {
+        // Append to end or use selection
+        const currentContent = value;
+        onChange(currentContent + spacingHtml);
+      }
+    }
+    setShowSpacingMenu(false);
+  };
+
   return (
     <div className="rich-text-editor relative" ref={editorRef}>
+      {/* Custom Toolbar for Spacing */}
+      <div className="flex items-center gap-2 mb-2 p-2 bg-gray-50 rounded-lg border border-gray-200">
+        <span className="text-xs text-gray-500 font-medium">Insert:</span>
+
+        {/* Spacing Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setShowSpacingMenu(!showSpacingMenu)}
+            className="px-3 py-1.5 text-xs font-medium bg-white border border-gray-300 rounded hover:bg-gray-50 flex items-center gap-1"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+            </svg>
+            Spacing
+            <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {showSpacingMenu && (
+            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[120px]">
+              {Object.entries(SPACING_OPTIONS).map(([key, config]) => (
+                <button
+                  key={key}
+                  onClick={() => insertSpacing(key as keyof typeof SPACING_OPTIONS)}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 first:rounded-t-lg last:rounded-b-lg"
+                >
+                  {config.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Horizontal Line */}
+        <button
+          onClick={() => {
+            onChange(value + '<hr class="blog-divider" />');
+          }}
+          className="px-3 py-1.5 text-xs font-medium bg-white border border-gray-300 rounded hover:bg-gray-50 flex items-center gap-1"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" />
+          </svg>
+          Line
+        </button>
+
+        <div className="flex-1" />
+
+        <span className="text-xs text-gray-400">Click images to resize</span>
+      </div>
+
       <ReactQuill
         theme="snow"
         value={value}
@@ -159,7 +240,8 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
 
       <style jsx global>{`
         .rich-text-editor .ql-container { min-height: 300px; font-size: 16px; }
-        .rich-text-editor .ql-editor { min-height: 300px; }
+        .rich-text-editor .ql-editor { min-height: 300px; line-height: 1.8; }
+        .rich-text-editor .ql-editor p { margin-bottom: 1em; }
         .rich-text-editor .ql-toolbar { border-radius: 0.5rem 0.5rem 0 0; background: #f9fafb; }
         .rich-text-editor .ql-container { border-radius: 0 0 0.5rem 0.5rem; }
         .rich-text-editor .ql-editor img {
@@ -179,6 +261,20 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
         .rich-text-editor .ql-editor img[data-size="medium"] { max-width: 500px; }
         .rich-text-editor .ql-editor img[data-size="large"] { max-width: 700px; }
         .rich-text-editor .ql-editor img[data-size="full"] { max-width: 100%; }
+
+        /* Spacer styles */
+        .rich-text-editor .ql-editor .blog-spacer {
+          display: block;
+          background: rgba(255, 107, 53, 0.1);
+          border: 1px dashed rgba(255, 107, 53, 0.3);
+          border-radius: 4px;
+          min-height: 1em;
+        }
+        .rich-text-editor .ql-editor .blog-divider {
+          border: none;
+          border-top: 2px solid #e5e7eb;
+          margin: 1.5em 0;
+        }
       `}</style>
     </div>
   );
