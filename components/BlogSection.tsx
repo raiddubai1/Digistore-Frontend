@@ -98,15 +98,20 @@ export default function BlogSection() {
 
   const displayPosts = posts.length > 0 ? posts : demoBlogPosts;
 
+  // Don't render if no posts available (and loading is done)
+  if (!loading && displayPosts.length === 0) {
+    return null;
+  }
+
   return (
-    <section className="py-16 md:py-20 bg-white">
+    <section className="py-16 md:py-20 bg-white dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex items-center justify-between mb-12">
           <div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-secondary">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-secondary dark:text-white">
               Latest from Our <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Blog</span>
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Tips, guides, and insights to help you succeed
             </p>
           </div>
@@ -129,10 +134,10 @@ export default function BlogSection() {
               <Link
                 key={post.id}
                 href={`${basePath}/blog/${post.slug}`}
-                className="group bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-primary hover:shadow-xl transition-all duration-300"
+                className="group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border-2 border-gray-100 dark:border-slate-700 hover:border-primary hover:shadow-xl transition-all duration-300"
               >
                 {/* Image */}
-                <div className="relative h-48 overflow-hidden bg-gray-200">
+                <div className="relative h-48 overflow-hidden bg-gray-200 dark:bg-slate-700">
                   {post.featuredImage ? (
                     <img
                       src={post.featuredImage}
@@ -153,15 +158,15 @@ export default function BlogSection() {
 
                 {/* Content */}
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-primary transition-colors line-clamp-2">
                     {post.title}
                   </h3>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">
                     {post.excerpt}
                   </p>
 
                   {/* Meta Info */}
-                  <div className="flex items-center gap-4 text-xs text-gray-500 pt-4 border-t border-gray-100">
+                  <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-500 pt-4 border-t border-gray-100 dark:border-slate-700">
                     <div className="flex items-center gap-1">
                       <User className="w-4 h-4" />
                       <span>{post.authorName}</span>
@@ -185,7 +190,7 @@ export default function BlogSection() {
         <div className="text-center mt-8 md:hidden">
           <Link
             href={`${basePath}/blog`}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-indigo-600 text-white rounded-[15px] font-semibold hover:shadow-xl hover:shadow-primary/25 transition-all hover:scale-105"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-all"
           >
             View All Posts
             <ArrowRight className="w-5 h-5" />

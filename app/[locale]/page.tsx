@@ -5,7 +5,7 @@ import { ArrowRight, Download, Shield, Star, Sparkles, TrendingUp, Award, Gift, 
 import ProductCard from "@/components/ProductCard";
 import OfferOfTheDay from "@/components/OfferOfTheDay";
 import CategoriesSection from "@/components/CategoriesSection";
-// import BlogSection from "@/components/BlogSection"; // Hidden until blog content is ready
+import BlogSection from "@/components/BlogSection";
 import MobileHome from "@/components/MobileHome";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import { getFeaturedProducts, getBestsellers, getNewArrivals } from "@/lib/api/products";
@@ -452,8 +452,8 @@ export default async function Home({ params }: HomeProps) {
         </section>
       )}
 
-      {/* Blog Section - Hidden until blog content is ready */}
-      {/* <BlogSection /> */}
+      {/* Blog Section */}
+      <BlogSection />
 
       {/* Recently Viewed Products */}
       <section className="py-12 bg-gray-50 dark:bg-slate-800/50">
