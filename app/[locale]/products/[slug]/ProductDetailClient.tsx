@@ -90,6 +90,28 @@ export default function ProductDetailClient({
     addToRecentlyViewed(product);
   }, [product]);
 
+  // Preload all product images for smooth carousel navigation
+  useEffect(() => {
+    // Build the images array (same logic as below)
+    const allImages: string[] = [];
+    if (product.thumbnailUrl) {
+      allImages.push(product.thumbnailUrl);
+    }
+    if (product.previewImages?.length > 0) {
+      for (const img of product.previewImages) {
+        if (img && img !== product.thumbnailUrl) {
+          allImages.push(img);
+        }
+      }
+    }
+
+    // Preload each image
+    allImages.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, [product.thumbnailUrl, product.previewImages]);
+
   const handleToggleWishlist = () => {
     if (isWishlisted) {
       removeFromWishlist(product.id);
