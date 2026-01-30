@@ -385,6 +385,7 @@ export const uploadAPI = {
     });
     return api.post('/upload/images', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 120000, // 2 minutes timeout for images
     });
   },
 
@@ -394,6 +395,7 @@ export const uploadAPI = {
     formData.append('file', file);
     return api.post('/upload/product-file', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 300000, // 5 minutes timeout for large files
     });
   },
 
@@ -405,6 +407,7 @@ export const uploadAPI = {
     });
     return api.post('/upload/product-files', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 300000, // 5 minutes timeout for large files
     });
   },
 };

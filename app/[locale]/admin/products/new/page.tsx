@@ -521,11 +521,15 @@ export default function NewProductPage() {
             .map(([attributeId, value]) => ({ attributeId, value }));
 
           if (attributesToSave.length > 0) {
+            setUploadProgress("Saving attributes...");
             try {
               await attributesAPI.setProductAttributes(createdProductId, attributesToSave);
             } catch (attrError) {
               console.error('Failed to save attributes:', attrError);
-              // Don't fail the whole creation, just log the error
+              // Product was created, just show warning for attributes
+              toast.success("Product created! (Note: Some attributes may not have saved)");
+              router.push(`${basePath}/admin/products`);
+              return;
             }
           }
         }
@@ -537,8 +541,13 @@ export default function NewProductPage() {
       }
     } catch (error: any) {
       console.error('Failed to create product:', error);
-      const message = error.response?.data?.message || error.message || 'Failed to create product';
-      toast.error(message);
+      // Check if it's a timeout error
+      if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+        toast.error('Request timed out. The product may have been created - please check the products list.');
+      } else {
+        const message = error.response?.data?.message || error.message || 'Failed to create product';
+        toast.error(message);
+      }
     } finally {
       isSubmittingRef.current = false;
       setIsLoading(false);
