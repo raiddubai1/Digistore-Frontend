@@ -120,9 +120,9 @@ export const productsAPI = {
 
   getById: (id: string) => api.get(`/products/by-id/${id}`),
 
-  create: (data: any) => api.post('/products', data),
+  create: (data: any) => api.post('/products', data, { timeout: 60000 }), // 1 minute timeout
 
-  update: (id: string, data: any) => api.put(`/products/${id}`, data),
+  update: (id: string, data: any) => api.put(`/products/${id}`, data, { timeout: 60000 }), // 1 minute timeout
 
   delete: (id: string) => api.delete(`/products/${id}`),
 
@@ -238,7 +238,7 @@ export const attributesAPI = {
     api.get(`/attributes/product/${productId}`),
 
   setProductAttributes: (productId: string, attributes: Array<{ attributeId: string; value: string }>) =>
-    api.post(`/attributes/product/${productId}`, { attributes }),
+    api.post(`/attributes/product/${productId}`, { attributes }, { timeout: 30000 }), // 30 second timeout
 };
 
 // ============================================

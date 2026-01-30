@@ -506,8 +506,10 @@ export default function NewProductPage() {
         })),
       };
 
+      console.log('Sending product data to API:', JSON.stringify(productData, null, 2));
       const response = await productsAPI.create(productData);
-      console.log('Create product response:', response);
+      console.log('Create product response status:', response.status);
+      console.log('Create product response data:', response.data);
 
       // Handle different response structures
       if (response.data?.success || response.status === 201 || response.status === 200) {
