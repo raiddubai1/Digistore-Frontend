@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Header from "./Header";
 import MegaMenu from "./MegaMenu";
@@ -16,6 +16,30 @@ interface ConditionalLayoutProps {
 
 export default function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname();
+
+  // Fix Chrome scrolling issue - force scroll recognition on document
+  useEffect(() => {
+    // Chrome sometimes fails to recognize the scroll container
+    // This forces a reflow that fixes wheel event handling
+    const fixChromeScroll = () => {
+      // Trigger a minimal reflow by reading/writing a layout property
+      document.documentElement.style.overflow = '';
+      void document.documentElement.offsetHeight; // Force reflow
+      document.documentElement.style.overflow = '';
+    };
+
+    // Run on mount and after a short delay (for hydration)
+    fixChromeScroll();
+    const timer = setTimeout(fixChromeScroll, 100);
+
+    // Also fix when window regains focus (Chrome can lose scroll context)
+    window.addEventListener('focus', fixChromeScroll);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('focus', fixChromeScroll);
+    };
+  }, []);
 
   // Check if we're on an admin page
   const isAdminPage = pathname.includes('/admin');
