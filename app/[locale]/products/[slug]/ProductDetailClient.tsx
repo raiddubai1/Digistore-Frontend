@@ -992,18 +992,18 @@ export default function ProductDetailClient({
                   e.stopPropagation();
                   setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
                 }}
-                className="absolute left-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+                className="absolute left-4 p-3 bg-white/90 dark:bg-slate-700/90 hover:bg-white dark:hover:bg-slate-600 backdrop-blur-sm rounded-full shadow-md transition-colors z-10"
               >
-                <ChevronLeft className="w-6 h-6 text-white" />
+                <ChevronLeft className="w-6 h-6 text-gray-800 dark:text-white" />
               </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
                 }}
-                className="absolute right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+                className="absolute right-4 p-3 bg-white/90 dark:bg-slate-700/90 hover:bg-white dark:hover:bg-slate-600 backdrop-blur-sm rounded-full shadow-md transition-colors z-10"
               >
-                <ChevronRight className="w-6 h-6 text-white" />
+                <ChevronRight className="w-6 h-6 text-gray-800 dark:text-white" />
               </button>
             </>
           )}
