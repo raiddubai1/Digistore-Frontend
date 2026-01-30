@@ -83,13 +83,13 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider messages={messages}>
       <ThemeProvider>
-        <div className="flex flex-col min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
+        <div className="flex flex-col min-h-screen min-h-dvh overflow-x-hidden bg-white dark:bg-slate-900 transition-colors duration-300">
           <AuthProvider>
             <PWAProvider>
               <ConditionalLayout>
-                <div className="page-content">
+                <main className="page-content">
                   {children}
-                </div>
+                </main>
               </ConditionalLayout>
               <Toaster
                 position="top-right"
