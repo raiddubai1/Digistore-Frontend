@@ -216,25 +216,25 @@ export default function ProductDetailClient({
           {/* Floating Back Button - Inside Image */}
           <Link
             href={`/${locale}/products`}
-            className="absolute top-4 left-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md z-10"
+            className="absolute top-4 left-4 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md z-10"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-800 dark:text-gray-800" />
+            <ChevronLeft className="w-5 h-5 text-white" />
           </Link>
 
           {/* Floating Action Buttons - Inside Image */}
           <div className="absolute top-4 right-4 flex gap-2 z-10">
             <button
               onClick={handleShare}
-              className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md"
+              className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md"
             >
-              <Share2 className="w-5 h-5 text-gray-800 dark:text-gray-800" />
+              <Share2 className="w-5 h-5 text-white" />
             </button>
             <button
               onClick={handleToggleWishlist}
-              className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md"
+              className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md"
             >
               <Heart
-                className={`w-5 h-5 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-800 dark:text-gray-800'}`}
+                className={`w-5 h-5 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-white'}`}
               />
             </button>
           </div>
