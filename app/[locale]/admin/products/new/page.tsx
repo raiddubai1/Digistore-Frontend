@@ -1152,39 +1152,34 @@ export default function NewProductPage() {
                     </div>
                   )}
                   {/* Category selector */}
-                  {formData.categoryIds.length < 3 && (
-                    <select
-                      value=""
-                      onChange={(e) => {
-                        if (e.target.value && !formData.categoryIds.includes(e.target.value)) {
-                          setFormData({
-                            ...formData,
-                            categoryIds: [...formData.categoryIds, e.target.value]
-                          });
-                        }
-                      }}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
-                    >
-                      <option value="">{formData.categoryIds.length === 0 ? 'Select a category' : 'Add another category...'}</option>
-                      {flatCategories
-                        .filter(cat => !formData.categoryIds.includes(cat.id))
-                        .map((cat) => (
-                          <option
-                            key={cat.id}
-                            value={cat.id}
-                            className={cat.level === 0 ? 'font-bold' : ''}
-                            style={{ paddingLeft: cat.level * 12 }}
-                          >
-                            {cat.displayName}
-                          </option>
-                        ))}
-                    </select>
-                  )}
+                  <select
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value && !formData.categoryIds.includes(e.target.value)) {
+                        setFormData({
+                          ...formData,
+                          categoryIds: [...formData.categoryIds, e.target.value]
+                        });
+                      }
+                    }}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
+                  >
+                    <option value="">{formData.categoryIds.length === 0 ? 'Select a category' : 'Add another category...'}</option>
+                    {flatCategories
+                      .filter(cat => !formData.categoryIds.includes(cat.id))
+                      .map((cat) => (
+                        <option
+                          key={cat.id}
+                          value={cat.id}
+                          className={cat.level === 0 ? 'font-bold' : ''}
+                          style={{ paddingLeft: cat.level * 12 }}
+                        >
+                          {cat.displayName}
+                        </option>
+                      ))}
+                  </select>
                   {formData.categoryIds.length === 0 && (
                     <p className="text-xs text-red-500 mt-1">At least one category is required</p>
-                  )}
-                  {formData.categoryIds.length === 3 && (
-                    <p className="text-xs text-gray-500 mt-1">Maximum 3 categories reached</p>
                   )}
                 </div>
               </div>
